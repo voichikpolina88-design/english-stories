@@ -157,6 +157,7 @@ function App() {
         <TopBar progress={progress} currentLevel={currentLevelLabel} language={language} t={t} />
         {activeStory ? (
           <LessonScreen
+            key={activeStory.id}
             story={activeStory}
             language={language}
             ui={t}
@@ -174,8 +175,10 @@ function App() {
               const nextStory = stories[storyIndex + 1];
               if (nextStory) {
                 setActiveStoryId(nextStory.id);
+                setPage("learn");
+                window.scrollTo({ top: 0, behavior: "smooth" });
               } else {
-                navigate("home");
+                navigate("learn");
               }
             }}
           />

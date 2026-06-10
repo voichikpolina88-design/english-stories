@@ -25,6 +25,7 @@ type LessonScreenProps = {
     chooseAnswer: string;
     trueLabel: string;
     falseLabel: string;
+    words: string;
   };
   initialProgress: number;
   isCompleted: boolean;
@@ -73,6 +74,7 @@ export function LessonScreen({
 
   const step = steps[stepIndex];
   const progressValue = Math.round(((stepIndex + 1) / steps.length) * 100);
+  const progressLabel = `${language === "Russian" ? "Прогресс истории" : "Story Progress"} · ${progressValue}%`;
 
   function moveNext() {
     const nextStep = Math.min(stepIndex + 1, steps.length - 1);
@@ -118,7 +120,7 @@ export function LessonScreen({
           {ui.home}
         </button>
         <div className="lesson-progress-area">
-          <ProgressBar value={progressValue} label={`${stepIndex + 1}/${steps.length}`} />
+          <ProgressBar value={progressValue} label={progressLabel} />
         </div>
         <span className="heart-pill">{story.xpReward} XP</span>
       </div>
@@ -160,6 +162,7 @@ export function LessonScreen({
             totalAnswers={2 + story.quiz.length}
             onBack={onBack}
             onNextLesson={onNextLesson}
+            language={language}
           />
         ) : null}
       </section>
@@ -218,7 +221,7 @@ function StoryCard({
       </div>
 
       <div className="cozy-illustration" style={{ backgroundColor: story.color }}>
-        <span>{sceneForStory(story, index)}</span>
+        <span className="scene-emoji">{sceneForStory(story, index)}</span>
       </div>
 
       <div className="story-bubbles">
@@ -270,7 +273,6 @@ function VocabularyChallenge({
             {challenge.type === "picture" ? (
               <span className="picture-tile">
                 <strong>{option}</strong>
-                <small>{pictureOptionLabel(option)}</small>
               </span>
             ) : (
               option
@@ -355,6 +357,7 @@ function CompleteCard({
   ui,
   onBack,
   onNextLesson,
+  language,
 }: {
   story: Story;
   ui: LessonScreenProps["ui"];
@@ -362,6 +365,7 @@ function CompleteCard({
   totalAnswers: number;
   onBack: () => void;
   onNextLesson: () => void;
+  language: NativeLanguage;
 }) {
   return (
     <article className="learning-card complete-card polished-card">
@@ -369,10 +373,15 @@ function CompleteCard({
         <PartyPopper size={44} aria-hidden="true" />
       </span>
       <h1>{ui.lessonComplete}</h1>
+      <p>{language === "Russian" ? "История пройдена. Отличная работа!" : "Story completed. Beautiful work!"}</p>
       <div className="reward-grid mvp-reward-grid">
         <div>
-          <span>{ui.xp}</span>
+          <span>{language === "Russian" ? "XP получено" : "XP earned"}</span>
           <strong>{story.xpReward}</strong>
+        </div>
+        <div>
+          <span>{language === "Russian" ? "Новые слова" : "Words learned"}</span>
+          <strong>{story.vocabulary.length} {ui.words}</strong>
         </div>
       </div>
       <div className="completion-actions">
@@ -420,53 +429,6 @@ function trueFalseLabels(language: NativeLanguage) {
   return language === "Russian"
     ? { trueLabel: "Правда", falseLabel: "Ложь" }
     : { trueLabel: "True", falseLabel: "False" };
-}
-
-function pictureOptionLabel(option: string) {
-  const labels: Record<string, string> = {
-    "☀️": "Sun",
-    "🏖️": "Beach",
-    "📱": "Phone",
-    "🎁": "Gift",
-    "🚆": "Train",
-    "💧": "Water",
-    "🥐": "Breakfast",
-    "😊": "Happy",
-    "😴": "Tired",
-    "🚗": "Drive",
-    "🎒": "School bag",
-    "🏫": "School",
-    "🛒": "Shop",
-    "🔑": "Keys",
-    "✈️": "Airport",
-    "☕": "Breakfast",
-    "🧺": "Basket",
-    "🥛": "Milk",
-    "🍞": "Bread",
-    "👩": "Mother",
-    "👨": "Father",
-    "⭐": "Best",
-    "👩‍🏫": "Teacher",
-    "🛏️": "Bed",
-    "☂️": "Umbrella",
-    "📅": "Calendar",
-    "🪖": "Helmet",
-    "🎫": "Ticket",
-    "😟": "Worried",
-    "🧑‍🏫": "Instructor",
-    "🖌️": "Paint",
-    "🎂": "Birthday",
-    "🛫": "Flight",
-    "🏙️": "City",
-    "🛤️": "Trail",
-    "❓": "Missing",
-    "📷": "Memory",
-    "🏛️": "Campus",
-    "🚪": "Opportunity",
-    "💬": "Message",
-    "🧭": "Lost",
-  };
-  return labels[option] ?? "Choice";
 }
 
 function challengePromptText(challenge: Challenge) {
