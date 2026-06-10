@@ -84,7 +84,6 @@ export function LessonScreen({
   const step = steps[stepIndex];
   const progressValue = Math.round(((stepIndex + 1) / steps.length) * 100);
   const progressLabel = `${language === "Russian" ? "Прогресс истории" : "Story Progress"} · ${progressValue}%`;
-  const hasChatMode = story.id === "best-friend";
 
   function moveNext() {
     const nextStep = Math.min(stepIndex + 1, steps.length - 1);
@@ -146,9 +145,7 @@ export function LessonScreen({
         <button
           className={readingMode === "chat" ? "active" : ""}
           type="button"
-          disabled={!hasChatMode}
           onClick={() => setReadingMode("chat")}
-          title={hasChatMode ? "Chat Mode" : "Chat Mode prototype is available in My Best Friend"}
         >
           💬 Chat Mode
         </button>
@@ -156,8 +153,8 @@ export function LessonScreen({
 
       <section className="lesson-card-stage">
         {step.type === "story" ? (
-          readingMode === "chat" && hasChatMode ? (
-            <ChatStoryCard story={story} title={step.title} index={step.index} onNext={moveNext} ui={ui} />
+          readingMode === "chat" ? (
+            <ChatStoryCard story={story} title={step.title} content={step.content} index={step.index} onNext={moveNext} ui={ui} />
           ) : (
             <StoryCard story={story} title={step.title} content={step.content} index={step.index} onNext={moveNext} ui={ui} />
           )
@@ -206,7 +203,8 @@ export function LessonScreen({
 function buildLessonSteps(story: Story, language: NativeLanguage): LessonStep[] {
   const storyCards = story.sections.slice(0, 4);
   const challengeOne = makeRuntimeChallenge(story.challenges[0], story.vocabulary, language);
-  const challengeTwo = makeRuntimeChallenge(story.challenges[1] ?? story.challenges[0], story.vocabulary, language);
+  const secondTranslationChallenge = story.challenges.find((challenge) => challenge.type === "match");
+  const challengeTwo = makeRuntimeChallenge(secondTranslationChallenge ?? story.challenges[0], story.vocabulary, language);
 
   return [
     { type: "story", title: "1", content: storyCards[0] ?? story.sections[0], index: 0 },
@@ -274,17 +272,20 @@ function StoryCard({
 function ChatStoryCard({
   story,
   title,
+  content,
   index,
   ui,
   onNext,
 }: {
   story: Story;
   title: string;
+  content: string;
   index: number;
   ui: LessonScreenProps["ui"];
   onNext: () => void;
 }) {
-  const messages = chatMessagesForStory(story.id, index);
+  const messages = chatMessagesForStory(story, index, content);
+  const chatCharacters = chatCharactersForStory(story.id);
 
   return (
     <article className="learning-card chat-story-card polished-card">
@@ -303,20 +304,27 @@ function ChatStoryCard({
 
       <div className="chat-phone">
         <div className="chat-phone-top">
-          <span>🙂</span>
+          <span>{chatCharacters[0].avatar}</span>
           <div>
-            <strong>Leo & Tom</strong>
+            <strong>{chatCharacters.map((character) => character.name).join(" & ")}</strong>
             <small>online</small>
           </div>
         </div>
         <div className="chat-thread">
           {messages.map((message, messageIndex) => (
-            <div className={messageIndex % 2 === 0 ? "chat-row" : "chat-row right"} key={`${message.speaker}-${message.text}`}>
-              <span className="chat-avatar">{message.avatar}</span>
-              <div className="chat-message">
-                <strong>{message.speaker}</strong>
-                <p>{message.text}</p>
+            <div className="chat-moment" key={`${message.speaker}-${message.text}`}>
+              <div className={messageIndex % 2 === 0 ? "chat-row" : "chat-row right"}>
+                <span className="chat-avatar">{message.avatar}</span>
+                <div className="chat-message">
+                  <strong>{message.speaker}</strong>
+                  <p>{message.text}</p>
+                </div>
               </div>
+              {messageIndex === 0 ? (
+                <div className="chat-inline-illustration" style={{ backgroundColor: story.color }}>
+                  <span>{sceneForStory(story, index)}</span>
+                </div>
+              ) : null}
             </div>
           ))}
         </div>
@@ -488,10 +496,11 @@ function CompleteCard({
   );
 }
 
-function chatMessagesForStory(storyId: string, index: number): ChatMessage[] {
-  if (storyId !== "best-friend") return [];
+function chatMessagesForStory(story: Story, index: number, content: string): ChatMessage[] {
+  const characters = chatCharactersForStory(story.id);
 
-  const scenes: ChatMessage[][] = [
+  if (story.id === "best-friend") {
+    const scenes: ChatMessage[][] = [
     [
       { speaker: "Leo", avatar: "🙂", text: "Hi! This is my best friend, Tom." },
       { speaker: "Tom", avatar: "😄", text: "Hello! I live next door to Leo." },
@@ -512,9 +521,52 @@ function chatMessagesForStory(storyId: string, index: number): ChatMessage[] {
       { speaker: "Leo", avatar: "🙂", text: "A good friend helps, laughs, and shares." },
       { speaker: "Tom", avatar: "😄", text: "That is why simple days feel better together." },
     ],
-  ];
+    ];
 
-  return scenes[index] ?? scenes[0];
+    return scenes[index] ?? scenes[0];
+  }
+
+  return splitIntoSentences(content).map((sentence, sentenceIndex) => {
+    const character = characters[sentenceIndex % characters.length];
+    return {
+      speaker: character.name,
+      avatar: character.avatar,
+      text: sentence,
+    };
+  });
+}
+
+function chatCharactersForStory(storyId: string) {
+  const characters: Record<string, Array<{ name: string; avatar: string }>> = {
+    "morning-routine": [{ name: "Emma", avatar: "🙂" }, { name: "Max", avatar: "😴" }],
+    "beach-day": [{ name: "Leo", avatar: "🙂" }, { name: "Sara", avatar: "😊" }],
+    supermarket: [{ name: "Mila", avatar: "🙂" }, { name: "Cashier", avatar: "🧑‍💼" }],
+    "my-family": [{ name: "Emma", avatar: "🙂" }, { name: "Family", avatar: "👨‍👩‍👧‍👦" }],
+    "best-friend": [{ name: "Leo", avatar: "🙂" }, { name: "Tom", avatar: "😄" }],
+    "at-school": [{ name: "Sara", avatar: "🙂" }, { name: "Teacher", avatar: "👩‍🏫" }],
+    "my-room": [{ name: "Nina", avatar: "🙂" }, { name: "Room", avatar: "🛋️" }],
+    "rainy-day": [{ name: "Max", avatar: "🙂" }, { name: "Mom", avatar: "👩" }],
+    "weekend-plans": [{ name: "Emma", avatar: "🙂" }, { name: "Friend", avatar: "😊" }],
+    "new-bicycle": [{ name: "Leo", avatar: "🙂" }, { name: "Dad", avatar: "👨" }],
+    "my-first-trip": [{ name: "Nikita", avatar: "🙂" }, { name: "Traveler", avatar: "🚆" }],
+    "lost-phone": [{ name: "Mira", avatar: "😟" }, { name: "Waiter", avatar: "☕" }],
+    "learning-to-drive": [{ name: "Oleg", avatar: "🙂" }, { name: "Instructor", avatar: "🧑‍🏫" }],
+    "busy-day": [{ name: "Sara", avatar: "🙂" }, { name: "Mom", avatar: "👩" }],
+    "new-hobby": [{ name: "Mira", avatar: "🙂" }, { name: "Friend", avatar: "🎨" }],
+    "birthday-surprise-a2": [{ name: "Sara", avatar: "😊" }, { name: "Friends", avatar: "🎂" }],
+    airport: [{ name: "Nikita", avatar: "🙂" }, { name: "Airport", avatar: "✈️" }],
+    "moving-city": [{ name: "Lena", avatar: "🙂" }, { name: "Neighbor", avatar: "👋" }],
+    "weekend-hiking": [{ name: "Leo", avatar: "🙂" }, { name: "Sara", avatar: "😊" }],
+    "missing-keys": [{ name: "Mira", avatar: "😟" }, { name: "Brother", avatar: "🙂" }],
+    "new-job": [{ name: "Oleg", avatar: "🙂" }, { name: "Marina", avatar: "🧑‍💼" }],
+    "surprise-gift": [{ name: "Lena", avatar: "🙂" }, { name: "Grandmother", avatar: "👵" }],
+    "first-day-university": [{ name: "Nikita", avatar: "🙂" }, { name: "Roommate", avatar: "🎓" }],
+    "difficult-decision": [{ name: "Sara", avatar: "🤔" }, { name: "Mom", avatar: "👩" }],
+    "unexpected-message": [{ name: "Mira", avatar: "😟" }, { name: "Friend", avatar: "💬" }],
+    "lost-abroad": [{ name: "Leo", avatar: "😟" }, { name: "Local woman", avatar: "👩" }],
+  };
+
+  return characters[storyId] ?? [{ name: "Learner", avatar: "🙂" }, { name: "Friend", avatar: "😊" }];
 }
 
 function makeRuntimeChallenge(challenge: Challenge, words: VocabularyItem[], language: NativeLanguage): RuntimeChallenge {
@@ -572,6 +624,12 @@ function splitReadable(content: string) {
   const first = sentences.slice(0, 2).join(" ").trim();
   const second = sentences.slice(2, 4).join(" ").trim();
   return [first, second].filter(Boolean);
+}
+
+function splitIntoSentences(content: string) {
+  return (content.match(/[^.!?]+[.!?"]*/g) ?? [content])
+    .map((sentence) => sentence.trim())
+    .filter(Boolean);
 }
 
 function characterForStory(storyId: string) {

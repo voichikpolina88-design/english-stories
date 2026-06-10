@@ -1095,6 +1095,11 @@ p {
   padding: 16px;
 }
 
+.chat-moment {
+  display: grid;
+  gap: 10px;
+}
+
 .chat-row {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
@@ -1156,6 +1161,20 @@ p {
   font-size: 1rem;
   font-weight: 820;
   line-height: 1.45;
+}
+
+.chat-inline-illustration {
+  display: grid;
+  min-height: 128px;
+  place-items: center;
+  border: 4px solid rgba(255, 255, 255, 0.82);
+  border-radius: 24px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.5), 0 12px 24px rgba(83, 62, 124, 0.08);
+}
+
+.chat-inline-illustration span {
+  font-size: 4rem;
+  line-height: 1;
 }
 
 .lesson-vocab-strip {
@@ -1599,6 +1618,15 @@ p {
 
   .chat-message p {
     font-size: 0.96rem;
+  }
+
+  .chat-inline-illustration {
+    min-height: 108px;
+    border-radius: 20px;
+  }
+
+  .chat-inline-illustration span {
+    font-size: 3.25rem;
   }
 
   .picture-tile strong {
