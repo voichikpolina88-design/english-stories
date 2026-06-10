@@ -1,6 +1,7 @@
 import { ArrowLeft, Check, MoveRight, PartyPopper, Volume2, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { emojiForWord, getTranslation } from "../data/translations";
+import { ipaForWord } from "../data/vocabulary";
 import type { Challenge, NativeLanguage, QuizQuestion, Story, VocabularyItem } from "../types";
 import { ProgressBar } from "./ProgressBar";
 
@@ -710,52 +711,6 @@ function trueFalseLabels(language: NativeLanguage) {
   return language === "Russian"
     ? { trueLabel: "Правда", falseLabel: "Ложь" }
     : { trueLabel: "True", falseLabel: "False" };
-}
-
-function ipaForWord(word: string) {
-  const ipa: Record<string, string> = {
-    "wake up": "/weɪk ʌp/",
-    breakfast: "/ˈbrekfəst/",
-    ready: "/ˈredi/",
-    quiet: "/ˈkwaɪət/",
-    usually: "/ˈjuːʒuəli/",
-    beach: "/biːtʃ/",
-    warm: "/wɔːrm/",
-    sandwich: "/ˈsænwɪtʃ/",
-    tired: "/ˈtaɪərd/",
-    supermarket: "/ˈsuːpərˌmɑːrkɪt/",
-    basket: "/ˈbæskɪt/",
-    family: "/ˈfæməli/",
-    mother: "/ˈmʌðər/",
-    friend: "/frend/",
-    school: "/skuːl/",
-    teacher: "/ˈtiːtʃər/",
-    room: "/ruːm/",
-    rain: "/reɪn/",
-    umbrella: "/ʌmˈbrelə/",
-    weekend: "/ˌwiːkˈend/",
-    bicycle: "/ˈbaɪsɪkəl/",
-    nervous: "/ˈnɜːrvəs/",
-    ticket: "/ˈtɪkɪt/",
-    phone: "/foʊn/",
-    worried: "/ˈwɜːrid/",
-    drive: "/draɪv/",
-    busy: "/ˈbɪzi/",
-    hobby: "/ˈhɑːbi/",
-    birthday: "/ˈbɜːrθdeɪ/",
-    airport: "/ˈerpɔːrt/",
-    city: "/ˈsɪti/",
-    hiking: "/ˈhaɪkɪŋ/",
-    keys: "/kiːz/",
-    colleague: "/ˈkɑːliːɡ/",
-    meaningful: "/ˈmiːnɪŋfəl/",
-    university: "/ˌjuːnɪˈvɜːrsəti/",
-    decision: "/dɪˈsɪʒən/",
-    unexpected: "/ˌʌnɪkˈspektɪd/",
-    abroad: "/əˈbrɔːd/",
-  };
-
-  return ipa[word.toLowerCase()] ?? `/${word.toLowerCase()}/`;
 }
 
 function challengePromptText(challenge: Challenge) {
