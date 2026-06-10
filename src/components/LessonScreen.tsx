@@ -1,5 +1,5 @@
 import { ArrowLeft, Check, MoveRight, PartyPopper, Volume2, X } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { emojiForWord, getTranslation } from "../data/translations";
 import type { Challenge, NativeLanguage, QuizQuestion, Story, VocabularyItem } from "../types";
 import { ProgressBar } from "./ProgressBar";
@@ -53,11 +53,57 @@ type ChatMessage = {
   text: string;
 };
 
+type SpeechControls = {
+  speakingText: string | null;
+  toggle: (text: string) => void;
+  cancel: () => void;
+};
+
 type LessonStep =
   | { type: "story"; content: string; title: string; index: number }
   | { type: "vocabulary"; challenge: RuntimeChallenge }
   | { type: "quiz"; quiz: RuntimeQuizQuestion[] }
   | { type: "complete" };
+
+function useSpeech(): SpeechControls {
+  const [speakingText, setSpeakingText] = useState<string | null>(null);
+
+  useEffect(() => {
+    const finish = () => setSpeakingText(null);
+    return () => {
+      window.speechSynthesis?.cancel();
+      finish();
+    };
+  }, []);
+
+  function cancel() {
+    window.speechSynthesis?.cancel();
+    setSpeakingText(null);
+  }
+
+  function toggle(text: string) {
+    if (!("speechSynthesis" in window)) return;
+    const normalizedText = text.trim();
+    if (!normalizedText) return;
+
+    if (speakingText === normalizedText && window.speechSynthesis.speaking) {
+      cancel();
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(normalizedText);
+    utterance.lang = "en-US";
+    utterance.rate = 0.88;
+    utterance.pitch = 1;
+    utterance.onend = () => setSpeakingText(null);
+    utterance.onerror = () => setSpeakingText(null);
+    setSpeakingText(normalizedText);
+    window.speechSynthesis.speak(utterance);
+  }
+
+  return { speakingText, toggle, cancel };
+}
 
 export function LessonScreen({
   story,
@@ -80,6 +126,7 @@ export function LessonScreen({
   const [quizAnswers, setQuizAnswers] = useState<Record<number, string>>({});
   const [quizSubmitted, setQuizSubmitted] = useState(false);
   const [readingMode, setReadingMode] = useState<ReadingMode>("story");
+  const speech = useSpeech();
 
   const step = steps[stepIndex];
   const progressValue = Math.round(((stepIndex + 1) / steps.length) * 100);
@@ -92,6 +139,7 @@ export function LessonScreen({
     setFeedback(null);
     setQuizAnswers({});
     setQuizSubmitted(false);
+    speech.cancel();
     onStepChange(story.id, Math.round(((nextStep + 1) / steps.length) * 100));
 
     if (steps[nextStep].type === "complete" && !isCompleted) {
@@ -154,9 +202,9 @@ export function LessonScreen({
       <section className="lesson-card-stage">
         {step.type === "story" ? (
           readingMode === "chat" ? (
-            <ChatStoryCard story={story} title={step.title} content={step.content} index={step.index} onNext={moveNext} ui={ui} />
+            <ChatStoryCard story={story} title={step.title} content={step.content} index={step.index} speech={speech} onNext={moveNext} ui={ui} />
           ) : (
-            <StoryCard story={story} title={step.title} content={step.content} index={step.index} onNext={moveNext} ui={ui} />
+            <StoryCard story={story} title={step.title} content={step.content} index={step.index} speech={speech} onNext={moveNext} ui={ui} />
           )
         ) : null}
 
@@ -166,6 +214,7 @@ export function LessonScreen({
             selectedAnswer={selectedAnswer}
             feedback={feedback}
             ui={ui}
+            speech={speech}
             onSelect={setSelectedAnswer}
             onCheck={() => checkChallenge(step.challenge)}
             onNext={moveNext}
@@ -193,6 +242,7 @@ export function LessonScreen({
             onBack={onBack}
             onNextLesson={onNextLesson}
             language={language}
+            speech={speech}
           />
         ) : null}
       </section>
@@ -224,6 +274,7 @@ function StoryCard({
   content,
   index,
   ui,
+  speech,
   onNext,
 }: {
   story: Story;
@@ -231,10 +282,12 @@ function StoryCard({
   content: string;
   index: number;
   ui: LessonScreenProps["ui"];
+  speech: SpeechControls;
   onNext: () => void;
 }) {
   const character = characterForStory(story.id);
-  const blocks = splitReadable(content);
+  const sentences = splitIntoSentences(content);
+  const isCardSpeaking = speech.speakingText === content.trim();
 
   return (
     <article className="learning-card story-step-card polished-card">
@@ -246,7 +299,7 @@ function StoryCard({
             <small>{ui.storyCard} {title}</small>
           </div>
         </div>
-        <button className="round-button" type="button" aria-label="Audio">
+        <button className={isCardSpeaking ? "round-button active" : "round-button"} type="button" aria-label="Audio" onClick={() => speech.toggle(content)}>
           <Volume2 size={19} aria-hidden="true" />
         </button>
       </div>
@@ -256,8 +309,11 @@ function StoryCard({
       </div>
 
       <div className="story-bubbles">
-        {blocks.map((block) => (
-          <p key={block}>{block}</p>
+        {sentences.map((sentence) => (
+          <p className="sentence-row" key={sentence}>
+            <AudioButton text={sentence} speech={speech} />
+            <span>{sentence}</span>
+          </p>
         ))}
       </div>
 
@@ -275,6 +331,7 @@ function ChatStoryCard({
   content,
   index,
   ui,
+  speech,
   onNext,
 }: {
   story: Story;
@@ -282,10 +339,13 @@ function ChatStoryCard({
   content: string;
   index: number;
   ui: LessonScreenProps["ui"];
+  speech: SpeechControls;
   onNext: () => void;
 }) {
   const messages = chatMessagesForStory(story, index, content);
   const chatCharacters = chatCharactersForStory(story.id);
+  const cardText = messages.map((message) => message.text).join(" ");
+  const isCardSpeaking = speech.speakingText === cardText.trim();
 
   return (
     <article className="learning-card chat-story-card polished-card">
@@ -297,7 +357,7 @@ function ChatStoryCard({
             <small>{ui.storyCard} {title}</small>
           </div>
         </div>
-        <button className="round-button" type="button" aria-label="Audio">
+        <button className={isCardSpeaking ? "round-button active" : "round-button"} type="button" aria-label="Audio" onClick={() => speech.toggle(cardText)}>
           <Volume2 size={19} aria-hidden="true" />
         </button>
       </div>
@@ -317,7 +377,10 @@ function ChatStoryCard({
                 <span className="chat-avatar">{message.avatar}</span>
                 <div className="chat-message">
                   <strong>{message.speaker}</strong>
-                  <p>{message.text}</p>
+                  <p className="sentence-row">
+                    <AudioButton text={message.text} speech={speech} />
+                    <span>{message.text}</span>
+                  </p>
                 </div>
               </div>
               {messageIndex === 0 ? (
@@ -343,6 +406,7 @@ function VocabularyChallenge({
   selectedAnswer,
   feedback,
   ui,
+  speech,
   onSelect,
   onCheck,
   onNext,
@@ -351,14 +415,28 @@ function VocabularyChallenge({
   selectedAnswer: string | null;
   feedback: "correct" | "wrong" | null;
   ui: LessonScreenProps["ui"];
+  speech: SpeechControls;
   onSelect: (answer: string) => void;
   onCheck: () => void;
   onNext: () => void;
 }) {
+  const vocabularyWord = "word" in challenge ? challenge.word : "";
+  const translation = vocabularyWord ? getTranslation(vocabularyWord, "Russian") : "";
+
   return (
     <article className="learning-card challenge-card polished-card">
       <span className="eyebrow">{ui.check}</span>
       <h1>{ui.chooseAnswer}</h1>
+      {vocabularyWord ? (
+        <div className="pronunciation-card">
+          <AudioButton text={vocabularyWord} speech={speech} />
+          <div>
+            <strong>{vocabularyWord}</strong>
+            <span>{ipaForWord(vocabularyWord)}</span>
+            <small>{translation}</small>
+          </div>
+        </div>
+      ) : null}
       <p className="prompt-box">{challengePromptText(challenge)}</p>
 
       <div className={challenge.type === "picture" ? "picture-options" : "choice-list"}>
@@ -458,6 +536,7 @@ function CompleteCard({
   onBack,
   onNextLesson,
   language,
+  speech,
 }: {
   story: Story;
   ui: LessonScreenProps["ui"];
@@ -466,6 +545,7 @@ function CompleteCard({
   onBack: () => void;
   onNextLesson: () => void;
   language: NativeLanguage;
+  speech: SpeechControls;
 }) {
   return (
     <article className="learning-card complete-card polished-card">
@@ -484,6 +564,18 @@ function CompleteCard({
           <strong>{story.vocabulary.length} {ui.words}</strong>
         </div>
       </div>
+      <div className="vocabulary-audio-grid">
+        {story.vocabulary.map((item) => (
+          <div className="vocabulary-audio-card" key={item.word}>
+            <AudioButton text={item.word} speech={speech} />
+            <div>
+              <strong>{item.word}</strong>
+              <span>{ipaForWord(item.word)}</span>
+              <small>{item.translation}</small>
+            </div>
+          </div>
+        ))}
+      </div>
       <div className="completion-actions">
         <button className="primary-button full" type="button" onClick={onNextLesson}>
           {ui.nextLesson}
@@ -493,6 +585,22 @@ function CompleteCard({
         </button>
       </div>
     </article>
+  );
+}
+
+function AudioButton({ text, speech }: { text: string; speech: SpeechControls }) {
+  const normalizedText = text.trim();
+  const isActive = speech.speakingText === normalizedText;
+
+  return (
+    <button
+      className={isActive ? "audio-button active" : "audio-button"}
+      type="button"
+      aria-label={isActive ? "Pause audio" : "Play audio"}
+      onClick={() => speech.toggle(normalizedText)}
+    >
+      <Volume2 size={15} aria-hidden="true" />
+    </button>
   );
 }
 
@@ -602,6 +710,52 @@ function trueFalseLabels(language: NativeLanguage) {
   return language === "Russian"
     ? { trueLabel: "Правда", falseLabel: "Ложь" }
     : { trueLabel: "True", falseLabel: "False" };
+}
+
+function ipaForWord(word: string) {
+  const ipa: Record<string, string> = {
+    "wake up": "/weɪk ʌp/",
+    breakfast: "/ˈbrekfəst/",
+    ready: "/ˈredi/",
+    quiet: "/ˈkwaɪət/",
+    usually: "/ˈjuːʒuəli/",
+    beach: "/biːtʃ/",
+    warm: "/wɔːrm/",
+    sandwich: "/ˈsænwɪtʃ/",
+    tired: "/ˈtaɪərd/",
+    supermarket: "/ˈsuːpərˌmɑːrkɪt/",
+    basket: "/ˈbæskɪt/",
+    family: "/ˈfæməli/",
+    mother: "/ˈmʌðər/",
+    friend: "/frend/",
+    school: "/skuːl/",
+    teacher: "/ˈtiːtʃər/",
+    room: "/ruːm/",
+    rain: "/reɪn/",
+    umbrella: "/ʌmˈbrelə/",
+    weekend: "/ˌwiːkˈend/",
+    bicycle: "/ˈbaɪsɪkəl/",
+    nervous: "/ˈnɜːrvəs/",
+    ticket: "/ˈtɪkɪt/",
+    phone: "/foʊn/",
+    worried: "/ˈwɜːrid/",
+    drive: "/draɪv/",
+    busy: "/ˈbɪzi/",
+    hobby: "/ˈhɑːbi/",
+    birthday: "/ˈbɜːrθdeɪ/",
+    airport: "/ˈerpɔːrt/",
+    city: "/ˈsɪti/",
+    hiking: "/ˈhaɪkɪŋ/",
+    keys: "/kiːz/",
+    colleague: "/ˈkɑːliːɡ/",
+    meaningful: "/ˈmiːnɪŋfəl/",
+    university: "/ˌjuːnɪˈvɜːrsəti/",
+    decision: "/dɪˈsɪʒən/",
+    unexpected: "/ˌʌnɪkˈspektɪd/",
+    abroad: "/əˈbrɔːd/",
+  };
+
+  return ipa[word.toLowerCase()] ?? `/${word.toLowerCase()}/`;
 }
 
 function challengePromptText(challenge: Challenge) {

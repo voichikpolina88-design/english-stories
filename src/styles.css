@@ -349,7 +349,8 @@ p {
 .text-button,
 .round-button,
 .icon-text-button,
-.ghost-action {
+.ghost-action,
+.audio-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -934,6 +935,27 @@ p {
   background: #f8f3ff;
 }
 
+.round-button.active,
+.audio-button.active {
+  color: #fff;
+  background: linear-gradient(135deg, var(--primary), var(--purple));
+}
+
+.audio-button {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  border-radius: 13px;
+  background: var(--lavender);
+  color: var(--purple);
+  box-shadow: inset 0 0 0 1px rgba(203, 184, 255, 0.35);
+}
+
+.audio-button:hover {
+  transform: translateY(-1px);
+  background: #f8f3ff;
+}
+
 .lesson-card-stage {
   display: grid;
   place-items: center;
@@ -1034,6 +1056,16 @@ p {
   font-weight: 780;
   line-height: 1.55;
   box-shadow: 0 12px 24px rgba(83, 62, 124, 0.06);
+}
+
+.sentence-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.sentence-row > span {
+  min-width: 0;
 }
 
 .story-bubbles p::before {
@@ -1163,6 +1195,17 @@ p {
   line-height: 1.45;
 }
 
+.chat-message .audio-button {
+  width: 30px;
+  height: 30px;
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.chat-row.right .chat-message .audio-button {
+  color: var(--purple);
+}
+
 .chat-inline-illustration {
   display: grid;
   min-height: 128px;
@@ -1214,6 +1257,56 @@ p {
 .prompt-box span {
   color: var(--muted);
   font-size: 1rem;
+}
+
+.pronunciation-card,
+.vocabulary-audio-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid rgba(203, 184, 255, 0.34);
+  border-radius: 20px;
+  background: linear-gradient(135deg, #fff, #fbf8ff);
+  box-shadow: 0 10px 24px rgba(83, 62, 124, 0.05);
+}
+
+.pronunciation-card strong,
+.pronunciation-card span,
+.pronunciation-card small,
+.vocabulary-audio-card strong,
+.vocabulary-audio-card span,
+.vocabulary-audio-card small {
+  display: block;
+}
+
+.pronunciation-card strong,
+.vocabulary-audio-card strong {
+  color: var(--ink);
+  font-size: 1.05rem;
+}
+
+.pronunciation-card span,
+.vocabulary-audio-card span {
+  color: var(--purple);
+  font-weight: 900;
+}
+
+.pronunciation-card small,
+.vocabulary-audio-card small {
+  color: var(--muted);
+  font-weight: 850;
+}
+
+.vocabulary-audio-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: 100%;
+  gap: 10px;
+  max-height: 320px;
+  overflow: auto;
+  padding: 2px;
 }
 
 .picture-options {
@@ -1618,6 +1711,11 @@ p {
 
   .chat-message p {
     font-size: 0.96rem;
+  }
+
+  .vocabulary-audio-grid {
+    grid-template-columns: 1fr;
+    max-height: 260px;
   }
 
   .chat-inline-illustration {
