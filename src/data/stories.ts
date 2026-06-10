@@ -1,4 +1,4 @@
-import type { Level, Story, VocabularyItem } from "../types";
+import type { Level, QuizQuestion, Story, VocabularyItem } from "../types";
 
 type StorySpec = {
   id: string;
@@ -13,6 +13,7 @@ type StorySpec = {
   highlights: string[];
   vocabulary: VocabularyItem[];
   sections: string[];
+  quiz?: QuizQuestion[];
 };
 
 const distractors = [
@@ -29,6 +30,12 @@ const distractors = [
   "готовый",
   "усталый",
 ];
+
+const pictureDistractors = ["☀️", "🏖️", "📱", "🎁", "🚆", "💧", "🥐", "😊", "😴", "🚗", "🎒", "🏫", "🛒", "🔑", "✈️"];
+
+function makeQuestion(question: string, answer: string, options: string[]): QuizQuestion {
+  return { question, answer, options };
+}
 
 function createStory(spec: StorySpec): Story {
   const vocabulary = spec.vocabulary.slice(0, 15);
@@ -56,8 +63,8 @@ function createStory(spec: StorySpec): Story {
         type: "picture",
         prompt: "Choose the picture.",
         word: secondWord.word,
-        options: [secondWord.pictureLabel ?? "Picture", "Train", "Phone", "Gift"],
-        answer: secondWord.pictureLabel ?? "Picture",
+        options: [secondWord.pictureLabel ?? "💬", ...pictureDistractors.filter((item) => item !== secondWord.pictureLabel).slice(0, 3)],
+        answer: secondWord.pictureLabel ?? "💬",
       },
       {
         id: `${spec.id}-fill`,
@@ -83,15 +90,204 @@ function createStory(spec: StorySpec): Story {
         answer: "True",
       },
     ],
-    quiz: vocabulary.slice(0, 5).map((item, index) => ({
-      question: `What does "${item.word}" mean?`,
-      options: [
-        item.translation,
-        ...distractors.filter((translation) => translation !== item.translation).slice(index, index + 2),
-      ],
-      answer: item.translation,
-    })),
+    quiz: spec.quiz ?? buildFinalQuiz(spec, vocabulary),
   };
+}
+
+const storyQuizData: Record<string, Array<[string, string, string[]]>> = {
+  "morning-routine": [
+    ["When does Emma wake up?", "At seven o'clock", ["At six o'clock", "At noon", "At nine o'clock"]],
+    ["Which room is small, warm, and quiet?", "Emma's room", ["The kitchen", "The classroom", "The bus"]],
+    ["What does Emma say in the mirror?", "Three English words", ["A song", "Her phone number", "A shopping list"]],
+    ["What is on Emma's blue plate?", "Toast", ["Soup", "Cake", "Rice"]],
+    ["What does Emma put in her school bag?", "A small dictionary", ["A beach towel", "A train ticket", "A birthday gift"]],
+  ],
+  "beach-day": [
+    ["Who goes to the beach with Leo?", "Sara", ["Emma", "Mira", "Nikita"]],
+    ["What do Leo and Sara carry to the beach?", "Towels, water, and sandwiches", ["Books, pencils, and milk", "Keys, flowers, and cake", "A map, tickets, and bags"]],
+    ["Why does Sara walk slowly into the water?", "She wants to feel the waves", ["She lost her phone", "She is looking for a bus", "She is reading a book"]],
+    ["Where do they eat lunch?", "Under a small umbrella", ["At a cafe", "On a train", "In the classroom"]],
+    ["How do they feel on the bus home?", "Tired and happy", ["Angry and cold", "Late and worried", "Quiet and afraid"]],
+  ],
+  supermarket: [
+    ["When does Mila go to the supermarket?", "After school", ["Before breakfast", "At midnight", "On Sunday morning"]],
+    ["Who gives Mila the shopping list?", "Her mother", ["Her teacher", "Her brother", "The cashier"]],
+    ["What fruit does Mila choose?", "Red apples", ["Green pears", "Yellow bananas", "Small oranges"]],
+    ["What does the cashier give Mila?", "A receipt and a white bag", ["A ticket and a map", "A towel and water", "A notebook and pencil"]],
+    ["Why does Mila walk home slowly?", "The bag is heavy", ["The street is wet", "She cannot find the door", "She is waiting for a train"]],
+  ],
+  "my-family": [
+    ["Who visits Emma's family on Sundays?", "Her grandmother", ["Her teacher", "Her neighbor", "Her cousin"]],
+    ["What does Emma's mother make for dinner?", "Soup", ["Cake", "Sandwiches", "Coffee"]],
+    ["What does Emma's father cut?", "Bread", ["Apples", "Paper stars", "Flowers"]],
+    ["What does Emma's sister draw?", "Funny pictures", ["A map", "A schedule", "A receipt"]],
+    ["Why does Emma like her home?", "People listen to each other", ["It is near the airport", "It has a new bicycle", "It is very expensive"]],
+  ],
+  "best-friend": [
+    ["What is Leo's best friend's name?", "Tom", ["Max", "Oleg", "Nikita"]],
+    ["Where does Tom live?", "Next door", ["In another country", "Near the airport", "At school"]],
+    ["Where do the boys meet after school?", "In the park", ["At the beach", "In a cafe", "At the station"]],
+    ["What does Tom help Leo with?", "English words", ["Driving", "Painting", "Shopping"]],
+    ["What does Leo help Tom with?", "Math", ["Cooking", "Finding keys", "Buying tickets"]],
+  ],
+  "at-school": [
+    ["When does Sara come to school?", "Early", ["Late", "At night", "After dinner"]],
+    ["Where does Sara put her book and pencil?", "On the desk", ["Under the sofa", "In a basket", "Near the gate"]],
+    ["When does the English lesson start?", "At nine", ["At seven", "At noon", "At four"]],
+    ["Where does Sara talk with friends at break?", "Near the window", ["Near the sea", "At the cashier", "On the bus"]],
+    ["Why does Sara feel happy after school?", "She knows the answer to a hard question", ["She finds a phone", "She buys cheese", "She misses the bus"]],
+  ],
+  "my-room": [
+    ["What color is Nina's table?", "White", ["Red", "Blue", "Green"]],
+    ["Where is the pink lamp?", "Near her books", ["Under the bed", "In the kitchen", "By the bus stop"]],
+    ["What does Nina put in a box?", "Toys", ["Keys", "Tickets", "Apples"]],
+    ["Where does Nina put her books?", "On the shelf", ["In the street", "At the airport", "Under a newspaper"]],
+    ["What does Nina do after cleaning?", "Reads quietly", ["Drives a car", "Builds a sand castle", "Buys milk"]],
+  ],
+  "rainy-day": [
+    ["What does Max see from the window?", "A wet street", ["A sunny beach", "A busy airport", "A new bike"]],
+    ["Why can't Max play football?", "It is raining", ["He lost his keys", "He has a flight", "He is at university"]],
+    ["What color is Max's umbrella?", "Blue", ["Pink", "Green", "Black"]],
+    ["What word does Max learn after lunch?", "Cozy", ["Passport", "Deadline", "Receipt"]],
+    ["When does the rain stop?", "In the evening", ["Before breakfast", "At noon", "After midnight"]],
+  ],
+  "weekend-plans": [
+    ["Where does Emma write her weekend plan?", "In her notebook", ["On a receipt", "On a ticket", "On a towel"]],
+    ["Who does Emma want to visit on Saturday?", "Her grandmother", ["Her teacher", "Her manager", "Her neighbor"]],
+    ["What will Emma and her grandmother look at?", "Old photos", ["A campus map", "Train seats", "Customer messages"]],
+    ["Where does Emma meet her friends on Sunday?", "In the park", ["At the airport", "In a cafe", "At the supermarket"]],
+    ["What does Emma watch at night?", "A movie", ["A lecture", "A train", "A message"]],
+  ],
+  "new-bicycle": [
+    ["What color is Leo's new bicycle?", "Red", ["Blue", "Yellow", "White"]],
+    ["Who gives Leo a helmet?", "His father", ["His teacher", "Sara", "A cashier"]],
+    ["What is more important than a fast ride?", "A safe ride", ["A loud bell", "A long route", "A busy street"]],
+    ["Where does Leo practice riding?", "On a quiet street near the park", ["Inside his room", "At the airport gate", "In the cafe"]],
+    ["Where does Leo stop?", "Near a tree", ["Near a train", "Near the sofa", "Near the sea"]],
+  ],
+  "my-first-trip": [
+    ["How old was Nikita on his first trip alone?", "Seventeen", ["Ten", "Twenty-five", "Thirteen"]],
+    ["Who did Nikita want to visit in Kazan?", "His cousin", ["His manager", "His teacher", "His grandmother"]],
+    ["Which platform did Nikita need to find?", "Platform three", ["Platform one", "Platform seven", "Platform twelve"]],
+    ["Who showed Nikita the right direction?", "A woman in a blue coat", ["A taxi driver", "His cousin", "A waiter"]],
+    ["How did Nikita feel when he reached Kazan?", "More confident", ["Angry", "Sleepy and cold", "Still lost"]],
+  ],
+  "lost-phone": [
+    ["Where does Mira spend Saturday afternoon?", "In a small cafe near the library", ["At the airport", "On a beach", "In a classroom"]],
+    ["What does Mira practice in the cafe?", "English phrases", ["Driving turns", "Math problems", "Painting flowers"]],
+    ["Where does Mira notice her phone is missing?", "At the bus stop", ["At home", "On the train", "In the kitchen"]],
+    ["Who helps Mira search in the cafe?", "The waiter", ["Her brother", "A local woman", "Her manager"]],
+    ["Where is the phone found?", "Under a newspaper", ["Inside a drawer", "Near a gate", "On a hill"]],
+  ],
+  "learning-to-drive": [
+    ["When is Oleg's first driving lesson?", "On a quiet Sunday morning", ["On a rainy Monday evening", "At midnight", "During lunch"]],
+    ["What does the instructor ask Oleg to do first?", "Breathe slowly", ["Run quickly", "Call his mother", "Open a map"]],
+    ["What does Oleg check before starting the engine?", "The mirror", ["The receipt", "The passport", "The shelf"]],
+    ["What does Oleg press too quickly?", "The brake", ["The horn", "The phone", "The doorbell"]],
+    ["How does Oleg feel at the end?", "Tired but calm", ["Lost and angry", "Cold and wet", "Bored and late"]],
+  ],
+  "busy-day": [
+    ["What does Sara look at after waking up?", "Her schedule", ["Her passport", "Her album", "Her bicycle"]],
+    ["Where does Sara go after class?", "The library", ["The airport", "The beach", "The supermarket first"]],
+    ["What does Sara want to finish before the meeting?", "English homework", ["A painting", "A job application", "A birthday cake"]],
+    ["What does Sara buy on the way home?", "Bread and fruit", ["Milk and cheese", "A helmet and bell", "Flowers and ribbon"]],
+    ["What does Sara learn about a busy day?", "It needs quiet moments", ["It should have no rest", "It is always easy", "It must start at the airport"]],
+  ],
+  "new-hobby": [
+    ["What new hobby does Mira try?", "Painting", ["Hiking", "Driving", "Cooking"]],
+    ["What does Mira buy with paints?", "A small brush and a white canvas", ["A passport and luggage", "A helmet and bicycle", "A receipt and bag"]],
+    ["What is Mira afraid to make?", "A mistake", ["A sandwich", "A phone call", "A schedule"]],
+    ["How often does Mira paint flowers?", "Every Saturday", ["Every morning", "Once a year", "Only at school"]],
+    ["Where does Mira go after one month?", "A gallery", ["A train station", "A cafe", "A supermarket"]],
+  ],
+  "birthday-surprise-a2": [
+    ["Who is the birthday surprise for?", "Sara", ["Mira", "Lena", "Emma"]],
+    ["How many guests do Sara's friends invite?", "Five", ["Two", "Ten", "Twelve"]],
+    ["What kind of cake does Leo buy?", "Chocolate cake", ["Apple cake", "Cheese cake", "Cream cake"]],
+    ["What does Mira use to decorate the room?", "Pink balloons and paper stars", ["Blue towels and shells", "Maps and tickets", "Books and pencils"]],
+    ["What does Sara do when everyone shouts?", "She laughs and covers her face", ["She leaves the room", "She calls the airport", "She looks for keys"]],
+  ],
+  airport: [
+    ["How early does Nikita arrive at the airport?", "Two hours before his flight", ["Ten minutes before his flight", "After boarding", "The night before"]],
+    ["What document does Nikita have?", "His passport", ["A receipt", "A campus map", "A library card"]],
+    ["Where does Nikita put his bag at security?", "On the belt", ["Under the sofa", "On a hill", "Near a classroom window"]],
+    ["Which gate does Nikita find?", "Gate twelve", ["Gate three", "Gate five", "Gate twenty"]],
+    ["Where is Nikita's seat on the plane?", "By the window", ["By the door", "In the aisle", "Near the pilot"]],
+  ],
+  "moving-city": [
+    ["Who moves to a new city?", "Lena", ["Sara", "Leo", "Oleg"]],
+    ["Why do the rooms look strange?", "There are many boxes", ["The walls are black", "The windows are broken", "There is no door"]],
+    ["Where does Lena write her new address?", "In a notebook", ["On a towel", "On a cake", "On a train ticket"]],
+    ["Who brings warm bread?", "A friendly neighbor", ["A security guard", "A teacher", "A waiter"]],
+    ["What does Lena put on the wall at night?", "Photos", ["A campus map", "A receipt", "A helmet"]],
+  ],
+  "weekend-hiking": [
+    ["Who goes hiking with Leo and Sara?", "Two friends", ["Their teacher", "Five guests", "A local woman"]],
+    ["What do they carry?", "Backpacks, water bottles, and a paper map", ["Cake, candles, and ribbons", "Milk, bread, and cheese", "A phone, keys, and wallet"]],
+    ["What is the forest trail like?", "Narrow but safe", ["Wide and noisy", "Wet and dangerous", "Closed and dark"]],
+    ["Where do they rest after climbing?", "Near a big stone", ["Under the sofa", "At gate twelve", "At a cashier desk"]],
+    ["How does everyone feel when they return home?", "Tired", ["Angry", "Worried", "Late"]],
+  ],
+  "missing-keys": [
+    ["What is Mira missing?", "Her keys", ["Her phone", "Her passport", "Her bicycle"]],
+    ["Where does Mira check first?", "Her bag and jacket", ["The airport screen", "The forest trail", "A blue plate"]],
+    ["Who tells Mira to search calmly?", "Her brother", ["Her manager", "A cashier", "A local woman"]],
+    ["Where does Mira find the keys?", "Under the sofa", ["In the cafe", "At the bus stop", "Near the embassy"]],
+    ["What are the keys beside?", "An old magazine", ["A chocolate cake", "A paper star", "A train ticket"]],
+  ],
+  "new-job": [
+    ["When does Oleg start his new job?", "On a rainy Monday morning", ["On a sunny Saturday", "At night", "On Sunday afternoon"]],
+    ["Why does Oleg arrive early?", "He does not want to look lost or late", ["He wants to buy bread", "He must catch a flight", "He plans a picnic"]],
+    ["Who welcomes Oleg?", "Marina", ["Sara", "Nikita", "Lena"]],
+    ["What is Oleg's first responsibility?", "Check customer messages and mark urgent ones", ["Decorate a room", "Find a phone", "Drive a car"]],
+    ["Why does Oleg's confidence grow?", "He asks questions and keeps going", ["He pretends to know everything", "He leaves early", "He wins a prize"]],
+  ],
+  "surprise-gift": [
+    ["Who does Lena want to give a meaningful gift to?", "Her grandmother", ["Her manager", "Her roommate", "Her teacher"]],
+    ["What does Lena have many of?", "Old family photos", ["Train tickets", "Customer messages", "Shopping lists"]],
+    ["What does Lena buy?", "A cream-colored album", ["A red bicycle", "A blue umbrella", "A white bag"]],
+    ["What color is the ribbon?", "Lavender", ["Green", "Black", "Yellow"]],
+    ["How does her grandmother react?", "She laughs and cries softly", ["She refuses the gift", "She leaves the room", "She asks for money"]],
+  ],
+  "first-day-university": [
+    ["What confuses Nikita on his first university day?", "The campus map", ["The supermarket receipt", "The bus schedule", "The cafe menu"]],
+    ["How many buildings does he walk past before finding the hall?", "Three", ["One", "Seven", "Twelve"]],
+    ["What does Nikita write down during the lecture?", "Every deadline", ["Every price", "Every bus stop", "Every recipe"]],
+    ["Who does Nikita meet at lunch?", "His roommate and two students from his major", ["A cashier and a waiter", "His cousin and grandmother", "A driver and an instructor"]],
+    ["How does the campus feel by evening?", "Large but not impossible", ["Small and boring", "Closed and empty", "Wet and dark"]],
+  ],
+  "difficult-decision": [
+    ["How many opportunities does Sara receive?", "Two", ["One", "Five", "Ten"]],
+    ["What is one opportunity?", "A summer course", ["A train trip", "A gallery visit", "A phone call"]],
+    ["What is the other opportunity?", "A part-time job at a cafe", ["A new apartment", "A driving license", "A hiking trail"]],
+    ["Who gives Sara advice?", "Her mother", ["Her roommate", "Her manager", "A local woman"]],
+    ["What does Sara choose?", "The course", ["The cafe job", "Both choices", "Neither choice"]],
+  ],
+  "unexpected-message": [
+    ["What is Mira doing when the message appears?", "Homework", ["Painting flowers", "Buying groceries", "Packing luggage"]],
+    ["Who sends the unexpected message?", "A friend she has not spoken to for weeks", ["Her teacher", "A cashier", "Her grandmother"]],
+    ["What does the message include?", "An apology", ["A train ticket", "A shopping list", "A deadline"]],
+    ["Why doesn't Mira reply at once?", "The silence between them has felt heavy", ["Her phone has no battery", "She is on a plane", "She is driving"]],
+    ["How does Mira feel by bedtime?", "Relief", ["Pressure", "Hunger", "Anger"]],
+  ],
+  "lost-abroad": [
+    ["Who travels abroad for the first time?", "Leo", ["Oleg", "Emma", "Mila"]],
+    ["Where is Leo before he gets lost?", "Near a famous landmark", ["At a supermarket cashier", "In a university lecture", "Under the sofa"]],
+    ["What problem does Leo's phone have?", "Almost no signal", ["A broken screen", "No photos", "Too many messages"]],
+    ["Who helps Leo?", "A local woman", ["A waiter", "His cousin", "A driving instructor"]],
+    ["Where is the bus stop?", "Near the embassy", ["Near the beach umbrella", "Inside the library", "Behind the school desk"]],
+  ],
+};
+
+function buildFinalQuiz(spec: StorySpec, vocabulary: VocabularyItem[]) {
+  const contentQuestions = (storyQuizData[spec.id] ?? []).map(([question, answer, options]) => makeQuestion(question, answer, options));
+  const wordQuestions = vocabulary.slice(0, 2).map((item, index) => makeQuestion(
+    `In "${spec.title}", what does "${item.word}" mean?`,
+    item.translation,
+    distractors.filter((translation) => translation !== item.translation).slice(index * 3, index * 3 + 3),
+  ));
+
+  return [...contentQuestions.slice(0, 5), ...wordQuestions].slice(0, 8);
 }
 
 const a1Stories: StorySpec[] = [
