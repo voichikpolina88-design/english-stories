@@ -1,4 +1,4 @@
-import { ArrowLeft, Check, Image, MoveRight, PartyPopper, Volume2, X } from "lucide-react";
+import { ArrowLeft, Check, MoveRight, PartyPopper, Volume2, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { emojiForWord, getTranslation } from "../data/translations";
 import type { Challenge, NativeLanguage, QuizQuestion, Story, VocabularyItem } from "../types";
@@ -269,8 +269,8 @@ function VocabularyChallenge({
           >
             {challenge.type === "picture" ? (
               <span className="picture-tile">
-                <Image size={24} aria-hidden="true" />
-                {option}
+                <strong>{option}</strong>
+                <small>{pictureOptionLabel(option)}</small>
               </span>
             ) : (
               option
@@ -420,6 +420,53 @@ function trueFalseLabels(language: NativeLanguage) {
   return language === "Russian"
     ? { trueLabel: "Правда", falseLabel: "Ложь" }
     : { trueLabel: "True", falseLabel: "False" };
+}
+
+function pictureOptionLabel(option: string) {
+  const labels: Record<string, string> = {
+    "☀️": "Sun",
+    "🏖️": "Beach",
+    "📱": "Phone",
+    "🎁": "Gift",
+    "🚆": "Train",
+    "💧": "Water",
+    "🥐": "Breakfast",
+    "😊": "Happy",
+    "😴": "Tired",
+    "🚗": "Drive",
+    "🎒": "School bag",
+    "🏫": "School",
+    "🛒": "Shop",
+    "🔑": "Keys",
+    "✈️": "Airport",
+    "☕": "Breakfast",
+    "🧺": "Basket",
+    "🥛": "Milk",
+    "🍞": "Bread",
+    "👩": "Mother",
+    "👨": "Father",
+    "⭐": "Best",
+    "👩‍🏫": "Teacher",
+    "🛏️": "Bed",
+    "☂️": "Umbrella",
+    "📅": "Calendar",
+    "🪖": "Helmet",
+    "🎫": "Ticket",
+    "😟": "Worried",
+    "🧑‍🏫": "Instructor",
+    "🖌️": "Paint",
+    "🎂": "Birthday",
+    "🛫": "Flight",
+    "🏙️": "City",
+    "🛤️": "Trail",
+    "❓": "Missing",
+    "📷": "Memory",
+    "🏛️": "Campus",
+    "🚪": "Opportunity",
+    "💬": "Message",
+    "🧭": "Lost",
+  };
+  return labels[option] ?? "Choice";
 }
 
 function challengePromptText(challenge: Challenge) {

@@ -1,23 +1,26 @@
 :root {
-  color: #33243b;
-  background: #fff9f1;
+  color: #3a3048;
+  background: #faf8ff;
   font-family:
     Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
-  --ink: #33243b;
-  --muted: #8b7b92;
-  --cream: #fff9f1;
+  --ink: #3a3048;
+  --muted: #81758f;
+  --cream: #faf8ff;
   --paper: #ffffff;
-  --pink: #f36fa9;
-  --purple: #8b62df;
-  --lavender: #f1eafe;
-  --blush: #fff0f7;
-  --line: rgba(90, 54, 103, 0.1);
+  --pink: #d89bea;
+  --purple: #b89af8;
+  --primary: #cbb8ff;
+  --lavender: #f0ebff;
+  --blush: #fbf3ff;
+  --line: rgba(77, 55, 105, 0.11);
   --success: #42b883;
   --wrong: #df6671;
-  --shadow: 0 18px 50px rgba(77, 45, 91, 0.11);
+  --shadow: 0 20px 54px rgba(83, 62, 124, 0.1);
+  --soft-shadow: 0 12px 32px rgba(83, 62, 124, 0.08);
+  --button-shadow: 0 16px 30px rgba(184, 154, 248, 0.28);
 }
 
 * {
@@ -35,9 +38,9 @@ body {
   min-width: 320px;
   min-height: 100vh;
   background:
-    radial-gradient(circle at 8% 4%, rgba(243, 111, 169, 0.16), transparent 30%),
-    radial-gradient(circle at 96% 12%, rgba(139, 98, 223, 0.14), transparent 32%),
-    linear-gradient(180deg, #fff9f1 0%, #fff7fb 54%, #f8f2ff 100%);
+    radial-gradient(circle at 10% 0%, rgba(203, 184, 255, 0.24), transparent 30%),
+    radial-gradient(circle at 94% 12%, rgba(184, 154, 248, 0.18), transparent 34%),
+    linear-gradient(180deg, #faf8ff 0%, #fff 48%, #f7f2ff 100%);
 }
 
 button,
@@ -47,6 +50,7 @@ input {
 
 button {
   cursor: pointer;
+  transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease, border-color 160ms ease, color 160ms ease;
 }
 
 button:disabled {
@@ -74,8 +78,9 @@ p {
   height: 100vh;
   padding: 24px 16px;
   border-right: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(18px);
+  background: rgba(255, 255, 255, 0.76);
+  box-shadow: 10px 0 34px rgba(83, 62, 124, 0.04);
+  backdrop-filter: blur(22px);
 }
 
 .brand,
@@ -106,7 +111,7 @@ p {
   display: grid;
   place-items: center;
   border-radius: 22px;
-  background: linear-gradient(135deg, #ffe5f1, #eee4ff);
+  background: linear-gradient(135deg, #fff4fb, #eee8ff);
 }
 
 .brand-icon {
@@ -140,16 +145,21 @@ p {
   min-height: 48px;
   padding: 0 14px;
   border: 0;
-  border-radius: 16px;
+  border-radius: 18px;
   background: transparent;
   color: var(--muted);
   font-weight: 900;
 }
 
+.sidebar-nav button:hover {
+  background: rgba(203, 184, 255, 0.16);
+  color: var(--ink);
+}
+
 .sidebar-nav button.active {
-  background: #fff;
+  background: linear-gradient(135deg, #fff, #f7f2ff);
   color: var(--purple);
-  box-shadow: 0 12px 26px rgba(77, 45, 91, 0.1);
+  box-shadow: var(--soft-shadow);
 }
 
 .app-main {
@@ -169,10 +179,10 @@ p {
   margin-bottom: 22px;
   padding: 10px;
   border: 1px solid var(--line);
-  border-radius: 24px;
-  background: rgba(255, 255, 255, 0.82);
-  box-shadow: 0 12px 30px rgba(77, 45, 91, 0.07);
-  backdrop-filter: blur(18px);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: var(--soft-shadow);
+  backdrop-filter: blur(22px);
 }
 
 .user-chip {
@@ -210,8 +220,9 @@ p {
   padding: 0 12px;
   border-radius: 999px;
   background: var(--blush);
-  color: var(--pink);
+  color: var(--purple);
   font-weight: 950;
+  box-shadow: inset 0 0 0 1px rgba(203, 184, 255, 0.28);
 }
 
 .page-stack {
@@ -233,8 +244,8 @@ p {
 .learning-card,
 .page-title {
   border: 1px solid var(--line);
-  border-radius: 28px;
-  background: rgba(255, 255, 255, 0.88);
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.92);
   box-shadow: var(--shadow);
 }
 
@@ -254,7 +265,7 @@ p {
 }
 
 .eyebrow {
-  color: var(--pink);
+  color: var(--purple);
   font-size: 0.78rem;
   font-weight: 950;
   text-transform: uppercase;
@@ -296,7 +307,7 @@ p {
   gap: 8px;
   min-height: 50px;
   border: 1px solid var(--line);
-  border-radius: 18px;
+  border-radius: 20px;
   background: #fff;
   color: var(--ink);
   font-weight: 900;
@@ -305,8 +316,8 @@ p {
 .language-grid button.active,
 .test-mode-grid button.active,
 .tab-row button.active {
-  border-color: rgba(139, 98, 223, 0.28);
-  background: var(--lavender);
+  border-color: rgba(184, 154, 248, 0.42);
+  background: linear-gradient(135deg, #fff, var(--lavender));
   color: var(--purple);
 }
 
@@ -317,9 +328,9 @@ p {
   gap: 20px;
   padding: clamp(18px, 4vw, 32px);
   border: 1px solid var(--line);
-  border-radius: 34px;
+  border-radius: 36px;
   background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(255, 247, 252, 0.92)),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(248, 244, 255, 0.94)),
     var(--paper);
   box-shadow: var(--shadow);
 }
@@ -347,13 +358,25 @@ p {
 }
 
 .primary-button {
-  min-height: 50px;
-  padding: 0 18px;
-  border-radius: 18px;
-  background: linear-gradient(135deg, var(--pink), var(--purple));
+  min-height: 52px;
+  padding: 0 20px;
+  border-radius: 20px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.22), transparent),
+    linear-gradient(135deg, var(--primary), var(--purple));
   color: #fff;
   font-weight: 950;
-  box-shadow: 0 14px 28px rgba(139, 98, 223, 0.22);
+  box-shadow: var(--button-shadow);
+}
+
+.primary-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 38px rgba(184, 154, 248, 0.34);
+}
+
+.primary-button:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 10px 22px rgba(184, 154, 248, 0.24);
 }
 
 .primary-button.full,
@@ -367,6 +390,10 @@ p {
   font-weight: 950;
 }
 
+.text-button:hover {
+  color: #9d7fed;
+}
+
 .progress-orb {
   display: grid;
   width: 154px;
@@ -375,8 +402,8 @@ p {
   border-radius: 50%;
   background:
     radial-gradient(circle at center, #fff 0 58%, transparent 59%),
-    conic-gradient(var(--pink) var(--value), #efe6f4 0);
-  box-shadow: inset 0 0 0 1px var(--line), 0 18px 36px rgba(77, 45, 91, 0.1);
+    conic-gradient(var(--purple) var(--value), #eee8ff 0);
+  box-shadow: inset 0 0 0 1px var(--line), 0 18px 36px rgba(83, 62, 124, 0.1);
 }
 
 .progress-orb span,
@@ -413,8 +440,8 @@ p {
   height: 46px;
   place-items: center;
   border-radius: 16px;
-  background: var(--blush);
-  color: var(--pink);
+  background: linear-gradient(135deg, #f8f3ff, #efe8ff);
+  color: var(--purple);
 }
 
 .metric-card small,
@@ -459,10 +486,15 @@ p {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
   align-items: stretch;
-  gap: 14px;
-  min-height: 430px;
-  padding: 14px;
+  gap: 16px;
+  min-height: 454px;
+  padding: 16px;
   min-width: 0;
+}
+
+.path-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 24px 58px rgba(83, 62, 124, 0.13);
 }
 
 .path-card.locked {
@@ -474,7 +506,7 @@ p {
 }
 
 .path-card.locked .primary-button {
-  background: #e6ddea;
+  background: #e8e1f3;
   color: #8b7b92;
   box-shadow: none;
 }
@@ -483,26 +515,32 @@ p {
 .cozy-illustration {
   display: grid;
   place-items: center;
-  border: 4px solid rgba(255, 255, 255, 0.78);
-  border-radius: 24px;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+  border: 5px solid rgba(255, 255, 255, 0.9);
+  border-radius: 26px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.65), 0 12px 28px rgba(83, 62, 124, 0.07);
 }
 
 .illustration-card {
   width: 100%;
-  height: 176px;
+  height: 202px;
 }
 
 .illustration-card span,
 .cozy-illustration span {
-  font-size: 4.3rem;
+  font-size: 4.8rem;
 }
 
 .path-card-body {
   display: grid;
   align-content: start;
-  gap: 10px;
+  gap: 11px;
   min-width: 0;
+}
+
+.path-card-body h3 {
+  color: var(--ink);
+  font-size: 1.18rem;
+  line-height: 1.2;
 }
 
 .path-card-body h3,
@@ -517,9 +555,9 @@ p {
 }
 
 .lesson-meta span {
-  padding: 4px 9px;
+  padding: 5px 10px;
   border-radius: 999px;
-  background: var(--lavender);
+  background: #f2edff;
   color: var(--purple);
   font-size: 0.76rem;
   font-weight: 950;
@@ -531,17 +569,19 @@ p {
 }
 
 .progress-track {
-  height: 12px;
+  height: 13px;
   overflow: hidden;
   border-radius: 999px;
-  background: #eee5f5;
+  background: #eee8ff;
+  box-shadow: inset 0 1px 2px rgba(83, 62, 124, 0.08);
 }
 
 .progress-fill {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, var(--pink), var(--purple));
+  background: linear-gradient(90deg, var(--primary), var(--purple));
+  box-shadow: 0 0 18px rgba(184, 154, 248, 0.32);
 }
 
 .progress-label {
@@ -590,8 +630,8 @@ p {
   height: 38px;
   place-items: center;
   border-radius: 14px;
-  background: var(--blush);
-  color: var(--pink);
+  background: var(--lavender);
+  color: var(--purple);
   font-weight: 950;
 }
 
@@ -725,19 +765,26 @@ p {
 
 .choice-button {
   width: 100%;
-  min-height: 52px;
-  padding: 12px 14px;
+  min-height: 56px;
+  padding: 13px 16px;
   border: 1px solid var(--line);
-  border-radius: 18px;
+  border-radius: 20px;
   background: #fff;
   color: var(--ink);
   font-weight: 900;
   text-align: left;
+  box-shadow: 0 8px 20px rgba(83, 62, 124, 0.05);
+}
+
+.choice-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: rgba(184, 154, 248, 0.46);
+  box-shadow: 0 12px 24px rgba(83, 62, 124, 0.08);
 }
 
 .choice-button.selected {
-  border-color: rgba(139, 98, 223, 0.34);
-  background: var(--lavender);
+  border-color: rgba(184, 154, 248, 0.55);
+  background: linear-gradient(135deg, #fff, var(--lavender));
   color: var(--purple);
 }
 
@@ -822,9 +869,10 @@ p {
   gap: 12px;
   padding: 10px;
   border: 1px solid var(--line);
-  border-radius: 24px;
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(18px);
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: var(--soft-shadow);
+  backdrop-filter: blur(22px);
 }
 
 .lesson-progress-area {
@@ -835,10 +883,17 @@ p {
 .ghost-action {
   min-height: 42px;
   padding: 0 14px;
-  border-radius: 16px;
+  border-radius: 18px;
   background: #fff;
   color: var(--muted);
   font-weight: 950;
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.icon-text-button:hover,
+.ghost-action:hover {
+  color: var(--purple);
+  background: #f8f3ff;
 }
 
 .lesson-card-stage {
@@ -855,7 +910,7 @@ p {
 }
 
 .polished-card {
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.95);
 }
 
 .story-scene-header {
@@ -874,7 +929,7 @@ p {
   height: 54px;
   place-items: center;
   border-radius: 18px;
-  background: var(--blush);
+  background: linear-gradient(135deg, #fff5fb, #eee8ff);
   font-size: 1.7rem;
 }
 
@@ -889,11 +944,11 @@ p {
 }
 
 .cozy-illustration {
-  min-height: 164px;
+  min-height: 194px;
 }
 
 .cozy-illustration span {
-  font-size: 4.4rem;
+  font-size: 5rem;
 }
 
 .story-bubbles {
@@ -902,10 +957,11 @@ p {
 }
 
 .story-bubbles p {
-  padding: 12px 14px;
-  border-radius: 20px;
-  background: #fff7fb;
+  padding: 14px 16px;
+  border-radius: 22px;
+  background: #fbf8ff;
   color: var(--ink);
+  box-shadow: inset 0 0 0 1px rgba(203, 184, 255, 0.22);
 }
 
 .lesson-vocab-strip {
@@ -933,9 +989,9 @@ p {
   display: grid;
   gap: 6px;
   padding: 16px;
-  border: 1px dashed rgba(139, 98, 223, 0.28);
-  border-radius: 22px;
-  background: #fbf7ff;
+  border: 1px dashed rgba(184, 154, 248, 0.4);
+  border-radius: 24px;
+  background: linear-gradient(135deg, #fff, #f7f2ff);
   color: var(--ink);
   font-size: clamp(1.55rem, 5vw, 2.4rem);
   font-weight: 950;
@@ -956,8 +1012,21 @@ p {
 .picture-tile {
   display: grid;
   justify-items: center;
-  gap: 8px;
+  gap: 4px;
+  width: 100%;
+  line-height: 1.1;
   text-align: center;
+}
+
+.picture-tile strong {
+  font-size: 2.45rem;
+  line-height: 1;
+}
+
+.picture-tile small {
+  color: var(--ink);
+  font-size: 0.86rem;
+  font-weight: 950;
 }
 
 .quiz-list {
@@ -967,11 +1036,12 @@ p {
 
 .quiz-item {
   display: grid;
-  gap: 10px;
-  padding: 14px;
+  gap: 12px;
+  padding: 16px;
   border: 1px solid var(--line);
-  border-radius: 22px;
+  border-radius: 24px;
   background: #fff;
+  box-shadow: 0 10px 26px rgba(83, 62, 124, 0.05);
 }
 
 .quiz-item h2 {
@@ -1058,10 +1128,10 @@ p {
     gap: 6px;
     padding: 8px;
     border: 1px solid var(--line);
-    border-radius: 24px;
-    background: rgba(255, 255, 255, 0.9);
-    box-shadow: 0 18px 44px rgba(77, 45, 91, 0.16);
-    backdrop-filter: blur(18px);
+    border-radius: 26px;
+    background: rgba(255, 255, 255, 0.94);
+    box-shadow: 0 18px 44px rgba(83, 62, 124, 0.16);
+    backdrop-filter: blur(22px);
   }
 
   .mobile-nav button {
@@ -1069,7 +1139,7 @@ p {
     gap: 3px;
     min-height: 54px;
     border: 0;
-    border-radius: 18px;
+    border-radius: 20px;
     background: transparent;
     color: var(--muted);
     font-size: 0.68rem;
@@ -1077,8 +1147,9 @@ p {
   }
 
   .mobile-nav button.active {
-    background: var(--blush);
-    color: var(--pink);
+    background: linear-gradient(135deg, #fff, var(--lavender));
+    color: var(--purple);
+    box-shadow: inset 0 0 0 1px rgba(203, 184, 255, 0.36);
   }
 
   .hero-dashboard,
@@ -1163,7 +1234,8 @@ p {
     grid-template-columns: 1fr;
     grid-template-rows: auto minmax(0, 1fr) auto;
     gap: 12px;
-    padding: 12px;
+    min-height: 420px;
+    padding: 13px;
   }
 
   .path-card .primary-button {
@@ -1172,7 +1244,7 @@ p {
 
   .illustration-card {
     width: 100%;
-    height: 150px;
+    height: 172px;
   }
 
   .lesson-player-top {
@@ -1208,11 +1280,11 @@ p {
   }
 
   .cozy-illustration {
-    min-height: 132px;
+    min-height: 156px;
   }
 
   .cozy-illustration span {
-    font-size: 3.5rem;
+    font-size: 4rem;
   }
 }
 
@@ -1251,7 +1323,7 @@ p {
 
   .path-card .illustration-card {
     width: 100%;
-    height: 138px;
+    height: 158px;
   }
 
   .path-card .primary-button {
@@ -1285,6 +1357,18 @@ p {
   .story-bubbles p {
     font-size: 0.96rem;
     line-height: 1.55;
+  }
+
+  .picture-tile {
+    gap: 5px;
+  }
+
+  .picture-tile strong {
+    font-size: 2.1rem;
+  }
+
+  .picture-tile small {
+    font-size: 0.82rem;
   }
 
   .prompt-box {
