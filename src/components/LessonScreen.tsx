@@ -45,6 +45,14 @@ type RuntimeChallenge = Challenge & {
   localizedAnswer: string;
 };
 
+type ReadingMode = "story" | "chat";
+
+type ChatMessage = {
+  speaker: string;
+  avatar: string;
+  text: string;
+};
+
 type LessonStep =
   | { type: "story"; content: string; title: string; index: number }
   | { type: "vocabulary"; challenge: RuntimeChallenge }
@@ -71,10 +79,12 @@ export function LessonScreen({
   const [answeredKeys, setAnsweredKeys] = useState<string[]>([]);
   const [quizAnswers, setQuizAnswers] = useState<Record<number, string>>({});
   const [quizSubmitted, setQuizSubmitted] = useState(false);
+  const [readingMode, setReadingMode] = useState<ReadingMode>("story");
 
   const step = steps[stepIndex];
   const progressValue = Math.round(((stepIndex + 1) / steps.length) * 100);
   const progressLabel = `${language === "Russian" ? "Прогресс истории" : "Story Progress"} · ${progressValue}%`;
+  const hasChatMode = story.id === "best-friend";
 
   function moveNext() {
     const nextStep = Math.min(stepIndex + 1, steps.length - 1);
@@ -125,9 +135,32 @@ export function LessonScreen({
         <span className="heart-pill">{story.xpReward} XP</span>
       </div>
 
+      <div className="reading-mode-switch" role="group" aria-label="Reading mode">
+        <button
+          className={readingMode === "story" ? "active" : ""}
+          type="button"
+          onClick={() => setReadingMode("story")}
+        >
+          📖 Story Mode
+        </button>
+        <button
+          className={readingMode === "chat" ? "active" : ""}
+          type="button"
+          disabled={!hasChatMode}
+          onClick={() => setReadingMode("chat")}
+          title={hasChatMode ? "Chat Mode" : "Chat Mode prototype is available in My Best Friend"}
+        >
+          💬 Chat Mode
+        </button>
+      </div>
+
       <section className="lesson-card-stage">
         {step.type === "story" ? (
-          <StoryCard story={story} title={step.title} content={step.content} index={step.index} onNext={moveNext} ui={ui} />
+          readingMode === "chat" && hasChatMode ? (
+            <ChatStoryCard story={story} title={step.title} index={step.index} onNext={moveNext} ui={ui} />
+          ) : (
+            <StoryCard story={story} title={step.title} content={step.content} index={step.index} onNext={moveNext} ui={ui} />
+          )
         ) : null}
 
         {step.type === "vocabulary" ? (
@@ -228,6 +261,65 @@ function StoryCard({
         {blocks.map((block) => (
           <p key={block}>{block}</p>
         ))}
+      </div>
+
+      <button className="primary-button full" type="button" onClick={onNext}>
+        {ui.continueLearning}
+        <MoveRight size={18} aria-hidden="true" />
+      </button>
+    </article>
+  );
+}
+
+function ChatStoryCard({
+  story,
+  title,
+  index,
+  ui,
+  onNext,
+}: {
+  story: Story;
+  title: string;
+  index: number;
+  ui: LessonScreenProps["ui"];
+  onNext: () => void;
+}) {
+  const messages = chatMessagesForStory(story.id, index);
+
+  return (
+    <article className="learning-card chat-story-card polished-card">
+      <div className="story-scene-header">
+        <div className="character-chip">
+          <span>💬</span>
+          <div>
+            <strong>{story.title}</strong>
+            <small>{ui.storyCard} {title}</small>
+          </div>
+        </div>
+        <button className="round-button" type="button" aria-label="Audio">
+          <Volume2 size={19} aria-hidden="true" />
+        </button>
+      </div>
+
+      <div className="chat-phone">
+        <div className="chat-phone-top">
+          <span>🙂</span>
+          <div>
+            <strong>Leo & Tom</strong>
+            <small>online</small>
+          </div>
+        </div>
+        <div className="chat-thread">
+          {messages.map((message, messageIndex) => (
+            <div className={messageIndex % 2 === 0 ? "chat-row" : "chat-row right"} key={`${message.speaker}-${message.text}`}>
+              <span className="chat-avatar">{message.avatar}</span>
+              <div className="chat-message">
+                <strong>{message.speaker}</strong>
+                <p>{message.text}</p>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
       <button className="primary-button full" type="button" onClick={onNext}>
@@ -394,6 +486,35 @@ function CompleteCard({
       </div>
     </article>
   );
+}
+
+function chatMessagesForStory(storyId: string, index: number): ChatMessage[] {
+  if (storyId !== "best-friend") return [];
+
+  const scenes: ChatMessage[][] = [
+    [
+      { speaker: "Leo", avatar: "🙂", text: "Hi! This is my best friend, Tom." },
+      { speaker: "Tom", avatar: "😄", text: "Hello! I live next door to Leo." },
+      { speaker: "Leo", avatar: "🙂", text: "We go to the same school every day." },
+    ],
+    [
+      { speaker: "Tom", avatar: "😄", text: "After school, we meet in the park." },
+      { speaker: "Leo", avatar: "🙂", text: "We ride bikes, play games, and share cookies." },
+      { speaker: "Tom", avatar: "😄", text: "Leo always brings good snacks in his bag." },
+    ],
+    [
+      { speaker: "Leo", avatar: "🙂", text: "Tom helps me with English words." },
+      { speaker: "Tom", avatar: "😄", text: "And Leo helps me with math." },
+      { speaker: "Leo", avatar: "🙂", text: "We laugh when we make small mistakes." },
+    ],
+    [
+      { speaker: "Tom", avatar: "😄", text: "A good friend listens." },
+      { speaker: "Leo", avatar: "🙂", text: "A good friend helps, laughs, and shares." },
+      { speaker: "Tom", avatar: "😄", text: "That is why simple days feel better together." },
+    ],
+  ];
+
+  return scenes[index] ?? scenes[0];
 }
 
 function makeRuntimeChallenge(challenge: Challenge, words: VocabularyItem[], language: NativeLanguage): RuntimeChallenge {
