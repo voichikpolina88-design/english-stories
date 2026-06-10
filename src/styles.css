@@ -450,14 +450,17 @@ p {
 
 .lesson-path-list {
   display: grid;
-  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  align-items: stretch;
+  gap: 16px;
 }
 
 .path-card {
   display: grid;
-  grid-template-columns: 96px minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 16px;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  align-items: stretch;
+  gap: 14px;
+  min-height: 430px;
   padding: 14px;
   min-width: 0;
 }
@@ -486,18 +489,19 @@ p {
 }
 
 .illustration-card {
-  width: 96px;
-  height: 96px;
+  width: 100%;
+  height: 176px;
 }
 
 .illustration-card span,
 .cozy-illustration span {
-  font-size: 2.6rem;
+  font-size: 4.3rem;
 }
 
 .path-card-body {
   display: grid;
-  gap: 8px;
+  align-content: start;
+  gap: 10px;
   min-width: 0;
 }
 
@@ -508,6 +512,7 @@ p {
 }
 
 .lesson-meta {
+  flex-wrap: wrap;
   gap: 8px;
 }
 
@@ -1155,7 +1160,8 @@ p {
   }
 
   .path-card {
-    grid-template-columns: 72px minmax(0, 1fr);
+    grid-template-columns: 1fr;
+    grid-template-rows: auto minmax(0, 1fr) auto;
     gap: 12px;
     padding: 12px;
   }
@@ -1165,8 +1171,8 @@ p {
   }
 
   .illustration-card {
-    width: 72px;
-    height: 72px;
+    width: 100%;
+    height: 150px;
   }
 
   .lesson-player-top {
@@ -1245,7 +1251,7 @@ p {
 
   .path-card .illustration-card {
     width: 100%;
-    height: 82px;
+    height: 138px;
   }
 
   .path-card .primary-button {

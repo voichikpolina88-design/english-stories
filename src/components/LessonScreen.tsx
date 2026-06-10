@@ -218,7 +218,7 @@ function StoryCard({
       </div>
 
       <div className="cozy-illustration" style={{ backgroundColor: story.color }}>
-        <span>{sceneForStory(story.id, index)}</span>
+        <span>{sceneForStory(story, index)}</span>
       </div>
 
       <div className="story-bubbles">
@@ -456,7 +456,7 @@ function characterForStory(storyId: string) {
   return characters[storyId] ?? { name: "Story friend", avatar: "😊" };
 }
 
-function sceneForStory(storyId: string, index: number) {
+function sceneForStory(story: Story, index: number) {
   const scenes: Record<string, string[]> = {
     "morning-routine": ["🛏️", "🪞", "☕", "🎒"],
     "beach-day": ["🏖️", "🌊", "🥪", "🚌"],
@@ -465,5 +465,5 @@ function sceneForStory(storyId: string, index: number) {
     "new-job": ["🏢", "👥", "💻", "📝"],
     "surprise-gift": ["📷", "📔", "🎀", "🎁"],
   };
-  return scenes[storyId]?.[index] ?? "📚";
+  return scenes[story.id]?.[index] ?? story.illustration ?? "📚";
 }

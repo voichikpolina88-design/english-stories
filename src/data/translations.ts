@@ -67,7 +67,9 @@ export type VocabularyWord = VocabularyItem & {
 };
 
 export function getTranslation(word: string, language: NativeLanguage) {
-  return translations[word]?.[language] ?? translations[word]?.Russian ?? word;
+  if (language === "English") return translations[word]?.English ?? word;
+  const storyWord = stories.flatMap((story) => story.vocabulary).find((item) => item.word === word);
+  return translations[word]?.Russian ?? storyWord?.translation ?? word;
 }
 
 export function getAllVocabulary(): VocabularyWord[] {
@@ -77,7 +79,7 @@ export function getAllVocabulary(): VocabularyWord[] {
       storyId: story.id,
       storyTitle: story.title,
       level: story.level,
-      emoji: wordEmoji[item.word] ?? "💬",
+      emoji: wordEmoji[item.word] ?? item.pictureLabel ?? "💬",
     })),
   );
 

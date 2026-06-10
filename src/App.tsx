@@ -64,6 +64,7 @@ const copy = {
     chooseAnswer: "Выберите ответ",
     trueLabel: "Правда",
     falseLabel: "Ложь",
+    words: "слов",
   },
   English: {
     appName: "English Stories",
@@ -106,6 +107,7 @@ const copy = {
     chooseAnswer: "Choose the answer",
     trueLabel: "True",
     falseLabel: "False",
+    words: "words",
   },
 };
 
@@ -493,12 +495,13 @@ function LessonPathCard({
 }) {
   return (
     <article className={unlocked ? "path-card" : "path-card locked"}>
-      <div className="illustration-card" style={{ backgroundColor: story.color }}>
-        <span>{sceneForStory(story.id)}</span>
+      <div className="illustration-card lesson-card-illustration" style={{ backgroundColor: story.color }}>
+        <span>{story.illustration ?? sceneForStory(story.id)}</span>
       </div>
       <div className="path-card-body">
         <div className="lesson-meta">
           <span>{story.level}</span>
+          <span>{story.vocabulary.length} {t.words}</span>
           <span>{story.readingTime}</span>
         </div>
         <h3>{index + 1}. {story.title}</h3>

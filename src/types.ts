@@ -64,6 +64,7 @@ export type Story = {
   xpReward: number;
   color: string;
   accent: string;
+  illustration?: string;
   text: string[];
   highlights: string[];
   vocabulary: VocabularyItem[];
