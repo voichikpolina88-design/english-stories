@@ -63,6 +63,8 @@ const copy = {
     changeLanguage: "Можно изменить родной язык в любой момент.",
     correct: "Верно! +3 XP",
     answer: "Ответ",
+    correctAnswer: "Правильный ответ",
+    sentenceTranslation: "Перевод",
     path: "путь",
     lessonComplete: "🎉 Урок завершен",
     nextLesson: "Следующий урок",
@@ -140,6 +142,8 @@ const copy = {
     changeLanguage: "You can change your native language any time.",
     correct: "Correct! +3 XP",
     answer: "Answer",
+    correctAnswer: "Correct answer",
+    sentenceTranslation: "Translation",
     path: "path",
     lessonComplete: "🎉 Lesson Complete",
     nextLesson: "Next Lesson",
@@ -979,11 +983,20 @@ function TrainingPage({
           />
           {answered ? (
             <div className={isCurrentTrainingAnswerCorrect(currentQuestion, selectedAnswer, matchedPairs) ? "feedback correct" : "feedback wrong"}>
-              {currentQuestion.type === "buildSentence"
-                ? `${t.answer}: ${trainingAnswerText(currentQuestion)}`
-                : isCurrentTrainingAnswerCorrect(currentQuestion, selectedAnswer, matchedPairs)
-                  ? t.correct
-                  : `${t.answer}: ${trainingAnswerText(currentQuestion)}`}
+              {currentQuestion.type === "buildSentence" ? (
+                <>
+                  <span>
+                    <strong>{t.correctAnswer}:</strong> {trainingAnswerText(currentQuestion)}
+                  </span>
+                  <span className="feedback-translation">
+                    <strong>{t.sentenceTranslation}:</strong> {currentQuestion.prompt}
+                  </span>
+                </>
+              ) : isCurrentTrainingAnswerCorrect(currentQuestion, selectedAnswer, matchedPairs) ? (
+                t.correct
+              ) : (
+                `${t.answer}: ${trainingAnswerText(currentQuestion)}`
+              )}
             </div>
           ) : null}
           <button className="training-primary-button full" type="button" disabled={!answered} onClick={nextTrainingQuestion}>
@@ -1086,7 +1099,8 @@ function TrainingQuestionView({
     return (
       <div className="training-question-stack" data-training-type="build">
         <span className="eyebrow">{t.buildSentence}</span>
-        <h2>{question.prompt}</h2>
+        <h2>{t.buildSentence}</h2>
+        <p className="sentence-translation-prompt">{question.prompt}</p>
         <div className="sentence-build-zone">
           {builtWords.length ? (
             builtWords.map((word, index) => (
@@ -1200,33 +1214,76 @@ function createTrainingQuestion(type: TrainingQuestion["type"], word: Vocabulary
     };
   }
 
-  const targetSentence = bestTrainingSentence(word);
-  const sentenceWords = targetSentence.replace(/[.!?]+$/g, "").split(/\s+/).slice(0, 7);
+  const sentenceSource = hasUsableTrainingSentence(word)
+    ? word
+    : shuffleArray(allWords).find((item) => hasUsableTrainingSentence(item)) ?? word;
+  const sentence = bestTrainingSentencePair(sentenceSource);
+  const sentenceWords = sentence.english.replace(/[.!?]+$/g, "").split(/\s+/).slice(0, 8);
   return {
     id: `build-${index}`,
     type: "buildSentence",
-    word,
-    prompt: bestTrainingSentenceRu(word),
+    word: sentenceSource,
+    prompt: sentence.russian,
     answer: sentenceWords.join(" "),
     options: shuffleArray(sentenceWords),
-    targetSentence,
+    targetSentence: sentence.english,
   };
 }
 
-function bestTrainingSentence(word: VocabularyEntry) {
-  if (word.example && word.example.split(/\s+/).length <= 8) return word.example.replace(/[.!?]+$/g, ".");
-  return `Tom learns ${word.word}.`;
+function hasUsableTrainingSentence(word: VocabularyEntry) {
+  return Boolean(
+    word.example &&
+      word.exampleRu &&
+      !isGeneratedVocabularyExample(word.example) &&
+      !isGeneratedVocabularyExample(word.exampleRu) &&
+      word.example.split(/\s+/).length <= 8 &&
+      word.exampleRu.split(/\s+/).length <= 10,
+  );
 }
 
-function bestTrainingSentenceRu(word: VocabularyEntry) {
-  if (word.exampleRu && !word.exampleRu.startsWith("Пример со словом") && word.exampleRu.split(/\s+/).length <= 10) {
-    return word.exampleRu.replace(/[.!?]+$/g, ".");
+function isGeneratedVocabularyExample(value: string) {
+  const normalized = value.toLowerCase();
+  return (
+    normalized.includes("пример со словом") ||
+    normalized.includes("example with") ||
+    normalized.includes("учит слово") ||
+    normalized.includes("learns the word") ||
+    normalized.includes("learns ")
+  );
+}
+
+function bestTrainingSentencePair(word: VocabularyEntry) {
+  if (hasUsableTrainingSentence(word)) {
+    return {
+      english: normalizeTrainingSentence(word.example),
+      russian: normalizeTrainingSentence(word.exampleRu),
+    };
   }
-  return `Том учит слово «${word.translation}».`;
+
+  const cleanWord = word.word.replace(/[.!?]+$/g, "").trim();
+  const cleanTranslation = word.translation.replace(/[.!?]+$/g, "").trim();
+
+  if (word.category === "actions" || cleanWord.includes(" ")) {
+    return {
+      english: normalizeTrainingSentence(`I can ${cleanWord}`),
+      russian: normalizeTrainingSentence(`Я могу ${cleanTranslation}`),
+    };
+  }
+
+  return {
+    english: normalizeTrainingSentence(`This is ${cleanWord}`),
+    russian: normalizeTrainingSentence(`Это ${cleanTranslation}`),
+  };
+}
+
+function normalizeTrainingSentence(value: string) {
+  const trimmed = value.trim().replace(/[.!?]+$/g, "");
+  return `${trimmed}.`;
 }
 
 function trainingAnswerText(question: TrainingQuestion) {
   if (question.type === "match") return question.words.map((word) => `${word.word} ↔ ${word.translation}`).join(", ");
+  if (question.type === "buildSentence") return question.targetSentence;
   return question.answer;
 }
 

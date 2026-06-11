@@ -799,6 +799,16 @@ p {
   font-weight: 950;
 }
 
+.feedback span {
+  display: block;
+}
+
+.feedback-translation {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
 .feedback.correct {
   background: rgba(66, 184, 131, 0.13);
   color: #267a57;
@@ -1786,6 +1796,17 @@ p {
 .training-question-stack h2 {
   font-size: clamp(1.45rem, 5vw, 2.3rem);
   line-height: 1.15;
+}
+
+.sentence-translation-prompt {
+  margin: -4px 0 2px;
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: rgba(99, 183, 224, 0.12);
+  color: var(--ink);
+  font-size: 1.05rem;
+  font-weight: 900;
+  line-height: 1.35;
 }
 
 .match-grid {
