@@ -10,6 +10,7 @@ import {
   Settings,
   Sparkles,
   Star,
+  Target,
   Trophy,
   Volume2,
 } from "lucide-react";
@@ -22,7 +23,7 @@ import { getAllVocabulary as getVocabularyDatabase, type VocabularyEntry } from 
 import { useLearnerProgress } from "./hooks/useLearnerProgress";
 import type { NativeLanguage, Story } from "./types";
 
-type Page = "home" | "learn" | "words" | "stats" | "settings";
+type Page = "home" | "learn" | "words" | "training" | "stats" | "settings";
 
 const languages: NativeLanguage[] = ["Russian", "English"];
 
@@ -35,6 +36,7 @@ const copy = {
     home: "Главная",
     learn: "Учиться",
     wordsPage: "Слова",
+    training: "Тренировка",
     stats: "Статистика",
     settings: "Настройки",
     learner: "Ежедневный ученик",
@@ -84,6 +86,21 @@ const copy = {
     nextQuestion: "Следующий вопрос",
     finishTraining: "Завершить",
     trainingResult: "Результат тренировки",
+    practiceVocabulary: "Тренируйте свой словарь",
+    totalVocabulary: "Всего слов",
+    savedWordsCount: "Сохранено слов",
+    startTraining: "Начать тренировку",
+    quickTraining: "Быстрая тренировка",
+    matchPairs: "Соедини пары",
+    audioChooseWord: "Аудио: выбери английское слово",
+    audioChooseTranslation: "Аудио: выбери перевод",
+    fillBlank: "Заполни пропуск",
+    buildSentence: "Собери предложение",
+    trainingComplete: "🎉 Тренировка завершена",
+    score: "Счёт",
+    xpEarned: "XP получено",
+    tryAgain: "Попробовать снова",
+    returnToTraining: "Вернуться к тренировке",
   },
   English: {
     appName: "English Stories",
@@ -93,6 +110,7 @@ const copy = {
     home: "Home",
     learn: "Learn",
     wordsPage: "Words",
+    training: "Training",
     stats: "Statistics",
     settings: "Settings",
     learner: "Daily learner",
@@ -142,6 +160,21 @@ const copy = {
     nextQuestion: "Next question",
     finishTraining: "Finish",
     trainingResult: "Training result",
+    practiceVocabulary: "Practice your vocabulary",
+    totalVocabulary: "Total vocabulary",
+    savedWordsCount: "Saved words",
+    startTraining: "Start Training",
+    quickTraining: "Quick Training",
+    matchPairs: "Match Pairs",
+    audioChooseWord: "Audio: choose English word",
+    audioChooseTranslation: "Audio: choose translation",
+    fillBlank: "Fill in the Blank",
+    buildSentence: "Build a Sentence",
+    trainingComplete: "🎉 Training Complete",
+    score: "Score",
+    xpEarned: "XP earned",
+    tryAgain: "Try Again",
+    returnToTraining: "Return to Training",
   },
 };
 
@@ -249,6 +282,13 @@ function App() {
                 t={t}
                 savedWords={progress.savedWords}
                 onToggleSavedWord={toggleSavedWord}
+                onSaveTestScore={saveTestScore}
+              />
+            ) : null}
+            {page === "training" ? (
+              <TrainingPage
+                t={t}
+                savedWords={progress.savedWords}
                 onSaveTestScore={saveTestScore}
               />
             ) : null}
@@ -727,6 +767,427 @@ function useVocabularySpeech() {
   return { toggle };
 }
 
+type TrainingQuestion =
+  | {
+      id: string;
+      type: "match";
+      words: VocabularyEntry[];
+      translations: string[];
+    }
+  | {
+      id: string;
+      type: "audioWord" | "audioTranslation" | "fillBlank" | "buildSentence";
+      word: VocabularyEntry;
+      prompt: string;
+      answer: string;
+      options: string[];
+      targetSentence?: string;
+    };
+
+function TrainingPage({
+  t,
+  savedWords,
+  onSaveTestScore,
+}: {
+  t: Copy;
+  savedWords: string[];
+  onSaveTestScore: (score: number, total: number, type: string) => void;
+}) {
+  const allWords = useMemo(() => getVocabularyDatabase(), []);
+  const savedVocabulary = allWords.filter((word) => savedWords.includes(word.word));
+  const [questions, setQuestions] = useState<TrainingQuestion[]>([]);
+  const [questionIndex, setQuestionIndex] = useState(0);
+  const [score, setScore] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+  const [answered, setAnswered] = useState(false);
+  const [finished, setFinished] = useState(false);
+  const [selectedLeft, setSelectedLeft] = useState<string | null>(null);
+  const [matchedPairs, setMatchedPairs] = useState<Record<string, string>>({});
+  const [builtWords, setBuiltWords] = useState<string[]>([]);
+  const speech = useVocabularySpeech();
+
+  const currentQuestion = questions[questionIndex];
+  const trainingPool = savedVocabulary.length ? savedVocabulary : allWords;
+  const progressValue = questions.length ? Math.round(((questionIndex + (finished ? 1 : 0)) / questions.length) * 100) : 0;
+
+  function startTraining() {
+    setQuestions(buildTrainingSession(trainingPool, allWords));
+    setQuestionIndex(0);
+    setScore(0);
+    setSelectedAnswer(null);
+    setAnswered(false);
+    setFinished(false);
+    setSelectedLeft(null);
+    setMatchedPairs({});
+    setBuiltWords([]);
+  }
+
+  function resetQuestionState() {
+    setSelectedAnswer(null);
+    setAnswered(false);
+    setSelectedLeft(null);
+    setMatchedPairs({});
+    setBuiltWords([]);
+  }
+
+  function markAnswer(isCorrect: boolean) {
+    if (answered) return;
+    setAnswered(true);
+    if (isCorrect) setScore((current) => current + 1);
+  }
+
+  function nextTrainingQuestion() {
+    if (questionIndex >= questions.length - 1) {
+      setFinished(true);
+      onSaveTestScore(score, questions.length, "training");
+      return;
+    }
+
+    setQuestionIndex((current) => current + 1);
+    resetQuestionState();
+  }
+
+  function returnToTraining() {
+    setQuestions([]);
+    setQuestionIndex(0);
+    setFinished(false);
+    resetQuestionState();
+  }
+
+  function chooseMatchRight(translation: string) {
+    if (!selectedLeft || currentQuestion?.type !== "match" || matchedPairs[selectedLeft]) return;
+    const selectedWord = currentQuestion.words.find((word) => word.word === selectedLeft);
+    if (!selectedWord) return;
+
+    const nextMatched = selectedWord.translation === translation ? { ...matchedPairs, [selectedLeft]: translation } : matchedPairs;
+    setMatchedPairs(nextMatched);
+    setSelectedLeft(null);
+
+    if (Object.keys(nextMatched).length === currentQuestion.words.length) {
+      markAnswer(true);
+    }
+  }
+
+  function chooseTrainingAnswer(answer: string) {
+    if (!currentQuestion || currentQuestion.type === "match" || answered) return;
+    setSelectedAnswer(answer);
+    markAnswer(answer === currentQuestion.answer);
+  }
+
+  function addBuildWord(word: string) {
+    if (!currentQuestion || currentQuestion.type !== "buildSentence" || answered) return;
+    setBuiltWords((current) => [...current, word]);
+  }
+
+  function checkBuiltSentence() {
+    if (!currentQuestion || currentQuestion.type !== "buildSentence") return;
+    setSelectedAnswer(builtWords.join(" "));
+    markAnswer(builtWords.join(" ") === currentQuestion.answer);
+  }
+
+  return (
+    <main className="page-stack training-page">
+      <PageTitle label={`🎯 ${t.training}`} title={t.practiceVocabulary} text={t.quickTraining} />
+
+      {!questions.length ? (
+        <>
+          <section className="content-card training-start-card">
+            <div className="training-start-copy">
+              <span className="training-orb">🎯</span>
+              <div>
+                <span className="eyebrow">{t.quickTraining}</span>
+                <h2>{t.practiceVocabulary}</h2>
+                <p>{savedVocabulary.length ? t.trainMyWords : t.noSavedWords}</p>
+              </div>
+            </div>
+            <div className="training-stats-grid">
+              <MetricCard icon={<BookOpen />} label={t.totalVocabulary} value={allWords.length.toString()} />
+              <MetricCard icon={<Star />} label={t.savedWordsCount} value={savedVocabulary.length.toString()} />
+            </div>
+            <button className="training-primary-button" type="button" onClick={startTraining}>
+              ▶ {t.startTraining}
+            </button>
+          </section>
+        </>
+      ) : null}
+
+      {currentQuestion && !finished ? (
+        <section className="content-card training-card">
+          <ProgressBar value={progressValue} label={`${t.quickTraining} · ${questionIndex + 1}/${questions.length}`} />
+          <TrainingQuestionView
+            question={currentQuestion}
+            t={t}
+            speech={speech.toggle}
+            selectedAnswer={selectedAnswer}
+            answered={answered}
+            selectedLeft={selectedLeft}
+            matchedPairs={matchedPairs}
+            builtWords={builtWords}
+            onSelectLeft={setSelectedLeft}
+            onSelectRight={chooseMatchRight}
+            onChooseAnswer={chooseTrainingAnswer}
+            onBuildWord={addBuildWord}
+            onRemoveBuildWord={(index) => setBuiltWords((current) => current.filter((_, currentIndex) => currentIndex !== index))}
+            onCheckBuiltSentence={checkBuiltSentence}
+          />
+          {answered ? (
+            <div className={isCurrentTrainingAnswerCorrect(currentQuestion, selectedAnswer, matchedPairs) ? "feedback correct" : "feedback wrong"}>
+              {isCurrentTrainingAnswerCorrect(currentQuestion, selectedAnswer, matchedPairs) ? t.correct : `${t.answer}: ${trainingAnswerText(currentQuestion)}`}
+            </div>
+          ) : null}
+          <button className="training-primary-button full" type="button" disabled={!answered} onClick={nextTrainingQuestion}>
+            {questionIndex >= questions.length - 1 ? t.finishTraining : t.nextQuestion}
+          </button>
+        </section>
+      ) : null}
+
+      {finished ? (
+        <section className="content-card training-complete-card">
+          <span className="celebration-mark">🎉</span>
+          <h2>{t.trainingComplete}</h2>
+          <div className="reward-grid">
+            <div>
+              <span>{t.score}</span>
+              <strong>{score} / {questions.length}</strong>
+            </div>
+            <div>
+              <span>{t.xpEarned}</span>
+              <strong>+{score * 3} XP</strong>
+            </div>
+          </div>
+          <button className="training-primary-button full" type="button" onClick={startTraining}>{t.tryAgain}</button>
+          <button className="ghost-action" type="button" onClick={returnToTraining}>{t.returnToTraining}</button>
+        </section>
+      ) : null}
+    </main>
+  );
+}
+
+function TrainingQuestionView({
+  question,
+  t,
+  speech,
+  selectedAnswer,
+  answered,
+  selectedLeft,
+  matchedPairs,
+  builtWords,
+  onSelectLeft,
+  onSelectRight,
+  onChooseAnswer,
+  onBuildWord,
+  onRemoveBuildWord,
+  onCheckBuiltSentence,
+}: {
+  question: TrainingQuestion;
+  t: Copy;
+  speech: (text: string) => void;
+  selectedAnswer: string | null;
+  answered: boolean;
+  selectedLeft: string | null;
+  matchedPairs: Record<string, string>;
+  builtWords: string[];
+  onSelectLeft: (word: string | null) => void;
+  onSelectRight: (translation: string) => void;
+  onChooseAnswer: (answer: string) => void;
+  onBuildWord: (word: string) => void;
+  onRemoveBuildWord: (index: number) => void;
+  onCheckBuiltSentence: () => void;
+}) {
+  if (question.type === "match") {
+    return (
+      <div className="training-question-stack" data-training-type="match">
+        <span className="eyebrow">{t.matchPairs}</span>
+        <h2>{t.matchPairs}</h2>
+        <div className="match-grid">
+          <div className="match-column">
+            {question.words.map((word) => (
+              <button
+                key={word.word}
+                className={selectedLeft === word.word ? "match-button selected" : matchedPairs[word.word] ? "match-button matched" : "match-button"}
+                type="button"
+                disabled={Boolean(matchedPairs[word.word])}
+                onClick={() => onSelectLeft(word.word)}
+              >
+                {word.word}
+              </button>
+            ))}
+          </div>
+          <div className="match-column">
+            {question.translations.map((translation) => (
+              <button
+                key={translation}
+                className={Object.values(matchedPairs).includes(translation) ? "match-button matched" : "match-button"}
+                type="button"
+                disabled={Object.values(matchedPairs).includes(translation)}
+                onClick={() => onSelectRight(translation)}
+              >
+                {translation}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (question.type === "buildSentence") {
+    return (
+      <div className="training-question-stack" data-training-type="build">
+        <span className="eyebrow">{t.buildSentence}</span>
+        <h2>{question.prompt}</h2>
+        <div className="sentence-build-zone">
+          {builtWords.length ? (
+            builtWords.map((word, index) => (
+              <button key={`${word}-${index}`} className="word-chip" type="button" disabled={answered} onClick={() => onRemoveBuildWord(index)}>
+                {word}
+              </button>
+            ))
+          ) : (
+            <span>{t.buildSentence}</span>
+          )}
+        </div>
+        <div className="build-word-grid">
+          {question.options.map((word, index) => (
+            <button
+              key={`${word}-${index}`}
+              className="choice-button"
+              type="button"
+              disabled={answered || builtWords.filter((item) => item === word).length >= question.options.filter((item) => item === word).length}
+              onClick={() => onBuildWord(word)}
+            >
+              {word}
+            </button>
+          ))}
+        </div>
+        <button className="ghost-action" type="button" disabled={answered || builtWords.length !== question.options.length} onClick={onCheckBuiltSentence}>
+          {t.check}
+        </button>
+      </div>
+    );
+  }
+
+  const title = question.type === "audioWord" ? t.audioChooseWord : question.type === "audioTranslation" ? t.audioChooseTranslation : t.fillBlank;
+
+  return (
+    <div className="training-question-stack" data-training-type={question.type}>
+      <span className="eyebrow">{title}</span>
+      <h2>{question.type === "audioWord" || question.type === "audioTranslation" ? t.listenAndChoose : question.prompt}</h2>
+      {question.type === "audioWord" || question.type === "audioTranslation" ? (
+        <button className="audio-prompt-button" type="button" onClick={() => speech(question.word.word)}>
+          <Volume2 size={26} aria-hidden="true" />
+        </button>
+      ) : null}
+      <div className="choice-list">
+        {question.options.map((option) => (
+          <button
+            key={option}
+            className={selectedAnswer === option ? "choice-button selected" : "choice-button"}
+            type="button"
+            disabled={answered}
+            onClick={() => onChooseAnswer(option)}
+          >
+            {option}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function buildTrainingSession(preferredWords: VocabularyEntry[], allWords: VocabularyEntry[]) {
+  const pool = shuffleArray(preferredWords.length ? preferredWords : allWords);
+  const sessionWords = Array.from({ length: 10 }, (_, index) => pool[index % pool.length]);
+  const types: TrainingQuestion["type"][] = shuffleArray([
+    "match",
+    "audioWord",
+    "audioTranslation",
+    "fillBlank",
+    "buildSentence",
+    "audioWord",
+    "audioTranslation",
+    "fillBlank",
+    "buildSentence",
+    "match",
+  ]);
+
+  return sessionWords.map((word, index) => createTrainingQuestion(types[index], word, allWords, index));
+}
+
+function createTrainingQuestion(type: TrainingQuestion["type"], word: VocabularyEntry, allWords: VocabularyEntry[], index: number): TrainingQuestion {
+  if (type === "match") {
+    const words = shuffleArray([word, ...shuffleArray(allWords.filter((item) => item.word !== word.word)).slice(0, 2)]);
+    return { id: `match-${index}`, type: "match", words, translations: shuffleArray(words.map((item) => item.translation)) };
+  }
+
+  if (type === "audioWord") {
+    return {
+      id: `audio-word-${index}`,
+      type,
+      word,
+      prompt: word.word,
+      answer: word.word,
+      options: answerOptions(word.word, allWords.filter((item) => item.word !== word.word).map((item) => item.word)),
+    };
+  }
+
+  if (type === "audioTranslation") {
+    return {
+      id: `audio-translation-${index}`,
+      type,
+      word,
+      prompt: word.word,
+      answer: word.translation,
+      options: answerOptions(word.translation, allWords.filter((item) => item.word !== word.word).map((item) => item.translation)),
+    };
+  }
+
+  if (type === "fillBlank") {
+    const sentence = bestTrainingSentence(word);
+    const prompt = sentence.replace(new RegExp(`\\b${escapeRegExp(word.word)}\\b`, "i"), "____");
+    const answer = word.word.split(" ")[0];
+    return {
+      id: `fill-${index}`,
+      type,
+      word,
+      prompt: prompt.includes("____") ? prompt : `Choose the word: ____`,
+      answer,
+      options: answerOptions(answer, allWords.filter((item) => item.word !== word.word).map((item) => item.word.split(" ")[0])),
+    };
+  }
+
+  const targetSentence = bestTrainingSentence(word);
+  const sentenceWords = targetSentence.replace(/[.!?]+$/g, "").split(/\s+/).slice(0, 7);
+  return {
+    id: `build-${index}`,
+    type: "buildSentence",
+    word,
+    prompt: targetSentence,
+    answer: sentenceWords.join(" "),
+    options: shuffleArray(sentenceWords),
+    targetSentence,
+  };
+}
+
+function bestTrainingSentence(word: VocabularyEntry) {
+  if (word.example && word.example.split(/\s+/).length <= 8) return word.example.replace(/[.!?]+$/g, ".");
+  return `Tom learns ${word.word}.`;
+}
+
+function trainingAnswerText(question: TrainingQuestion) {
+  if (question.type === "match") return question.words.map((word) => `${word.word} ↔ ${word.translation}`).join(", ");
+  return question.answer;
+}
+
+function isCurrentTrainingAnswerCorrect(question: TrainingQuestion, selectedAnswer: string | null, matchedPairs: Record<string, string>) {
+  if (question.type === "match") return question.words.every((word) => matchedPairs[word.word] === word.translation);
+  return selectedAnswer === question.answer;
+}
+
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 function StatisticsPage({
   t,
   progress,
@@ -856,6 +1317,7 @@ function navItems(t: Copy): Array<{ page: Page; label: string; short: string; ic
     { page: "home", label: t.home, short: t.home, icon: <Home size={20} /> },
     { page: "learn", label: t.learn, short: t.learn, icon: <GraduationCap size={20} /> },
     { page: "words", label: t.wordsPage, short: t.wordsPage, icon: <BookOpen size={20} /> },
+    { page: "training", label: t.training, short: t.training, icon: <Target size={20} /> },
     { page: "stats", label: t.stats, short: t.stats, icon: <BarChart3 size={20} /> },
     { page: "settings", label: t.settings, short: t.settings, icon: <Settings size={20} /> },
   ];
