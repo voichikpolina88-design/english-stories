@@ -13,6 +13,8 @@
   --pink: #d89bea;
   --purple: #b89af8;
   --primary: #cbb8ff;
+  --sky: #9edfff;
+  --sky-soft: #eef9ff;
   --lavender: #f0ebff;
   --blush: #fbf3ff;
   --line: rgba(77, 55, 105, 0.11);
@@ -938,7 +940,7 @@ p {
 .round-button.active,
 .audio-button.active {
   color: #fff;
-  background: linear-gradient(135deg, var(--primary), var(--purple));
+  background: linear-gradient(135deg, var(--sky), #79c9f2);
 }
 
 .audio-button {
@@ -946,14 +948,14 @@ p {
   width: 34px;
   height: 34px;
   border-radius: 13px;
-  background: var(--lavender);
-  color: var(--purple);
-  box-shadow: inset 0 0 0 1px rgba(203, 184, 255, 0.35);
+  background: var(--sky-soft);
+  color: #4f9fca;
+  box-shadow: inset 0 0 0 1px rgba(158, 223, 255, 0.42);
 }
 
 .audio-button:hover {
   transform: translateY(-1px);
-  background: #f8f3ff;
+  background: #e2f5ff;
 }
 
 .lesson-card-stage {
@@ -1203,7 +1205,7 @@ p {
 }
 
 .chat-row.right .chat-message .audio-button {
-  color: var(--purple);
+  color: #4f9fca;
 }
 
 .chat-inline-illustration {
@@ -1464,7 +1466,7 @@ p {
   height: 56px;
   place-items: center;
   border-radius: 20px;
-  background: linear-gradient(135deg, #fff4fb, #eee8ff);
+  background: linear-gradient(135deg, var(--sky-soft), #eee8ff);
   font-size: 1.7rem;
 }
 
@@ -1480,7 +1482,7 @@ p {
 }
 
 .word-card-main span {
-  color: var(--purple);
+  color: #4f9fca;
   font-weight: 950;
 }
 
@@ -1509,6 +1511,15 @@ p {
   background: linear-gradient(135deg, #fff, var(--lavender));
   color: var(--purple);
   box-shadow: inset 0 0 0 1px rgba(203, 184, 255, 0.42);
+}
+
+.smart-word-card .round-button {
+  background: var(--sky-soft);
+  color: #4f9fca;
+}
+
+.smart-word-card .round-button:hover {
+  background: #e2f5ff;
 }
 
 .word-card-close {
@@ -1565,6 +1576,38 @@ p {
   gap: 14px;
 }
 
+.vocabulary-section-card {
+  display: grid;
+  gap: 14px;
+}
+
+.vocabulary-section-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: 54px;
+  border: 0;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #fff, var(--sky-soft));
+  color: var(--ink);
+  font-size: 1.08rem;
+  font-weight: 950;
+  text-align: left;
+  box-shadow: inset 0 0 0 1px rgba(158, 223, 255, 0.46);
+}
+
+.vocabulary-section-toggle span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.vocabulary-section-toggle strong {
+  color: #4f9fca;
+  font-size: 0.95rem;
+}
+
 .audio-prompt-button {
   display: grid;
   width: 92px;
@@ -1573,9 +1616,9 @@ p {
   justify-self: center;
   border: 0;
   border-radius: 32px;
-  background: linear-gradient(135deg, var(--primary), var(--purple));
+  background: linear-gradient(135deg, var(--sky), #8dcfff);
   color: #fff;
-  box-shadow: var(--button-shadow);
+  box-shadow: 0 16px 30px rgba(99, 183, 224, 0.28);
 }
 
 .training-result {

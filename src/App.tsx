@@ -597,8 +597,24 @@ function WordsPage({
         </section>
       ) : null}
 
-      <VocabularySection title={`⭐ ${t.myWords}`} words={savedVocabulary} savedWords={savedWords} labels={t} onSpeak={speech.toggle} onToggleSavedWord={onToggleSavedWord} />
-      <VocabularySection title={`📖 ${t.allWords}`} words={allWords} savedWords={savedWords} labels={t} onSpeak={speech.toggle} onToggleSavedWord={onToggleSavedWord} />
+      <VocabularySection
+        title={`⭐ ${t.myWords}`}
+        words={savedVocabulary}
+        savedWords={savedWords}
+        labels={t}
+        defaultOpen
+        onSpeak={speech.toggle}
+        onToggleSavedWord={onToggleSavedWord}
+      />
+      <VocabularySection
+        title={`📚 ${t.allWords}`}
+        words={allWords}
+        savedWords={savedWords}
+        labels={t}
+        defaultOpen={false}
+        onSpeak={speech.toggle}
+        onToggleSavedWord={onToggleSavedWord}
+      />
     </main>
   );
 }
@@ -608,6 +624,7 @@ function VocabularySection({
   words,
   savedWords,
   labels,
+  defaultOpen = true,
   onSpeak,
   onToggleSavedWord,
 }: {
@@ -615,34 +632,39 @@ function VocabularySection({
   words: VocabularyEntry[];
   savedWords: string[];
   labels: Copy;
+  defaultOpen?: boolean;
   onSpeak: (text: string) => void;
   onToggleSavedWord: (word: string) => void;
 }) {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+
   return (
-    <section className="content-card">
-      <div className="section-header">
-        <h2>{title}</h2>
-        <span className="soft-pill">{words.length}</span>
-      </div>
-      {words.length ? (
-        <div className="smart-vocab-grid">
-          {words.map((word) => (
-            <WordCard
-              key={word.id}
-              word={word}
-              saved={savedWords.includes(word.word)}
-              labels={{ addWord: labels.addWord, saved: labels.saved }}
-              onSpeak={onSpeak}
-              onToggleSave={onToggleSavedWord}
-            />
-          ))}
-        </div>
-      ) : (
-        <div className="empty-state">
-          <span>📚</span>
-          <p>{labels.noSavedWords}</p>
-        </div>
-      )}
+    <section className="content-card vocabulary-section-card">
+      <button className="vocabulary-section-toggle" type="button" onClick={() => setIsOpen((current) => !current)}>
+        <span>{title} ({words.length})</span>
+        <strong>{isOpen ? "▲" : "▶"}</strong>
+      </button>
+      {isOpen ? (
+        words.length ? (
+          <div className="smart-vocab-grid">
+            {words.map((word) => (
+              <WordCard
+                key={word.id}
+                word={word}
+                saved={savedWords.includes(word.word)}
+                labels={{ addWord: labels.addWord, saved: labels.saved }}
+                onSpeak={onSpeak}
+                onToggleSave={onToggleSavedWord}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="empty-state">
+            <span>📚</span>
+            <p>{labels.noSavedWords}</p>
+          </div>
+        )
+      ) : null}
     </section>
   );
 }

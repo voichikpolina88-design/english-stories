@@ -74,7 +74,7 @@ export function wordCardDataForText(text: string): WordCardData {
   const cleanWord = text.replace(/[^a-zA-Z' -]+/g, "").trim();
   return {
     word: cleanWord,
-    translation: "перевод скоро",
+    translation: "слово из истории",
     ipa: ipaForWord(cleanWord),
   };
 }

@@ -5,7 +5,7 @@ import { ipaForWord } from "../data/vocabulary";
 import type { Challenge, NativeLanguage, QuizQuestion, Story, VocabularyItem } from "../types";
 import { ClickableText } from "./ClickableText";
 import { ProgressBar } from "./ProgressBar";
-import { WordCardModal, wordCardDataForText, type WordCardData } from "./WordCard";
+import { WordCardModal, type WordCardData } from "./WordCard";
 
 type LessonScreenProps = {
   story: Story;
@@ -246,7 +246,6 @@ export function LessonScreen({
             feedback={feedback}
             ui={ui}
             speech={speech}
-            onWordClick={setActiveWord}
             onSelect={setSelectedAnswer}
             onCheck={() => checkChallenge(step.challenge)}
             onNext={moveNext}
@@ -259,7 +258,6 @@ export function LessonScreen({
             ui={ui}
             quizAnswers={quizAnswers}
             quizSubmitted={quizSubmitted}
-            onWordClick={setActiveWord}
             onAnswer={(index, answer) => setQuizAnswers((current) => ({ ...current, [index]: answer }))}
             onSubmit={() => submitQuiz(step.quiz)}
             onNext={moveNext}
@@ -457,7 +455,6 @@ function VocabularyChallenge({
   feedback,
   ui,
   speech,
-  onWordClick,
   onSelect,
   onCheck,
   onNext,
@@ -467,7 +464,6 @@ function VocabularyChallenge({
   feedback: "correct" | "wrong" | null;
   ui: LessonScreenProps["ui"];
   speech: SpeechControls;
-  onWordClick: (word: WordCardData) => void;
   onSelect: (answer: string) => void;
   onCheck: () => void;
   onNext: () => void;
@@ -480,7 +476,7 @@ function VocabularyChallenge({
       <span className="eyebrow">{ui.check}</span>
       <h1>{ui.chooseAnswer}</h1>
       {vocabularyWord ? (
-        <div className="pronunciation-card clickable-pronunciation" role="button" tabIndex={0} onClick={() => onWordClick(wordCardDataForText(vocabularyWord))}>
+        <div className="pronunciation-card">
           <AudioButton text={vocabularyWord} speech={speech} />
           <div>
             <strong>{vocabularyWord}</strong>
@@ -489,7 +485,7 @@ function VocabularyChallenge({
           </div>
         </div>
       ) : null}
-      <p className="prompt-box"><ClickableText text={challengePromptText(challenge)} onWordClick={onWordClick} /></p>
+      <p className="prompt-box">{challengePromptText(challenge)}</p>
 
       <div className={challenge.type === "picture" ? "picture-options" : "choice-list"}>
         {challenge.shuffledOptions.map((option) => (
@@ -530,7 +526,6 @@ function QuizCard({
   ui,
   quizAnswers,
   quizSubmitted,
-  onWordClick,
   onAnswer,
   onSubmit,
   onNext,
@@ -539,7 +534,6 @@ function QuizCard({
   ui: LessonScreenProps["ui"];
   quizAnswers: Record<number, string>;
   quizSubmitted: boolean;
-  onWordClick: (word: WordCardData) => void;
   onAnswer: (index: number, answer: string) => void;
   onSubmit: () => void;
   onNext: () => void;
@@ -554,7 +548,7 @@ function QuizCard({
       <div className="quiz-list">
         {quiz.map((question, index) => (
           <div className="quiz-item" key={question.question}>
-            <h2><ClickableText text={question.question} onWordClick={onWordClick} /></h2>
+            <h2>{question.question}</h2>
             <div className="choice-list">
               {question.shuffledOptions.map((option) => (
                 <button
