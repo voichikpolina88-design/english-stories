@@ -98,6 +98,13 @@ export function useLearnerProgress() {
     });
   }
 
+  function saveWords(words: string[]) {
+    setProgress((current) => ({
+      ...current,
+      savedWords: Array.from(new Set([...current.savedWords, ...words])),
+    }));
+  }
+
   function toggleFavoriteWord(word: string) {
     setProgress((current) => {
       const isFavorite = current.favoriteWords.includes(word);
@@ -128,6 +135,7 @@ export function useLearnerProgress() {
     completeLesson,
     selectLanguage,
     toggleSavedWord,
+    saveWords,
     toggleFavoriteWord,
     saveTestScore,
   };

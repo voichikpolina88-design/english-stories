@@ -1405,6 +1405,191 @@ p {
   gap: 10px;
 }
 
+.inline-word-button {
+  display: inline;
+  padding: 0 2px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: inherit;
+  text-decoration: underline;
+  text-decoration-color: rgba(184, 154, 248, 0.42);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+.inline-word-button:hover {
+  background: rgba(203, 184, 255, 0.18);
+  color: var(--purple);
+}
+
+.word-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: end center;
+  padding: 18px;
+  background: rgba(58, 48, 72, 0.18);
+  backdrop-filter: blur(10px);
+}
+
+.word-modal {
+  width: min(430px, 100%);
+}
+
+.smart-word-card {
+  position: relative;
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid rgba(203, 184, 255, 0.36);
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 22px 52px rgba(83, 62, 124, 0.16);
+}
+
+.word-card-main {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+}
+
+.word-card-emoji {
+  display: grid;
+  width: 56px;
+  height: 56px;
+  place-items: center;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #fff4fb, #eee8ff);
+  font-size: 1.7rem;
+}
+
+.word-card-main h3,
+.word-card-main span,
+.word-card-main p {
+  display: block;
+}
+
+.word-card-main h3 {
+  color: var(--ink);
+  font-size: 1.35rem;
+}
+
+.word-card-main span {
+  color: var(--purple);
+  font-weight: 950;
+}
+
+.word-card-main p {
+  color: var(--muted);
+  font-weight: 850;
+}
+
+.word-card-actions {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+}
+
+.save-word-button {
+  min-height: 42px;
+  border: 0;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--primary), var(--purple));
+  color: #fff;
+  font-weight: 950;
+  box-shadow: var(--button-shadow);
+}
+
+.save-word-button.saved {
+  background: linear-gradient(135deg, #fff, var(--lavender));
+  color: var(--purple);
+  box-shadow: inset 0 0 0 1px rgba(203, 184, 255, 0.42);
+}
+
+.word-card-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 0;
+  border-radius: 13px;
+  background: var(--blush);
+  color: var(--muted);
+}
+
+.clickable-pronunciation {
+  width: 100%;
+  cursor: pointer;
+}
+
+.story-words-action {
+  max-width: 520px;
+}
+
+.words-page .page-title p {
+  max-width: 620px;
+}
+
+.words-hero-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+}
+
+.words-hero-card h2 {
+  margin-top: 4px;
+  font-size: clamp(2rem, 6vw, 3.5rem);
+}
+
+.smart-vocab-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 12px;
+}
+
+.smart-vocab-grid .smart-word-card {
+  box-shadow: 0 12px 30px rgba(83, 62, 124, 0.07);
+}
+
+.vocab-training-card {
+  display: grid;
+  gap: 14px;
+}
+
+.audio-prompt-button {
+  display: grid;
+  width: 92px;
+  height: 92px;
+  place-items: center;
+  justify-self: center;
+  border: 0;
+  border-radius: 32px;
+  background: linear-gradient(135deg, var(--primary), var(--purple));
+  color: #fff;
+  box-shadow: var(--button-shadow);
+}
+
+.training-result {
+  display: grid;
+  gap: 12px;
+  justify-items: center;
+  text-align: center;
+}
+
+.training-result strong {
+  color: var(--purple);
+  font-size: 2.5rem;
+}
+
 .mobile-nav {
   display: none;
 }
@@ -1430,7 +1615,7 @@ p {
     left: 12px;
     z-index: 20;
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 6px;
     padding: 8px;
     border: 1px solid var(--line);
@@ -1448,7 +1633,7 @@ p {
     border-radius: 20px;
     background: transparent;
     color: var(--muted);
-    font-size: 0.68rem;
+    font-size: 0.62rem;
     font-weight: 900;
   }
 
@@ -1459,7 +1644,8 @@ p {
   }
 
   .hero-dashboard,
-  .test-layout {
+  .test-layout,
+  .words-hero-card {
     grid-template-columns: 1fr;
   }
 
@@ -1737,5 +1923,28 @@ p {
 
   .reward-grid {
     grid-template-columns: 1fr;
+  }
+
+  .word-modal-backdrop {
+    align-items: end;
+    padding: 10px;
+  }
+
+  .smart-vocab-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .word-card-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .word-card-actions .round-button {
+    width: 100%;
+  }
+
+  .audio-prompt-button {
+    width: 82px;
+    height: 82px;
+    border-radius: 28px;
   }
 }

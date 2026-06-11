@@ -3,7 +3,9 @@ import { useEffect, useMemo, useState } from "react";
 import { emojiForWord, getTranslation } from "../data/translations";
 import { ipaForWord } from "../data/vocabulary";
 import type { Challenge, NativeLanguage, QuizQuestion, Story, VocabularyItem } from "../types";
+import { ClickableText } from "./ClickableText";
 import { ProgressBar } from "./ProgressBar";
+import { WordCardModal, wordCardDataForText, type WordCardData } from "./WordCard";
 
 type LessonScreenProps = {
   story: Story;
@@ -27,12 +29,18 @@ type LessonScreenProps = {
     trueLabel: string;
     falseLabel: string;
     words: string;
+    addWord?: string;
+    saved?: string;
+    addStoryWords?: string;
   };
   initialProgress: number;
   isCompleted: boolean;
+  savedWords: string[];
   streak: number;
   onBack: () => void;
   onNextLesson: () => void;
+  onToggleSavedWord: (word: string) => void;
+  onSaveStoryWords: (words: string[]) => void;
   onStepChange: (storyId: string, progressValue: number) => void;
   onComplete: (storyId: string, xpReward: number) => void;
 };
@@ -112,8 +120,11 @@ export function LessonScreen({
   ui,
   initialProgress,
   isCompleted,
+  savedWords,
   onBack,
   onNextLesson,
+  onToggleSavedWord,
+  onSaveStoryWords,
   onStepChange,
   onComplete,
 }: LessonScreenProps) {
@@ -127,6 +138,7 @@ export function LessonScreen({
   const [quizAnswers, setQuizAnswers] = useState<Record<number, string>>({});
   const [quizSubmitted, setQuizSubmitted] = useState(false);
   const [readingMode, setReadingMode] = useState<ReadingMode>("story");
+  const [activeWord, setActiveWord] = useState<WordCardData | null>(null);
   const speech = useSpeech();
 
   const step = steps[stepIndex];
@@ -203,9 +215,27 @@ export function LessonScreen({
       <section className="lesson-card-stage">
         {step.type === "story" ? (
           readingMode === "chat" ? (
-            <ChatStoryCard story={story} title={step.title} content={step.content} index={step.index} speech={speech} onNext={moveNext} ui={ui} />
+            <ChatStoryCard
+              story={story}
+              title={step.title}
+              content={step.content}
+              index={step.index}
+              speech={speech}
+              onWordClick={setActiveWord}
+              onNext={moveNext}
+              ui={ui}
+            />
           ) : (
-            <StoryCard story={story} title={step.title} content={step.content} index={step.index} speech={speech} onNext={moveNext} ui={ui} />
+            <StoryCard
+              story={story}
+              title={step.title}
+              content={step.content}
+              index={step.index}
+              speech={speech}
+              onWordClick={setActiveWord}
+              onNext={moveNext}
+              ui={ui}
+            />
           )
         ) : null}
 
@@ -216,6 +246,7 @@ export function LessonScreen({
             feedback={feedback}
             ui={ui}
             speech={speech}
+            onWordClick={setActiveWord}
             onSelect={setSelectedAnswer}
             onCheck={() => checkChallenge(step.challenge)}
             onNext={moveNext}
@@ -228,6 +259,7 @@ export function LessonScreen({
             ui={ui}
             quizAnswers={quizAnswers}
             quizSubmitted={quizSubmitted}
+            onWordClick={setActiveWord}
             onAnswer={(index, answer) => setQuizAnswers((current) => ({ ...current, [index]: answer }))}
             onSubmit={() => submitQuiz(step.quiz)}
             onNext={moveNext}
@@ -244,9 +276,22 @@ export function LessonScreen({
             onNextLesson={onNextLesson}
             language={language}
             speech={speech}
+            savedWords={savedWords}
+            onToggleSavedWord={onToggleSavedWord}
+            onSaveStoryWords={onSaveStoryWords}
           />
         ) : null}
       </section>
+      {activeWord ? (
+        <WordCardModal
+          word={activeWord}
+          saved={savedWords.includes(activeWord.word)}
+          labels={{ addWord: ui.addWord ?? "Добавить в мои слова", saved: ui.saved ?? "Сохранено", close: "Close" }}
+          onSpeak={speech.toggle}
+          onToggleSave={onToggleSavedWord}
+          onClose={() => setActiveWord(null)}
+        />
+      ) : null}
     </main>
   );
 }
@@ -276,6 +321,7 @@ function StoryCard({
   index,
   ui,
   speech,
+  onWordClick,
   onNext,
 }: {
   story: Story;
@@ -284,6 +330,7 @@ function StoryCard({
   index: number;
   ui: LessonScreenProps["ui"];
   speech: SpeechControls;
+  onWordClick: (word: WordCardData) => void;
   onNext: () => void;
 }) {
   const character = characterForStory(story.id);
@@ -313,7 +360,7 @@ function StoryCard({
         {sentences.map((sentence) => (
           <p className="sentence-row" key={sentence}>
             <AudioButton text={sentence} speech={speech} />
-            <span>{sentence}</span>
+            <span><ClickableText text={sentence} onWordClick={onWordClick} /></span>
           </p>
         ))}
       </div>
@@ -333,6 +380,7 @@ function ChatStoryCard({
   index,
   ui,
   speech,
+  onWordClick,
   onNext,
 }: {
   story: Story;
@@ -341,6 +389,7 @@ function ChatStoryCard({
   index: number;
   ui: LessonScreenProps["ui"];
   speech: SpeechControls;
+  onWordClick: (word: WordCardData) => void;
   onNext: () => void;
 }) {
   const messages = chatMessagesForStory(story, index, content);
@@ -380,7 +429,7 @@ function ChatStoryCard({
                   <strong>{message.speaker}</strong>
                   <p className="sentence-row">
                     <AudioButton text={message.text} speech={speech} />
-                    <span>{message.text}</span>
+                    <span><ClickableText text={message.text} onWordClick={onWordClick} /></span>
                   </p>
                 </div>
               </div>
@@ -408,6 +457,7 @@ function VocabularyChallenge({
   feedback,
   ui,
   speech,
+  onWordClick,
   onSelect,
   onCheck,
   onNext,
@@ -417,6 +467,7 @@ function VocabularyChallenge({
   feedback: "correct" | "wrong" | null;
   ui: LessonScreenProps["ui"];
   speech: SpeechControls;
+  onWordClick: (word: WordCardData) => void;
   onSelect: (answer: string) => void;
   onCheck: () => void;
   onNext: () => void;
@@ -429,7 +480,7 @@ function VocabularyChallenge({
       <span className="eyebrow">{ui.check}</span>
       <h1>{ui.chooseAnswer}</h1>
       {vocabularyWord ? (
-        <div className="pronunciation-card">
+        <div className="pronunciation-card clickable-pronunciation" role="button" tabIndex={0} onClick={() => onWordClick(wordCardDataForText(vocabularyWord))}>
           <AudioButton text={vocabularyWord} speech={speech} />
           <div>
             <strong>{vocabularyWord}</strong>
@@ -438,7 +489,7 @@ function VocabularyChallenge({
           </div>
         </div>
       ) : null}
-      <p className="prompt-box">{challengePromptText(challenge)}</p>
+      <p className="prompt-box"><ClickableText text={challengePromptText(challenge)} onWordClick={onWordClick} /></p>
 
       <div className={challenge.type === "picture" ? "picture-options" : "choice-list"}>
         {challenge.shuffledOptions.map((option) => (
@@ -479,6 +530,7 @@ function QuizCard({
   ui,
   quizAnswers,
   quizSubmitted,
+  onWordClick,
   onAnswer,
   onSubmit,
   onNext,
@@ -487,6 +539,7 @@ function QuizCard({
   ui: LessonScreenProps["ui"];
   quizAnswers: Record<number, string>;
   quizSubmitted: boolean;
+  onWordClick: (word: WordCardData) => void;
   onAnswer: (index: number, answer: string) => void;
   onSubmit: () => void;
   onNext: () => void;
@@ -501,7 +554,7 @@ function QuizCard({
       <div className="quiz-list">
         {quiz.map((question, index) => (
           <div className="quiz-item" key={question.question}>
-            <h2>{question.question}</h2>
+            <h2><ClickableText text={question.question} onWordClick={onWordClick} /></h2>
             <div className="choice-list">
               {question.shuffledOptions.map((option) => (
                 <button
@@ -538,6 +591,9 @@ function CompleteCard({
   onNextLesson,
   language,
   speech,
+  savedWords,
+  onToggleSavedWord,
+  onSaveStoryWords,
 }: {
   story: Story;
   ui: LessonScreenProps["ui"];
@@ -547,6 +603,9 @@ function CompleteCard({
   onNextLesson: () => void;
   language: NativeLanguage;
   speech: SpeechControls;
+  savedWords: string[];
+  onToggleSavedWord: (word: string) => void;
+  onSaveStoryWords: (words: string[]) => void;
 }) {
   return (
     <article className="learning-card complete-card polished-card">
@@ -577,6 +636,9 @@ function CompleteCard({
           </div>
         ))}
       </div>
+      <button className="ghost-action story-words-action" type="button" onClick={() => onSaveStoryWords(story.vocabulary.map((item) => item.word))}>
+        📚 {ui.addStoryWords ?? "Добавить все слова истории"}
+      </button>
       <div className="completion-actions">
         <button className="primary-button full" type="button" onClick={onNextLesson}>
           {ui.nextLesson}
@@ -598,7 +660,10 @@ function AudioButton({ text, speech }: { text: string; speech: SpeechControls })
       className={isActive ? "audio-button active" : "audio-button"}
       type="button"
       aria-label={isActive ? "Pause audio" : "Play audio"}
-      onClick={() => speech.toggle(normalizedText)}
+      onClick={(event) => {
+        event.stopPropagation();
+        speech.toggle(normalizedText);
+      }}
     >
       <Volume2 size={15} aria-hidden="true" />
     </button>

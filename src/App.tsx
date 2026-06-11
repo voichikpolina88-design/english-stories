@@ -1,5 +1,6 @@
 import {
   BarChart3,
+  BookOpen,
   CheckCircle2,
   Flame,
   GraduationCap,
@@ -10,15 +11,18 @@ import {
   Sparkles,
   Star,
   Trophy,
+  Volume2,
 } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { LessonScreen } from "./components/LessonScreen";
 import { ProgressBar } from "./components/ProgressBar";
+import { WordCard } from "./components/WordCard";
 import { getStoryById, stories } from "./data/stories";
+import { getAllVocabulary as getVocabularyDatabase, type VocabularyEntry } from "./data/vocabulary";
 import { useLearnerProgress } from "./hooks/useLearnerProgress";
 import type { NativeLanguage, Story } from "./types";
 
-type Page = "home" | "learn" | "stats" | "settings";
+type Page = "home" | "learn" | "words" | "stats" | "settings";
 
 const languages: NativeLanguage[] = ["Russian", "English"];
 
@@ -30,6 +34,7 @@ const copy = {
     chooseHelp: "Интерфейс и переводы будут использовать этот язык.",
     home: "Главная",
     learn: "Учиться",
+    wordsPage: "Слова",
     stats: "Статистика",
     settings: "Настройки",
     learner: "Ежедневный ученик",
@@ -65,6 +70,20 @@ const copy = {
     trueLabel: "Правда",
     falseLabel: "Ложь",
     words: "слов",
+    myWords: "Мои слова",
+    allWords: "Все слова",
+    trainMyWords: "Тренировать мои слова",
+    addWord: "Добавить в мои слова",
+    saved: "Сохранено",
+    addStoryWords: "Добавить все слова истории",
+    chooseTranslation: "Выбери перевод",
+    chooseEnglish: "Выбери английское слово",
+    audioTest: "Аудио-тест",
+    listenAndChoose: "Послушай и выбери слово",
+    noSavedWords: "Сохраняйте слова в историях, чтобы тренировать их здесь.",
+    nextQuestion: "Следующий вопрос",
+    finishTraining: "Завершить",
+    trainingResult: "Результат тренировки",
   },
   English: {
     appName: "English Stories",
@@ -73,6 +92,7 @@ const copy = {
     chooseHelp: "Interface text and translations will use this language.",
     home: "Home",
     learn: "Learn",
+    wordsPage: "Words",
     stats: "Statistics",
     settings: "Settings",
     learner: "Daily learner",
@@ -108,6 +128,20 @@ const copy = {
     trueLabel: "True",
     falseLabel: "False",
     words: "words",
+    myWords: "My Words",
+    allWords: "All Words",
+    trainMyWords: "Train my words",
+    addWord: "Add to my words",
+    saved: "Saved",
+    addStoryWords: "Add all story words",
+    chooseTranslation: "Choose translation",
+    chooseEnglish: "Choose English word",
+    audioTest: "Audio test",
+    listenAndChoose: "Listen and choose the word",
+    noSavedWords: "Save words inside stories to practice them here.",
+    nextQuestion: "Next question",
+    finishTraining: "Finish",
+    trainingResult: "Training result",
   },
 };
 
@@ -116,7 +150,16 @@ type Copy = typeof copy.English;
 function App() {
   const [page, setPage] = useState<Page>("home");
   const [activeStoryId, setActiveStoryId] = useState<string | null>(null);
-  const { progress, currentLevel, saveLessonProgress, completeLesson, selectLanguage } = useLearnerProgress();
+  const {
+    progress,
+    currentLevel,
+    saveLessonProgress,
+    completeLesson,
+    selectLanguage,
+    toggleSavedWord,
+    saveWords,
+    saveTestScore,
+  } = useLearnerProgress();
 
   const language = progress.selectedLanguage ?? "Russian";
   const t = copy[language];
@@ -163,8 +206,11 @@ function App() {
             ui={t}
             initialProgress={progress.lessonProgress[activeStory.id] ?? 0}
             isCompleted={progress.completedLessons.includes(activeStory.id)}
+            savedWords={progress.savedWords}
             streak={progress.streak}
             onBack={() => setActiveStoryId(null)}
+            onToggleSavedWord={toggleSavedWord}
+            onSaveStoryWords={saveWords}
             onStepChange={saveLessonProgress}
             onComplete={(storyId, xpReward) => {
               const storyIndex = stories.findIndex((story) => story.id === storyId);
@@ -197,6 +243,14 @@ function App() {
             ) : null}
             {page === "learn" ? (
               <LearnPage t={t} progress={progress} onStartLesson={openLesson} isLessonUnlocked={isLessonUnlocked} />
+            ) : null}
+            {page === "words" ? (
+              <WordsPage
+                t={t}
+                savedWords={progress.savedWords}
+                onToggleSavedWord={toggleSavedWord}
+                onSaveTestScore={saveTestScore}
+              />
             ) : null}
             {page === "stats" ? (
               <StatisticsPage t={t} progress={progress} currentLevel={currentLevelLabel} totalProgress={totalProgress} />
@@ -416,6 +470,241 @@ function LearnPage({
   );
 }
 
+type VocabularyQuestion = {
+  type: "translation" | "english" | "audio";
+  prompt: string;
+  answer: string;
+  options: string[];
+  word: VocabularyEntry;
+};
+
+function WordsPage({
+  t,
+  savedWords,
+  onToggleSavedWord,
+  onSaveTestScore,
+}: {
+  t: Copy;
+  savedWords: string[];
+  onToggleSavedWord: (word: string) => void;
+  onSaveTestScore: (score: number, total: number, type: string) => void;
+}) {
+  const allWords = useMemo(() => getVocabularyDatabase(), []);
+  const savedVocabulary = allWords.filter((word) => savedWords.includes(word.word));
+  const [training, setTraining] = useState<VocabularyQuestion[] | null>(null);
+  const [questionIndex, setQuestionIndex] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+  const [score, setScore] = useState(0);
+  const [finished, setFinished] = useState(false);
+  const speech = useVocabularySpeech();
+
+  const currentQuestion = training?.[questionIndex];
+
+  function startTraining() {
+    const questions = buildVocabularyTraining(savedVocabulary, allWords);
+    setTraining(questions);
+    setQuestionIndex(0);
+    setSelectedAnswer(null);
+    setScore(0);
+    setFinished(false);
+  }
+
+  function answerQuestion(answer: string) {
+    if (!currentQuestion || selectedAnswer) return;
+    setSelectedAnswer(answer);
+    if (answer === currentQuestion.answer) {
+      setScore((current) => current + 1);
+    }
+  }
+
+  function moveTrainingNext() {
+    if (!training) return;
+    if (questionIndex >= training.length - 1) {
+      setFinished(true);
+      onSaveTestScore(score, training.length, "vocabulary");
+      return;
+    }
+
+    setQuestionIndex((current) => current + 1);
+    setSelectedAnswer(null);
+  }
+
+  return (
+    <main className="page-stack words-page">
+      <PageTitle label={t.wordsPage} title={t.wordsPage} text={t.noSavedWords} />
+
+      <section className="content-card words-hero-card">
+        <div>
+          <span className="eyebrow">⭐ {t.myWords}</span>
+          <h2>{savedVocabulary.length} {t.words}</h2>
+          <p>{savedVocabulary.length ? t.trainMyWords : t.noSavedWords}</p>
+        </div>
+        <button className="primary-button" type="button" disabled={!savedVocabulary.length} onClick={startTraining}>
+          {t.trainMyWords}
+        </button>
+      </section>
+
+      {training && currentQuestion ? (
+        <section className="content-card vocab-training-card">
+          {finished ? (
+            <div className="training-result">
+              <span className="celebration-mark">✨</span>
+              <h2>{t.trainingResult}</h2>
+              <strong>{score}/{training.length}</strong>
+              <button className="primary-button full" type="button" onClick={startTraining}>
+                {t.trainMyWords}
+              </button>
+            </div>
+          ) : (
+            <>
+              <div className="section-header">
+                <div>
+                  <span className="eyebrow">
+                    {currentQuestion.type === "translation" ? t.chooseTranslation : currentQuestion.type === "english" ? t.chooseEnglish : t.audioTest}
+                  </span>
+                  <h2>{currentQuestion.type === "audio" ? t.listenAndChoose : currentQuestion.prompt}</h2>
+                </div>
+                <span className="soft-pill">{questionIndex + 1}/{training.length}</span>
+              </div>
+              {currentQuestion.type === "audio" ? (
+                <button className="audio-prompt-button" type="button" onClick={() => speech.toggle(currentQuestion.word.word)}>
+                  <Volume2 size={24} aria-hidden="true" />
+                </button>
+              ) : null}
+              <div className="choice-list">
+                {currentQuestion.options.map((option) => (
+                  <button
+                    key={option}
+                    className={selectedAnswer === option ? "choice-button selected" : "choice-button"}
+                    type="button"
+                    disabled={selectedAnswer !== null}
+                    onClick={() => answerQuestion(option)}
+                  >
+                    {option}
+                  </button>
+                ))}
+              </div>
+              {selectedAnswer ? (
+                <div className={selectedAnswer === currentQuestion.answer ? "feedback correct" : "feedback wrong"}>
+                  {selectedAnswer === currentQuestion.answer ? t.correct : `${t.answer}: ${currentQuestion.answer}`}
+                </div>
+              ) : null}
+              <button className="primary-button full" type="button" disabled={!selectedAnswer} onClick={moveTrainingNext}>
+                {questionIndex >= training.length - 1 ? t.finishTraining : t.nextQuestion}
+              </button>
+            </>
+          )}
+        </section>
+      ) : null}
+
+      <VocabularySection title={`⭐ ${t.myWords}`} words={savedVocabulary} savedWords={savedWords} labels={t} onSpeak={speech.toggle} onToggleSavedWord={onToggleSavedWord} />
+      <VocabularySection title={`📖 ${t.allWords}`} words={allWords} savedWords={savedWords} labels={t} onSpeak={speech.toggle} onToggleSavedWord={onToggleSavedWord} />
+    </main>
+  );
+}
+
+function VocabularySection({
+  title,
+  words,
+  savedWords,
+  labels,
+  onSpeak,
+  onToggleSavedWord,
+}: {
+  title: string;
+  words: VocabularyEntry[];
+  savedWords: string[];
+  labels: Copy;
+  onSpeak: (text: string) => void;
+  onToggleSavedWord: (word: string) => void;
+}) {
+  return (
+    <section className="content-card">
+      <div className="section-header">
+        <h2>{title}</h2>
+        <span className="soft-pill">{words.length}</span>
+      </div>
+      {words.length ? (
+        <div className="smart-vocab-grid">
+          {words.map((word) => (
+            <WordCard
+              key={word.id}
+              word={word}
+              saved={savedWords.includes(word.word)}
+              labels={{ addWord: labels.addWord, saved: labels.saved }}
+              onSpeak={onSpeak}
+              onToggleSave={onToggleSavedWord}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="empty-state">
+          <span>📚</span>
+          <p>{labels.noSavedWords}</p>
+        </div>
+      )}
+    </section>
+  );
+}
+
+function buildVocabularyTraining(savedVocabulary: VocabularyEntry[], allWords: VocabularyEntry[]) {
+  return shuffleArray(savedVocabulary)
+    .slice(0, 8)
+    .map((word, index) => {
+      const type = (["translation", "english", "audio"] as const)[index % 3];
+      if (type === "translation") {
+        const options = answerOptions(
+          word.translation,
+          allWords.filter((item) => item.word !== word.word).map((item) => item.translation),
+        );
+        return {
+          type,
+          prompt: word.word,
+          answer: word.translation,
+          options,
+          word,
+        };
+      }
+      const englishOptions = answerOptions(
+        word.word,
+        allWords.filter((item) => item.word !== word.word).map((item) => item.word),
+      );
+      return {
+        type,
+        prompt: type === "audio" ? word.word : word.translation,
+        answer: word.word,
+        options: englishOptions,
+        word,
+      };
+    });
+}
+
+function answerOptions(answer: string, distractors: string[]) {
+  return shuffleArray([answer, ...shuffleArray(distractors).slice(0, 3)]);
+}
+
+function shuffleArray<T>(items: T[]) {
+  const copyItems = Array.from(new Set(items));
+  for (let index = copyItems.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(Math.random() * (index + 1));
+    [copyItems[index], copyItems[swapIndex]] = [copyItems[swapIndex], copyItems[index]];
+  }
+  return copyItems;
+}
+
+function useVocabularySpeech() {
+  function toggle(text: string) {
+    if (!("speechSynthesis" in window)) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "en-US";
+    utterance.rate = 0.88;
+    window.speechSynthesis.speak(utterance);
+  }
+
+  return { toggle };
+}
+
 function StatisticsPage({
   t,
   progress,
@@ -544,6 +833,7 @@ function navItems(t: Copy): Array<{ page: Page; label: string; short: string; ic
   return [
     { page: "home", label: t.home, short: t.home, icon: <Home size={20} /> },
     { page: "learn", label: t.learn, short: t.learn, icon: <GraduationCap size={20} /> },
+    { page: "words", label: t.wordsPage, short: t.wordsPage, icon: <BookOpen size={20} /> },
     { page: "stats", label: t.stats, short: t.stats, icon: <BarChart3 size={20} /> },
     { page: "settings", label: t.settings, short: t.settings, icon: <Settings size={20} /> },
   ];

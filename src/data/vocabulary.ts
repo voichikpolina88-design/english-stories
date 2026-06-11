@@ -347,6 +347,11 @@ export function getAllVocabulary() {
   return vocabularyDatabase;
 }
 
+export function findVocabularyEntry(query: string) {
+  const normalizedQuery = normalizeVocabularyKey(query);
+  return vocabularyDatabase.find((entry) => normalizeVocabularyKey(entry.word) === normalizedQuery);
+}
+
 export function getVocabularyByLevel(level: Level) {
   return vocabularyDatabase.filter((entry) => entry.level === level);
 }
@@ -435,10 +440,15 @@ function buildVocabularyDatabase() {
 }
 
 function toVocabularyId(word: string) {
-  return word
+  return normalizeVocabularyKey(word).replace(/ /g, "-");
+}
+
+function normalizeVocabularyKey(value: string) {
+  return value
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
+    .replace(/[^a-z0-9' ]+/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 function buildExampleTranslation(translation: string) {
