@@ -1,7 +1,7 @@
 import { ArrowLeft, Check, MoveRight, PartyPopper, Volume2, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { emojiForWord, getTranslation } from "../data/translations";
-import { ipaForWord } from "../data/vocabulary";
+import { getVocabularyEntryForText, ipaForWord } from "../data/vocabulary";
 import type { Challenge, NativeLanguage, QuizQuestion, Story, VocabularyItem } from "../types";
 import { ClickableText } from "./ClickableText";
 import { ProgressBar } from "./ProgressBar";
@@ -274,8 +274,6 @@ export function LessonScreen({
             onNextLesson={onNextLesson}
             language={language}
             speech={speech}
-            savedWords={savedWords}
-            onToggleSavedWord={onToggleSavedWord}
             onSaveStoryWords={onSaveStoryWords}
           />
         ) : null}
@@ -469,7 +467,6 @@ function VocabularyChallenge({
   onNext: () => void;
 }) {
   const vocabularyWord = "word" in challenge ? challenge.word : "";
-  const translation = vocabularyWord ? getTranslation(vocabularyWord, "Russian") : "";
 
   return (
     <article className="learning-card challenge-card polished-card">
@@ -481,7 +478,6 @@ function VocabularyChallenge({
           <div>
             <strong>{vocabularyWord}</strong>
             <span>{ipaForWord(vocabularyWord)}</span>
-            <small>{translation}</small>
           </div>
         </div>
       ) : null}
@@ -585,8 +581,6 @@ function CompleteCard({
   onNextLesson,
   language,
   speech,
-  savedWords,
-  onToggleSavedWord,
   onSaveStoryWords,
 }: {
   story: Story;
@@ -597,8 +591,6 @@ function CompleteCard({
   onNextLesson: () => void;
   language: NativeLanguage;
   speech: SpeechControls;
-  savedWords: string[];
-  onToggleSavedWord: (word: string) => void;
   onSaveStoryWords: (words: string[]) => void;
 }) {
   return (
@@ -618,15 +610,12 @@ function CompleteCard({
           <strong>{story.vocabulary.length} {ui.words}</strong>
         </div>
       </div>
-      <div className="vocabulary-audio-grid">
+      <div className="lesson-word-list">
         {story.vocabulary.map((item) => (
-          <div className="vocabulary-audio-card" key={item.word}>
+          <div className="lesson-word-row" key={item.word}>
             <AudioButton text={item.word} speech={speech} />
-            <div>
-              <strong>{item.word}</strong>
-              <span>{ipaForWord(item.word)}</span>
-              <small>{item.translation}</small>
-            </div>
+            <strong>{item.word}</strong>
+            <span>{getVocabularyEntryForText(item.word)?.translation ?? item.translation}</span>
           </div>
         ))}
       </div>

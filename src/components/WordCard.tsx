@@ -1,5 +1,5 @@
 import { BookmarkPlus, Check, Volume2, X } from "lucide-react";
-import { findVocabularyEntry, ipaForWord, type VocabularyEntry } from "../data/vocabulary";
+import { getVocabularyEntryForText, type VocabularyEntry } from "../data/vocabulary";
 
 export type WordCardData = {
   word: string;
@@ -67,14 +67,6 @@ export function WordCardModal({
   );
 }
 
-export function wordCardDataForText(text: string): WordCardData {
-  const entry = findVocabularyEntry(text);
-  if (entry) return entry;
-
-  const cleanWord = text.replace(/[^a-zA-Z' -]+/g, "").trim();
-  return {
-    word: cleanWord,
-    translation: "слово из истории",
-    ipa: ipaForWord(cleanWord),
-  };
+export function wordCardDataForText(text: string): WordCardData | null {
+  return getVocabularyEntryForText(text);
 }

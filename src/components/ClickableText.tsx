@@ -1,4 +1,3 @@
-import { findVocabularyEntry } from "../data/vocabulary";
 import { wordCardDataForText, type WordCardData } from "./WordCard";
 
 type ClickableTextProps = {
@@ -19,7 +18,10 @@ export function ClickableText({ text, onWordClick }: ClickableTextProps) {
             className="inline-word-button"
             key={`${part.text}-${index}`}
             type="button"
-            onClick={() => onWordClick(wordCardDataForText(part.lookupText ?? part.text))}
+            onClick={() => {
+              const word = wordCardDataForText(part.lookupText ?? part.text);
+              if (word) onWordClick(word);
+            }}
           >
             {part.text}
           </button>
@@ -47,7 +49,7 @@ function tokenizeText(text: string) {
 
     const nextMatch = matches[index + 1];
     const phrase = nextMatch ? `${word} ${nextMatch[0]}` : "";
-    if (phrase && findVocabularyEntry(phrase)) {
+    if (phrase && wordCardDataForText(phrase)) {
       const phraseEnd = (nextMatch.index ?? start) + nextMatch[0].length;
       parts.push({ text: text.slice(start, phraseEnd), clickable: true, lookupText: phrase });
       cursor = phraseEnd;
@@ -55,7 +57,7 @@ function tokenizeText(text: string) {
       continue;
     }
 
-    parts.push({ text: word, clickable: true, lookupText: word });
+    parts.push({ text: word, clickable: Boolean(wordCardDataForText(word)), lookupText: word });
     cursor = start + word.length;
   }
 

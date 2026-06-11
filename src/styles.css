@@ -1311,6 +1311,44 @@ p {
   padding: 2px;
 }
 
+.lesson-word-list {
+  display: grid;
+  width: min(520px, 100%);
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid rgba(158, 223, 255, 0.42);
+  border-radius: 22px;
+  background: linear-gradient(135deg, #fff, var(--sky-soft));
+}
+
+.lesson-word-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  min-height: 42px;
+  padding: 7px 9px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.72);
+  text-align: left;
+}
+
+.lesson-word-row strong,
+.lesson-word-row span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.lesson-word-row strong {
+  color: var(--ink);
+  font-weight: 950;
+}
+
+.lesson-word-row span {
+  color: var(--muted);
+  font-weight: 850;
+}
+
 .picture-options {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

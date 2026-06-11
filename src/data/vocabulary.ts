@@ -24,6 +24,11 @@ export type VocabularyEntry = {
   category: VocabularyCategory;
 };
 
+export type VocabularyLookupEntry = Pick<
+  VocabularyEntry,
+  "id" | "word" | "translation" | "ipa" | "sourceStories" | "sourceStoryIds" | "example" | "exampleRu" | "category" | "level" | "sourceStory"
+>;
+
 type SupplementalVocabularyItem = {
   word: string;
   translation: string;
@@ -320,6 +325,199 @@ const supplementalVocabulary: SupplementalVocabularyItem[] = [
   },
 ];
 
+const manualWordForms: Record<string, { translation: string; ipa?: string; category?: VocabularyCategory }> = {
+  a: { translation: "неопределенный артикль" },
+  about: { translation: "о" },
+  after: { translation: "после" },
+  again: { translation: "снова" },
+  all: { translation: "все" },
+  also: { translation: "также" },
+  always: { translation: "всегда" },
+  an: { translation: "неопределенный артикль" },
+  and: { translation: "и" },
+  are: { translation: "являются" },
+  as: { translation: "как" },
+  at: { translation: "в, у" },
+  be: { translation: "быть" },
+  because: { translation: "потому что" },
+  before: { translation: "до" },
+  better: { translation: "лучше" },
+  big: { translation: "большой" },
+  blue: { translation: "синий" },
+  both: { translation: "оба" },
+  bring: { translation: "приносить" },
+  brings: { translation: "приносит" },
+  but: { translation: "но" },
+  by: { translation: "у, около" },
+  can: { translation: "мочь" },
+  "can't": { translation: "не может" },
+  cannot: { translation: "не может" },
+  car: { translation: "машина" },
+  day: { translation: "день" },
+  did: { translation: "сделал" },
+  do: { translation: "делать" },
+  does: { translation: "делает" },
+  "doesn't": { translation: "не делает" },
+  down: { translation: "вниз" },
+  during: { translation: "во время" },
+  each: { translation: "каждый" },
+  early: { translation: "рано" },
+  easy: { translation: "легкий" },
+  eat: { translation: "есть" },
+  eats: { translation: "ест" },
+  emma: { translation: "Эмма" },
+  empty: { translation: "пустой" },
+  english: { translation: "английский" },
+  every: { translation: "каждый" },
+  everyone: { translation: "все" },
+  eyes: { translation: "глаза", ipa: "/eyez/", category: "objects" },
+  face: { translation: "лицо" },
+  felt: { translation: "почувствовал" },
+  find: { translation: "находить" },
+  first: { translation: "первый" },
+  for: { translation: "для" },
+  from: { translation: "из" },
+  gets: { translation: "получает" },
+  gift: { translation: "подарок" },
+  give: { translation: "давать" },
+  gives: { translation: "дает" },
+  go: { translation: "идти" },
+  goes: { translation: "идет" },
+  good: { translation: "хороший" },
+  green: { translation: "зеленый" },
+  had: { translation: "имел" },
+  has: { translation: "имеет" },
+  have: { translation: "иметь" },
+  he: { translation: "он" },
+  heavy: { translation: "тяжелый" },
+  hello: { translation: "привет" },
+  her: { translation: "ее" },
+  him: { translation: "его" },
+  his: { translation: "его" },
+  how: { translation: "как" },
+  i: { translation: "я" },
+  important: { translation: "важный" },
+  in: { translation: "в" },
+  into: { translation: "внутрь" },
+  is: { translation: "является" },
+  it: { translation: "это" },
+  job: { translation: "работа" },
+  keep: { translation: "держать" },
+  know: { translation: "знать" },
+  large: { translation: "большой" },
+  late: { translation: "поздно" },
+  later: { translation: "позже" },
+  learn: { translation: "учить" },
+  learning: { translation: "изучение" },
+  left: { translation: "левый" },
+  leo: { translation: "Лео" },
+  like: { translation: "нравиться" },
+  likes: { translation: "нравится" },
+  little: { translation: "маленький" },
+  live: { translation: "жить" },
+  lives: { translation: "живет" },
+  look: { translation: "смотреть" },
+  looks: { translation: "смотрит" },
+  many: { translation: "много" },
+  max: { translation: "Макс" },
+  meet: { translation: "встречать" },
+  meets: { translation: "встречает" },
+  mila: { translation: "Мила" },
+  mira: { translation: "Мира" },
+  morning: { translation: "утро" },
+  my: { translation: "мой" },
+  near: { translation: "рядом" },
+  need: { translation: "нуждаться" },
+  needs: { translation: "нуждается" },
+  new: { translation: "новый" },
+  next: { translation: "следующий" },
+  nikita: { translation: "Никита" },
+  no: { translation: "нет" },
+  not: { translation: "не" },
+  of: { translation: "из" },
+  on: { translation: "на" },
+  one: { translation: "один" },
+  only: { translation: "только" },
+  open: { translation: "открывать" },
+  opens: { translation: "открывает" },
+  or: { translation: "или" },
+  other: { translation: "другой" },
+  out: { translation: "наружу" },
+  own: { translation: "собственный" },
+  people: { translation: "люди" },
+  play: { translation: "играть" },
+  plays: { translation: "играет" },
+  put: { translation: "класть" },
+  puts: { translation: "кладет" },
+  quickly: { translation: "быстро" },
+  red: { translation: "красный" },
+  right: { translation: "правильный" },
+  sara: { translation: "Сара" },
+  say: { translation: "говорить" },
+  says: { translation: "говорит" },
+  see: { translation: "видеть" },
+  sees: { translation: "видит" },
+  she: { translation: "она" },
+  short: { translation: "короткий" },
+  simple: { translation: "простой" },
+  small: { translation: "маленький" },
+  so: { translation: "так" },
+  some: { translation: "несколько" },
+  start: { translation: "начинать" },
+  starts: { translation: "начинает" },
+  stay: { translation: "оставаться" },
+  stays: { translation: "остается" },
+  still: { translation: "все еще" },
+  take: { translation: "брать" },
+  takes: { translation: "берет" },
+  talk: { translation: "говорить" },
+  ten: { translation: "десять" },
+  than: { translation: "чем" },
+  that: { translation: "что, тот" },
+  the: { translation: "определенный артикль" },
+  their: { translation: "их" },
+  them: { translation: "их" },
+  then: { translation: "затем" },
+  there: { translation: "там" },
+  they: { translation: "они", ipa: "/they/" },
+  things: { translation: "вещи" },
+  three: { translation: "три" },
+  through: { translation: "через" },
+  time: { translation: "время" },
+  to: { translation: "к, чтобы" },
+  today: { translation: "сегодня" },
+  tom: { translation: "Том" },
+  too: { translation: "тоже" },
+  took: { translation: "взял" },
+  towels: { translation: "полотенца", ipa: "/tow-uhlz/", category: "objects" },
+  two: { translation: "два" },
+  under: { translation: "под" },
+  up: { translation: "вверх" },
+  very: { translation: "очень" },
+  walk: { translation: "гулять" },
+  walks: { translation: "гуляет" },
+  want: { translation: "хотеть" },
+  wants: { translation: "хочет" },
+  was: { translation: "был" },
+  water: { translation: "вода" },
+  way: { translation: "путь" },
+  we: { translation: "мы" },
+  were: { translation: "были" },
+  what: { translation: "что" },
+  when: { translation: "когда" },
+  where: { translation: "где" },
+  white: { translation: "белый" },
+  who: { translation: "кто" },
+  why: { translation: "почему" },
+  will: { translation: "будет" },
+  with: { translation: "с" },
+  without: { translation: "без" },
+  word: { translation: "слово" },
+  words: { translation: "слова" },
+  would: { translation: "бы" },
+  your: { translation: "твой" },
+};
+
 const exampleTranslations: Record<string, string> = {
   "wake up": "Я просыпаюсь в семь.",
   breakfast: "Завтрак - это теплый тост и чай.",
@@ -350,6 +548,22 @@ export function getAllVocabulary() {
 export function findVocabularyEntry(query: string) {
   const normalizedQuery = normalizeVocabularyKey(query);
   return vocabularyDatabase.find((entry) => normalizeVocabularyKey(entry.word) === normalizedQuery);
+}
+
+export function getVocabularyEntryForText(query: string): VocabularyLookupEntry | null {
+  const normalizedQuery = normalizeVocabularyKey(query);
+  if (!normalizedQuery) return null;
+
+  const exactEntry = findVocabularyEntry(normalizedQuery);
+  if (exactEntry) return exactEntry;
+
+  const manualEntry = manualWordForms[normalizedQuery];
+  if (manualEntry) return buildManualEntry(normalizedQuery, manualEntry);
+
+  const derived = deriveKnownWordForm(normalizedQuery);
+  if (derived) return derived;
+
+  return null;
 }
 
 export function getVocabularyByLevel(level: Level) {
@@ -453,6 +667,64 @@ function normalizeVocabularyKey(value: string) {
 
 function buildExampleTranslation(translation: string) {
   return `Пример со словом «${translation}».`;
+}
+
+function buildManualEntry(word: string, data: { translation: string; ipa?: string; category?: VocabularyCategory }): VocabularyLookupEntry {
+  return {
+    id: toVocabularyId(word),
+    word,
+    translation: data.translation,
+    ipa: data.ipa ?? ipaForWord(word),
+    level: "A1",
+    sourceStory: "Story text",
+    sourceStories: ["Story text"],
+    sourceStoryIds: [],
+    example: word,
+    exampleRu: data.translation,
+    category: data.category ?? "daily life",
+  };
+}
+
+function deriveKnownWordForm(word: string): VocabularyLookupEntry | null {
+  const possessive = word.endsWith("'s") ? word.slice(0, -2) : "";
+  if (possessive) {
+    const owner = manualWordForms[possessive] ?? findVocabularyEntry(possessive);
+    if (owner) return buildManualEntry(word, { translation: `${owner.translation} (принадлежность)`, ipa: ipaForWord(word) });
+  }
+
+  const pluralBase = word.endsWith("ies") ? `${word.slice(0, -3)}y` : word.endsWith("es") ? word.slice(0, -2) : word.endsWith("s") ? word.slice(0, -1) : "";
+  if (pluralBase) {
+    const baseEntry = findVocabularyEntry(pluralBase);
+    const manualBase = manualWordForms[pluralBase];
+    if (baseEntry) return buildManualEntry(word, { translation: pluralizeRussian(baseEntry.translation), ipa: ipaForWord(word), category: baseEntry.category });
+    if (manualBase) return buildManualEntry(word, { translation: pluralizeRussian(manualBase.translation), ipa: ipaForWord(word), category: manualBase.category });
+  }
+
+  const verbBase = word.endsWith("ing") ? word.slice(0, -3) : word.endsWith("ed") ? word.slice(0, -2) : "";
+  if (verbBase) {
+    const baseEntry = findVocabularyEntry(verbBase) ?? findVocabularyEntry(`${verbBase}e`);
+    const manualBase = manualWordForms[verbBase] ?? manualWordForms[`${verbBase}e`];
+    if (baseEntry) return buildManualEntry(word, { translation: baseEntry.translation, ipa: ipaForWord(word), category: baseEntry.category });
+    if (manualBase) return buildManualEntry(word, { translation: manualBase.translation, ipa: ipaForWord(word), category: manualBase.category });
+  }
+
+  return null;
+}
+
+function pluralizeRussian(translation: string) {
+  const knownPlurals: Record<string, string> = {
+    полотенце: "полотенца",
+    глаз: "глаза",
+    книга: "книги",
+    друг: "друзья",
+    слово: "слова",
+    история: "истории",
+    комната: "комнаты",
+    окно: "окна",
+    ключи: "ключи",
+  };
+
+  return knownPlurals[translation] ?? translation;
 }
 
 function lowestLevel(current: Level, next: Level): Level {
