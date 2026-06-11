@@ -1714,6 +1714,47 @@ p {
   gap: 12px;
 }
 
+.training-mode-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.training-mode-card {
+  display: grid;
+  gap: 6px;
+  justify-items: start;
+  min-height: 118px;
+  padding: 14px;
+  border: 1px solid rgba(158, 223, 255, 0.36);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.88);
+  color: var(--ink);
+  text-align: left;
+  box-shadow: 0 10px 24px rgba(83, 62, 124, 0.06);
+}
+
+.training-mode-card span {
+  font-size: 1.8rem;
+}
+
+.training-mode-card strong,
+.training-mode-card small {
+  display: block;
+}
+
+.training-mode-card small {
+  color: var(--muted);
+  font-weight: 850;
+}
+
+.training-mode-card.active {
+  border-color: rgba(99, 183, 224, 0.64);
+  background: linear-gradient(135deg, #fff, var(--sky-soft));
+  color: #4f9fca;
+  box-shadow: 0 14px 30px rgba(99, 183, 224, 0.16);
+}
+
 .training-primary-button {
   display: inline-flex;
   align-items: center;
@@ -2175,6 +2216,7 @@ p {
 
   .training-start-copy,
   .training-stats-grid,
+  .training-mode-grid,
   .match-grid,
   .build-word-grid {
     grid-template-columns: 1fr;
