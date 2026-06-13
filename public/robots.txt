@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://english-stories.vercel.app/sitemap.xml
+Sitemap: https://www.storylingo.ru/sitemap.xml
