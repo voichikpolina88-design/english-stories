@@ -68,20 +68,27 @@ export type VocabularyWord = VocabularyItem & {
 
 export function getTranslation(word: string, language: NativeLanguage) {
   if (language === "English") return translations[word]?.English ?? word;
-  const storyWord = stories.flatMap((story) => story.vocabulary).find((item) => item.word === word);
+  const storyWord = stories.reduce<VocabularyItem | undefined>(
+    (found, story) => found ?? story.vocabulary.find((item) => item.word === word),
+    undefined,
+  );
   return translations[word]?.Russian ?? storyWord?.translation ?? word;
 }
 
 export function getAllVocabulary(): VocabularyWord[] {
-  const words = stories.flatMap((story) =>
-    story.vocabulary.map((item) => ({
-      ...item,
-      storyId: story.id,
-      storyTitle: story.title,
-      level: story.level,
-      emoji: wordEmoji[item.word] ?? item.pictureLabel ?? "💬",
-    })),
-  );
+  const words = stories.reduce<VocabularyWord[]>((items, story) => {
+    story.vocabulary.forEach((item) => {
+      items.push({
+        ...item,
+        storyId: story.id,
+        storyTitle: story.title,
+        level: story.level,
+        emoji: wordEmoji[item.word] ?? item.pictureLabel ?? "💬",
+      });
+    });
+
+    return items;
+  }, []);
 
   return Array.from(new Map(words.map((item) => [item.word, item])).values());
 }

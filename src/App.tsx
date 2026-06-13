@@ -821,7 +821,14 @@ function TrainingPage({
   const allWords = useMemo(() => getVocabularyDatabase(), []);
   const savedVocabulary = allWords.filter((word) => savedWords.includes(word.word));
   const completedVocabulary = useMemo(
-    () => Array.from(new Map(completedLessons.flatMap((storyId) => getVocabularyByStory(storyId)).map((word) => [word.word, word])).values()),
+    () => {
+      const words = completedLessons.reduce<VocabularyEntry[]>((items, storyId) => {
+        getVocabularyByStory(storyId).forEach((word) => items.push(word));
+        return items;
+      }, []);
+
+      return Array.from(new Map(words.map((word) => [word.word, word])).values());
+    },
     [completedLessons],
   );
   const [questions, setQuestions] = useState<TrainingQuestion[]>([]);

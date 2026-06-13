@@ -34,7 +34,7 @@ export function ClickableText({ text, onWordClick }: ClickableTextProps) {
 }
 
 function tokenizeText(text: string) {
-  const matches = Array.from(text.matchAll(wordPattern));
+  const matches = collectWordMatches(text);
   const parts: Array<{ text: string; clickable: boolean; lookupText?: string }> = [];
   let cursor = 0;
 
@@ -66,4 +66,17 @@ function tokenizeText(text: string) {
   }
 
   return parts;
+}
+
+function collectWordMatches(text: string) {
+  const matches: Array<{ 0: string; index: number }> = [];
+  const pattern = new RegExp(wordPattern.source, "g");
+  let match = pattern.exec(text);
+
+  while (match) {
+    matches.push({ 0: match[0], index: match.index });
+    match = pattern.exec(text);
+  }
+
+  return matches;
 }

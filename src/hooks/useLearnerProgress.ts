@@ -20,16 +20,8 @@ const defaultProgress: LearnerProgress = {
 
 export function useLearnerProgress() {
   const [progress, setProgress] = useState<LearnerProgress>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (!saved) {
-        return defaultProgress;
-      }
-
-      return { ...defaultProgress, ...JSON.parse(saved) };
-    } catch {
-      return defaultProgress;
-    }
+    const saved = readProgressFromStorage();
+    return saved ? { ...defaultProgress, ...saved } : defaultProgress;
   });
 
   useEffect(() => {
@@ -43,7 +35,7 @@ export function useLearnerProgress() {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+    writeProgressToStorage(progress);
   }, [progress]);
 
   const currentLevel = useMemo(() => {
@@ -139,4 +131,23 @@ export function useLearnerProgress() {
     toggleFavoriteWord,
     saveTestScore,
   };
+}
+
+function readProgressFromStorage(): Partial<LearnerProgress> | null {
+  try {
+    if (!window.localStorage) return null;
+    const saved = window.localStorage.getItem(STORAGE_KEY);
+    return saved ? JSON.parse(saved) : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeProgressToStorage(progress: LearnerProgress) {
+  try {
+    if (!window.localStorage) return;
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+  } catch {
+    // Some iOS Safari/WebView contexts block localStorage. The app should still run.
+  }
 }

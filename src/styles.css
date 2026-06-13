@@ -45,6 +45,39 @@ body {
     linear-gradient(180deg, #faf8ff 0%, #fff 48%, #f7f2ff 100%);
 }
 
+.app-runtime-error {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: #faf8ff;
+  color: var(--ink);
+}
+
+.app-runtime-error > div {
+  width: min(100%, 360px);
+  padding: 24px;
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 18px 45px rgba(83, 62, 124, 0.12);
+  text-align: center;
+}
+
+.app-runtime-error strong,
+.app-runtime-error span {
+  display: block;
+}
+
+.app-runtime-error strong {
+  margin-bottom: 8px;
+  font-size: 1.15rem;
+}
+
+.app-runtime-error span {
+  color: var(--muted);
+  line-height: 1.5;
+}
+
 button,
 input {
   font: inherit;
