@@ -316,7 +316,15 @@ function App() {
               <StatisticsPage t={t} progress={progress} currentLevel={currentLevelLabel} totalProgress={totalProgress} />
             ) : null}
             {page === "settings" ? (
-              <SettingsPage t={t} selectedLanguage={language} onSelectLanguage={selectLanguage} />
+              <SettingsPage
+                t={t}
+                selectedLanguage={language}
+                onSelectLanguage={selectLanguage}
+                progress={progress}
+                currentLevel={currentLevelLabel}
+                totalProgress={totalProgress}
+                onNavigate={navigate}
+              />
             ) : null}
           </>
         )}
@@ -1382,16 +1390,29 @@ function SettingsPage({
   t,
   selectedLanguage,
   onSelectLanguage,
+  progress,
+  currentLevel,
+  totalProgress,
+  onNavigate,
 }: {
   t: Copy;
   selectedLanguage: NativeLanguage;
   onSelectLanguage: (language: NativeLanguage) => void;
+  progress: ReturnType<typeof useLearnerProgress>["progress"];
+  currentLevel: string;
+  totalProgress: number;
+  onNavigate: (page: Page) => void;
 }) {
+  const [openSection, setOpenSection] = useState<"stats" | "vocabulary" | null>(null);
+  const vocabulary = useMemo(() => getVocabularyDatabase(), []);
+  const completedLessonsLabel = `${progress.completedLessons.length}/${stories.length}`;
+  const savedWordsLabel = progress.savedWords.length.toString();
+
   return (
-    <main className="page-stack">
-      <section className="content-card compact-settings">
+    <main className="page-stack profile-page">
+      <section className="content-card compact-settings profile-language-card">
         <div>
-          <span className="eyebrow">{t.settings}</span>
+          <span className="eyebrow">{t.profile}</span>
           <h1>{t.languageSettings}</h1>
           <p>{t.changeLanguage}</p>
         </div>
@@ -1403,6 +1424,70 @@ function SettingsPage({
             </button>
           ))}
         </div>
+      </section>
+
+      <section className="content-card profile-panel">
+        <button
+          className="profile-panel-toggle"
+          type="button"
+          aria-expanded={openSection === "stats"}
+          onClick={() => setOpenSection(openSection === "stats" ? null : "stats")}
+        >
+          <span>
+            <BarChart3 size={20} aria-hidden="true" />
+            {t.stats}
+          </span>
+          <strong>{openSection === "stats" ? "-" : "+"}</strong>
+        </button>
+        {openSection === "stats" ? (
+          <div className="profile-panel-body">
+            <div className="profile-metric-grid">
+              <MetricCard icon={<Sparkles />} label={t.totalXp} value={progress.xp.toString()} />
+              <MetricCard icon={<Flame />} label={t.streak} value={`${progress.streak}`} />
+              <MetricCard icon={<Trophy />} label={t.level} value={currentLevel} />
+              <MetricCard icon={<CheckCircle2 />} label={t.completedLessons} value={completedLessonsLabel} />
+            </div>
+            <div className="profile-progress-summary">
+              <div className="section-header">
+                <div>
+                  <span className="eyebrow">{t.progress}</span>
+                  <h2>{totalProgress}%</h2>
+                </div>
+              </div>
+              <ProgressBar value={totalProgress} />
+            </div>
+            <button className="secondary-button profile-link-button" type="button" onClick={() => onNavigate("stats")}>
+              {t.stats}
+            </button>
+          </div>
+        ) : null}
+      </section>
+
+      <section className="content-card profile-panel">
+        <button
+          className="profile-panel-toggle"
+          type="button"
+          aria-expanded={openSection === "vocabulary"}
+          onClick={() => setOpenSection(openSection === "vocabulary" ? null : "vocabulary")}
+        >
+          <span>
+            <BookOpen size={20} aria-hidden="true" />
+            {t.wordsPage}
+          </span>
+          <strong>{openSection === "vocabulary" ? "-" : "+"}</strong>
+        </button>
+        {openSection === "vocabulary" ? (
+          <div className="profile-panel-body">
+            <div className="profile-metric-grid">
+              <MetricCard icon={<Star />} label={t.myWords} value={savedWordsLabel} />
+              <MetricCard icon={<BookOpen />} label={t.allWords} value={vocabulary.length.toString()} />
+              <MetricCard icon={<CheckCircle2 />} label={t.savedWordsCount} value={savedWordsLabel} />
+            </div>
+            <button className="secondary-button profile-link-button" type="button" onClick={() => onNavigate("words")}>
+              {t.wordsPage}
+            </button>
+          </div>
+        ) : null}
       </section>
     </main>
   );

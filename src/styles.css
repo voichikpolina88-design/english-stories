@@ -471,6 +471,7 @@ p {
 }
 
 .primary-button,
+.secondary-button,
 .text-button,
 .round-button,
 .icon-text-button,
@@ -507,6 +508,23 @@ p {
 .primary-button.full,
 .ghost-action {
   width: 100%;
+}
+
+.secondary-button {
+  min-height: 48px;
+  padding: 0 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--ink);
+  font-weight: 760;
+  box-shadow: var(--soft-shadow);
+}
+
+.secondary-button:hover:not(:disabled) {
+  border-color: rgba(123, 184, 165, 0.3);
+  color: var(--primary-dark);
+  transform: translateY(-1px);
 }
 
 .text-button {
@@ -2158,6 +2176,81 @@ p {
   margin-top: 6px;
 }
 
+.profile-page {
+  max-width: 980px;
+}
+
+.profile-language-card {
+  align-items: start;
+}
+
+.profile-panel {
+  padding: 0;
+  overflow: hidden;
+}
+
+.profile-panel-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 72px;
+  padding: 0 22px;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+}
+
+.profile-panel-toggle span {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 820;
+}
+
+.profile-panel-toggle svg {
+  color: var(--primary-dark);
+}
+
+.profile-panel-toggle strong {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--sky-soft);
+  color: var(--primary-dark);
+  font-size: 1.25rem;
+}
+
+.profile-panel-body {
+  display: grid;
+  gap: 14px;
+  padding: 0 22px 22px;
+}
+
+.profile-metric-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.profile-progress-summary {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: var(--card-soft);
+}
+
+.profile-progress-summary .section-header {
+  margin-bottom: 12px;
+}
+
+.profile-link-button {
+  justify-self: start;
+}
+
 @media (max-width: 760px) {
   .page-stack {
     gap: 12px;
@@ -2229,6 +2322,31 @@ p {
     grid-template-columns: 1fr;
   }
 
+  .profile-page {
+    max-width: none;
+  }
+
+  .profile-language-card {
+    gap: 14px;
+  }
+
+  .profile-panel-toggle {
+    min-height: 66px;
+    padding: 0 18px;
+  }
+
+  .profile-panel-body {
+    padding: 0 18px 18px;
+  }
+
+  .profile-metric-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-link-button {
+    width: 100%;
+  }
+
   .path-card {
     grid-template-columns: 1fr;
     grid-template-rows: auto minmax(0, 1fr) auto;
@@ -2270,7 +2388,54 @@ p {
   }
 
   .hero-dashboard {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    width: 100%;
+    max-width: 100%;
+    padding: 18px;
+    overflow: hidden;
     border-radius: var(--radius-card);
+  }
+
+  .hero-copy {
+    min-width: 0;
+    justify-items: stretch;
+  }
+
+  .hero-copy .eyebrow,
+  .hero-copy h1,
+  .hero-copy p {
+    max-width: 100%;
+  }
+
+  .hero-copy .primary-button {
+    width: 100%;
+  }
+
+  .hero-visual {
+    order: 0;
+    min-height: 164px;
+    width: 100%;
+    max-width: 100%;
+    border-radius: 26px;
+  }
+
+  .hero-book-card {
+    width: 104px;
+    height: 104px;
+    border-radius: 28px;
+  }
+
+  .hero-book-card svg {
+    width: 48px;
+    height: 48px;
+  }
+
+  .hero-progress-chip {
+    right: 12px;
+    bottom: 12px;
+    padding: 8px 10px;
+    border-radius: 16px;
   }
 
   .progress-orb {
@@ -2313,6 +2478,32 @@ p {
 
   .hero-dashboard p {
     margin: 10px 0 14px;
+  }
+
+  .hero-dashboard {
+    padding: 16px;
+  }
+
+  .hero-visual {
+    min-height: 146px;
+  }
+
+  .hero-progress-chip strong {
+    font-size: 0.92rem;
+  }
+
+  .hero-progress-chip span {
+    font-size: 0.68rem;
+  }
+
+  .hero-leaf-one {
+    right: -10px;
+    top: 14px;
+  }
+
+  .hero-leaf-two {
+    left: -8px;
+    bottom: 14px;
   }
 
   .top-bar {
