@@ -2461,6 +2461,100 @@ p {
   }
 }
 
+@media (max-width: 767px) {
+  .compact-home,
+  .compact-home *,
+  .hero-dashboard,
+  .hero-dashboard * {
+    min-width: 0;
+  }
+
+  .compact-home {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: clip;
+  }
+
+  .hero-dashboard {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    width: 100%;
+    max-width: 100%;
+    padding: 18px;
+    gap: 16px;
+    overflow: hidden;
+    border-radius: var(--radius-card);
+  }
+
+  .hero-copy {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    max-width: 100%;
+    order: 1;
+  }
+
+  .hero-dashboard h1 {
+    width: 100%;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-break: normal;
+    hyphens: auto;
+    line-height: 1.08;
+  }
+
+  .hero-dashboard p,
+  .hero-copy .eyebrow {
+    width: 100%;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  .hero-copy .primary-button {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .hero-visual {
+    position: relative;
+    display: grid;
+    place-items: center;
+    order: 0;
+    width: 100%;
+    max-width: 100%;
+    min-height: 150px;
+    overflow: hidden;
+    border-radius: 26px;
+  }
+
+  .hero-book-card {
+    width: min(104px, 34vw);
+    height: min(104px, 34vw);
+    max-width: 104px;
+    max-height: 104px;
+  }
+
+  .hero-leaf-one {
+    right: 14px;
+    top: 14px;
+  }
+
+  .hero-leaf-two {
+    left: 14px;
+    bottom: 14px;
+  }
+
+  .hero-progress-chip {
+    right: 12px;
+    bottom: 12px;
+    min-width: 0;
+    max-width: calc(100% - 24px);
+  }
+}
+
 @media (max-width: 460px) {
   .section-header {
     align-items: start;
