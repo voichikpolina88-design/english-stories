@@ -6,6 +6,7 @@ import {
   GraduationCap,
   Home,
   Languages,
+  Leaf,
   LockKeyhole,
   Settings,
   Sparkles,
@@ -37,6 +38,7 @@ const copy = {
     learn: "Учиться",
     wordsPage: "Слова",
     training: "Тренировка",
+    profile: "Профиль",
     stats: "Статистика",
     settings: "Настройки",
     learner: "Ежедневный ученик",
@@ -106,6 +108,9 @@ const copy = {
     xpEarned: "XP получено",
     tryAgain: "Попробовать снова",
     returnToTraining: "Вернуться к тренировке",
+    audioTraining: "Аудио тренировка",
+    vocabTrainer: "Словарный тренажёр",
+    grammarTasks: "Грамматика / задания",
   },
   English: {
     appName: "English Stories",
@@ -116,6 +121,7 @@ const copy = {
     learn: "Learn",
     wordsPage: "Words",
     training: "Training",
+    profile: "Profile",
     stats: "Statistics",
     settings: "Settings",
     learner: "Daily learner",
@@ -185,6 +191,9 @@ const copy = {
     xpEarned: "XP earned",
     tryAgain: "Try Again",
     returnToTraining: "Return to Training",
+    audioTraining: "Audio training",
+    vocabTrainer: "Vocabulary trainer",
+    grammarTasks: "Grammar / tasks",
   },
 };
 
@@ -361,14 +370,25 @@ function Sidebar({ page, t, onNavigate }: { page: Page; t: Copy; onNavigate: (pa
 }
 
 function MobileNav({ page, t, onNavigate }: { page: Page; t: Copy; onNavigate: (page: Page) => void }) {
+  const items: Array<{ page: Page; label: string; icon: ReactNode; activePages?: Page[] }> = [
+    { page: "home", label: t.home, icon: <Home size={20} /> },
+    { page: "learn", label: t.learn, icon: <BookOpen size={20} /> },
+    { page: "training", label: t.training, icon: <Target size={20} /> },
+    { page: "settings", label: t.profile, icon: <Settings size={20} />, activePages: ["settings", "words", "stats"] },
+  ];
+
   return (
     <nav className="mobile-nav" aria-label="Mobile navigation">
-      {navItems(t).map((item) => (
-        <button key={item.page} className={page === item.page ? "active" : ""} type="button" onClick={() => onNavigate(item.page)}>
-          {item.icon}
-          <span>{item.short}</span>
-        </button>
-      ))}
+      {items.map((item) => {
+        const isActive = item.activePages ? item.activePages.includes(page) : page === item.page;
+
+        return (
+          <button key={item.page} className={isActive ? "active" : ""} type="button" onClick={() => onNavigate(item.page)}>
+            {item.icon}
+            <span>{item.label}</span>
+          </button>
+        );
+      })}
     </nav>
   );
 }
@@ -423,27 +443,34 @@ function HomePage({
   return (
     <main className="page-stack compact-home">
       <section className="hero-dashboard">
-        <div>
+        <div className="hero-copy">
           <span className="eyebrow">{t.cozy}</span>
-          <h1>{t.welcome} 🌷</h1>
+          <h1>{t.welcome}</h1>
           <p>{t.welcomeText}</p>
           <button className="primary-button" type="button" onClick={() => onStartLesson(nextStory.id)}>
             {t.continueLearning}
           </button>
         </div>
-        <div className="progress-orb" style={{ "--value": `${totalProgress}%` } as React.CSSProperties}>
-          <span>{totalProgress}%</span>
-          <small>{t.path}</small>
+        <div className="hero-visual" aria-hidden="true">
+          <div className="hero-book-card">
+            <BookOpen size={58} strokeWidth={1.7} />
+            <span className="hero-leaf hero-leaf-one"><Leaf size={22} /></span>
+            <span className="hero-leaf hero-leaf-two"><Leaf size={18} /></span>
+          </div>
+          <div className="hero-progress-chip">
+            <strong>{totalProgress}%</strong>
+            <span>{t.path}</span>
+          </div>
         </div>
       </section>
 
-      <div className="dashboard-grid">
+      <div className="dashboard-grid home-stats-grid">
         <MetricCard icon={<Sparkles />} label={t.xp} value={progress.xp.toString()} />
         <MetricCard icon={<Flame />} label={t.streak} value={`${progress.streak}`} />
         <MetricCard icon={<Star />} label={t.level} value={currentLevel} />
       </div>
 
-      <section className="content-card">
+      <section className="content-card home-continue-section">
         <div className="section-header">
           <div>
             <span className="eyebrow">{t.continueLearning}</span>
@@ -460,6 +487,21 @@ function HomePage({
           unlocked
           onStartLesson={onStartLesson}
         />
+      </section>
+
+      <section className="home-training-preview">
+        <button className="training-preview-card" type="button" onClick={() => onNavigate("training")}>
+          <span><Volume2 size={22} /></span>
+          <strong>{t.audioTraining}</strong>
+        </button>
+        <button className="training-preview-card" type="button" onClick={() => onNavigate("training")}>
+          <span><BookOpen size={22} /></span>
+          <strong>{t.vocabTrainer}</strong>
+        </button>
+        <button className="training-preview-card" type="button" onClick={() => onNavigate("training")}>
+          <span><GraduationCap size={22} /></span>
+          <strong>{t.grammarTasks}</strong>
+        </button>
       </section>
 
       <section className="content-card home-path-card">
