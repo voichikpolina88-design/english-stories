@@ -101,6 +101,7 @@ const copy = {
     matchPairs: "Соедини пары",
     audioChooseWord: "Аудио: выбери английское слово",
     audioChooseTranslation: "Аудио: выбери перевод",
+    audioChooseSentenceTranslation: "Аудио: выбери перевод предложения",
     fillBlank: "Заполни пропуск",
     buildSentence: "Собери предложение",
     trainingComplete: "🎉 Тренировка завершена",
@@ -191,6 +192,7 @@ const copy = {
     matchPairs: "Match Pairs",
     audioChooseWord: "Audio: choose English word",
     audioChooseTranslation: "Audio: choose translation",
+    audioChooseSentenceTranslation: "Audio: choose sentence translation",
     fillBlank: "Fill in the Blank",
     buildSentence: "Build a Sentence",
     trainingComplete: "🎉 Training Complete",
@@ -859,7 +861,7 @@ type TrainingQuestion =
     }
   | {
       id: string;
-      type: "translation" | "english" | "audioTranslation" | "buildSentence";
+      type: "translation" | "english" | "audioEnglish" | "audioTranslation" | "audioSentenceTranslation" | "fillBlank" | "buildSentence" | "audioBuildSentence";
       word: VocabularyEntry;
       prompt: string;
       answer: string;
@@ -928,7 +930,7 @@ function TrainingPage({
   function startTraining(mode = selectedMode ?? trainingModes[1], category = selectedCategory ?? trainingCategories[1]) {
     setSelectedMode(mode);
     setSelectedCategory(category);
-    setQuestions(buildTrainingSession(trainingPool, allWords, mode.count));
+    setQuestions(buildTrainingSession(trainingPool, allWords, mode.count, category.id));
     setQuestionIndex(0);
     setScore(0);
     setSelectedAnswer(null);
@@ -1097,7 +1099,7 @@ function TrainingPage({
               <strong>+{score * 3} XP</strong>
             </div>
           </div>
-          <button className="training-primary-button full" type="button" onClick={() => startTraining(selectedMode ?? trainingModes[1])}>{t.tryAgain}</button>
+          <button className="training-primary-button full" type="button" onClick={() => startTraining(selectedMode ?? trainingModes[1], selectedCategory ?? trainingCategories[1])}>{t.tryAgain}</button>
           <button className="ghost-action" type="button" onClick={returnToTraining}>{t.returnToTraining}</button>
         </section>
       ) : null}
@@ -1173,11 +1175,16 @@ function TrainingQuestionView({
     );
   }
 
-  if (question.type === "buildSentence") {
+  if (question.type === "buildSentence" || question.type === "audioBuildSentence") {
     return (
       <div className="training-question-stack" data-training-type="build">
         <span className="eyebrow">{t.buildSentence}</span>
         <h2>{t.buildSentence}</h2>
+        {question.type === "audioBuildSentence" ? (
+          <button className="audio-prompt-button" type="button" onClick={() => speech(question.targetSentence ?? question.answer)}>
+            <Volume2 size={26} aria-hidden="true" />
+          </button>
+        ) : null}
         <p className="sentence-translation-prompt">{question.prompt}</p>
         <div className="sentence-build-zone">
           {builtWords.length ? (
@@ -1210,14 +1217,26 @@ function TrainingQuestionView({
     );
   }
 
-  const title = question.type === "translation" ? t.chooseTranslation : question.type === "english" ? t.chooseEnglish : question.type === "audioTranslation" ? t.audioChooseTranslation : t.fillBlank;
+  const title = question.type === "translation"
+    ? t.chooseTranslation
+    : question.type === "english"
+      ? t.chooseEnglish
+      : question.type === "audioEnglish"
+        ? t.audioChooseWord
+        : question.type === "audioTranslation"
+          ? t.audioChooseTranslation
+          : question.type === "audioSentenceTranslation"
+            ? t.audioChooseSentenceTranslation
+            : t.fillBlank;
+  const isAudioQuestion = question.type === "audioEnglish" || question.type === "audioTranslation" || question.type === "audioSentenceTranslation";
+  const audioText = question.type === "audioSentenceTranslation" ? question.targetSentence ?? question.prompt : question.word.word;
 
   return (
     <div className="training-question-stack" data-training-type={question.type}>
       <span className="eyebrow">{title}</span>
-      <h2>{question.type === "audioTranslation" ? t.listenAndChoose : question.prompt}</h2>
-      {question.type === "audioTranslation" ? (
-        <button className="audio-prompt-button" type="button" onClick={() => speech(question.word.word)}>
+      <h2>{isAudioQuestion ? t.listenAndChoose : question.prompt}</h2>
+      {isAudioQuestion ? (
+        <button className="audio-prompt-button" type="button" onClick={() => speech(audioText)}>
           <Volume2 size={26} aria-hidden="true" />
         </button>
       ) : null}
@@ -1238,19 +1257,25 @@ function TrainingQuestionView({
   );
 }
 
-function buildTrainingSession(preferredWords: VocabularyEntry[], allWords: VocabularyEntry[], questionCount: number) {
+function buildTrainingSession(preferredWords: VocabularyEntry[], allWords: VocabularyEntry[], questionCount: number, category: TrainingCategory["id"] = "words") {
   const pool = shuffleArray(preferredWords.length ? preferredWords : allWords);
   const sessionWords = Array.from({ length: questionCount }, (_, index) => pool[index % pool.length]);
-  const baseTypes: TrainingQuestion["type"][] = [
-    "match",
-    "translation",
-    "english",
-    "audioTranslation",
-    "buildSentence",
-  ];
+  const baseTypes = trainingTypesForCategory(category);
   const types = shuffleArray(Array.from({ length: questionCount }, (_, index) => baseTypes[index % baseTypes.length]));
 
   return sessionWords.map((word, index) => createTrainingQuestion(types[index], word, allWords, index));
+}
+
+function trainingTypesForCategory(category: TrainingCategory["id"]): TrainingQuestion["type"][] {
+  if (category === "audio") {
+    return ["audioEnglish", "audioTranslation", "audioSentenceTranslation", "audioBuildSentence"];
+  }
+
+  if (category === "grammar") {
+    return ["buildSentence", "audioBuildSentence", "buildSentence", "audioBuildSentence"];
+  }
+
+  return ["translation", "english", "match", "fillBlank"];
 }
 
 function createTrainingQuestion(type: TrainingQuestion["type"], word: VocabularyEntry, allWords: VocabularyEntry[], index: number): TrainingQuestion {
@@ -1270,9 +1295,9 @@ function createTrainingQuestion(type: TrainingQuestion["type"], word: Vocabulary
     };
   }
 
-  if (type === "english") {
+  if (type === "english" || type === "audioEnglish") {
     return {
-      id: `english-${index}`,
+      id: `${type}-${index}`,
       type,
       word,
       prompt: word.translation,
@@ -1292,14 +1317,49 @@ function createTrainingQuestion(type: TrainingQuestion["type"], word: Vocabulary
     };
   }
 
-  const sentenceSource = hasUsableTrainingSentence(word)
-    ? word
-    : shuffleArray(allWords).find((item) => hasUsableTrainingSentence(item)) ?? word;
+  if (type === "audioSentenceTranslation") {
+    const sentenceSource = bestSentenceWord(word, allWords);
+    const sentence = bestTrainingSentencePair(sentenceSource);
+    const sentenceOptions = answerOptions(
+      sentence.russian,
+      allWords
+        .filter((item) => item.word !== sentenceSource.word)
+        .map((item) => bestTrainingSentencePair(item).russian),
+    );
+
+    return {
+      id: `audio-sentence-${index}`,
+      type,
+      word: sentenceSource,
+      prompt: tSafeSentencePrompt(sentence.english),
+      answer: sentence.russian,
+      options: sentenceOptions,
+      targetSentence: sentence.english,
+    };
+  }
+
+  if (type === "fillBlank") {
+    const sentenceSource = bestSentenceWord(word, allWords);
+    const sentence = bestTrainingSentencePair(sentenceSource);
+    const blankPrompt = fillBlankPrompt(sentence.english, sentenceSource.word);
+
+    return {
+      id: `fill-blank-${index}`,
+      type,
+      word: sentenceSource,
+      prompt: blankPrompt,
+      answer: sentenceSource.word,
+      options: answerOptions(sentenceSource.word, allWords.filter((item) => item.word !== sentenceSource.word).map((item) => item.word)),
+      targetSentence: sentence.english,
+    };
+  }
+
+  const sentenceSource = bestSentenceWord(word, allWords);
   const sentence = bestTrainingSentencePair(sentenceSource);
   const sentenceWords = sentence.english.replace(/[.!?]+$/g, "").split(/\s+/).slice(0, 8);
   return {
-    id: `build-${index}`,
-    type: "buildSentence",
+    id: `${type}-${index}`,
+    type,
     word: sentenceSource,
     prompt: sentence.russian,
     answer: sentenceWords.join(" "),
@@ -1317,6 +1377,29 @@ function hasUsableTrainingSentence(word: VocabularyEntry) {
       word.example.split(/\s+/).length <= 8 &&
       word.exampleRu.split(/\s+/).length <= 10,
   );
+}
+
+function bestSentenceWord(word: VocabularyEntry, allWords: VocabularyEntry[]) {
+  return hasUsableTrainingSentence(word)
+    ? word
+    : shuffleArray(allWords).find((item) => hasUsableTrainingSentence(item)) ?? word;
+}
+
+function fillBlankPrompt(sentence: string, word: string) {
+  const cleanSentence = sentence.replace(/[.!?]+$/g, "");
+  const cleanWord = word.replace(/[.!?]+$/g, "").trim();
+  const phrasePattern = new RegExp(`\\b${escapeRegExp(cleanWord)}\\b`, "i");
+
+  if (phrasePattern.test(cleanSentence)) {
+    return `${cleanSentence.replace(phrasePattern, "____")}.`;
+  }
+
+  const firstWordPattern = /\b[A-Za-z][A-Za-z'-]*\b/;
+  return `${cleanSentence.replace(firstWordPattern, "____")}.`;
+}
+
+function tSafeSentencePrompt(sentence: string) {
+  return sentence;
 }
 
 function isGeneratedVocabularyExample(value: string) {
