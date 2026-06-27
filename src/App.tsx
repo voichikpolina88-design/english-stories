@@ -108,6 +108,13 @@ const copy = {
     xpEarned: "XP получено",
     tryAgain: "Попробовать снова",
     returnToTraining: "Вернуться к тренировке",
+    trainingPrompt: "Что потренируем сегодня?",
+    audioCategory: "🎧 Аудио",
+    audioCategoryDescription: "Учись понимать слова и предложения на слух",
+    wordsCategory: "📚 Слова",
+    wordsCategoryDescription: "Повторяй слова из историй",
+    grammarCategory: "✍️ Грамматика",
+    grammarCategoryDescription: "Собирай предложения и тренируй структуру языка",
     audioTraining: "Аудио тренировка",
     vocabTrainer: "Словарный тренажёр",
     grammarTasks: "Грамматика / задания",
@@ -191,6 +198,13 @@ const copy = {
     xpEarned: "XP earned",
     tryAgain: "Try Again",
     returnToTraining: "Return to Training",
+    trainingPrompt: "What shall we practice today?",
+    audioCategory: "🎧 Audio",
+    audioCategoryDescription: "Learn to understand words and sentences by ear",
+    wordsCategory: "📚 Words",
+    wordsCategoryDescription: "Review words from stories",
+    grammarCategory: "✍️ Grammar",
+    grammarCategoryDescription: "Build sentences and practice language structure",
     audioTraining: "Audio training",
     vocabTrainer: "Vocabulary trainer",
     grammarTasks: "Grammar / tasks",
@@ -853,6 +867,12 @@ type TrainingQuestion =
       targetSentence?: string;
     };
 
+type TrainingCategory = {
+  id: "audio" | "words" | "grammar";
+  title: string;
+  description: string;
+};
+
 function TrainingPage({
   t,
   savedWords,
@@ -879,6 +899,7 @@ function TrainingPage({
   );
   const [questions, setQuestions] = useState<TrainingQuestion[]>([]);
   const [selectedMode, setSelectedMode] = useState<{ label: string; count: number } | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<TrainingCategory | null>(null);
   const [questionIndex, setQuestionIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
@@ -898,8 +919,15 @@ function TrainingPage({
     { icon: "🏆", label: t.bigTraining, count: 20 },
   ];
 
-  function startTraining(mode = selectedMode ?? trainingModes[1]) {
+  const trainingCategories: TrainingCategory[] = [
+    { id: "audio", title: t.audioCategory, description: t.audioCategoryDescription },
+    { id: "words", title: t.wordsCategory, description: t.wordsCategoryDescription },
+    { id: "grammar", title: t.grammarCategory, description: t.grammarCategoryDescription },
+  ];
+
+  function startTraining(mode = selectedMode ?? trainingModes[1], category = selectedCategory ?? trainingCategories[1]) {
     setSelectedMode(mode);
+    setSelectedCategory(category);
     setQuestions(buildTrainingSession(trainingPool, allWords, mode.count));
     setQuestionIndex(0);
     setScore(0);
@@ -939,6 +967,7 @@ function TrainingPage({
   function returnToTraining() {
     setQuestions([]);
     setSelectedMode(null);
+    setSelectedCategory(null);
     setQuestionIndex(0);
     setFinished(false);
     resetQuestionState();
@@ -977,7 +1006,7 @@ function TrainingPage({
 
   return (
     <main className="page-stack training-page">
-      <PageTitle label={`🎯 ${t.training}`} title={t.practiceVocabulary} text={t.quickTraining} />
+      <PageTitle label={`🎯 ${t.training}`} title={t.trainingPrompt} text={t.practiceVocabulary} />
 
       {!questions.length ? (
         <>
@@ -985,8 +1014,8 @@ function TrainingPage({
             <div className="training-start-copy">
               <span className="training-orb">🎯</span>
               <div>
-                <span className="eyebrow">{t.quickTraining}</span>
-                <h2>{t.practiceVocabulary}</h2>
+                <span className="eyebrow">{t.training}</span>
+                <h2>{t.trainingPrompt}</h2>
                 <p>{savedVocabulary.length ? t.trainMyWords : t.noSavedWords}</p>
               </div>
             </div>
@@ -994,23 +1023,19 @@ function TrainingPage({
               <MetricCard icon={<BookOpen />} label={t.totalVocabulary} value={allWords.length.toString()} />
               <MetricCard icon={<Star />} label={t.savedWordsCount} value={savedVocabulary.length.toString()} />
             </div>
-            <div className="training-mode-grid">
-              {trainingModes.map((mode) => (
+            <div className="training-category-grid">
+              {trainingCategories.map((category) => (
                 <button
-                  key={mode.count}
-                  className={(selectedMode?.count ?? 10) === mode.count ? "training-mode-card active" : "training-mode-card"}
+                  key={category.id}
+                  className={selectedCategory?.id === category.id ? "training-category-card active" : "training-category-card"}
                   type="button"
-                  onClick={() => setSelectedMode(mode)}
+                  onClick={() => startTraining(trainingModes[1], category)}
                 >
-                  <span>{mode.icon}</span>
-                  <strong>{mode.label}</strong>
-                  <small>{mode.count} {t.questionsCount}</small>
+                  <strong>{category.title}</strong>
+                  <small>{category.description}</small>
                 </button>
               ))}
             </div>
-            <button className="training-primary-button" type="button" onClick={() => startTraining(selectedMode ?? trainingModes[1])}>
-              ▶ {t.startTraining}
-            </button>
           </section>
         </>
       ) : null}
