@@ -241,10 +241,6 @@ function App() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  if (!progress.selectedLanguage) {
-    return <Onboarding t={copy.English} onSelect={selectLanguage} />;
-  }
-
   return (
     <div className="premium-shell">
       <Sidebar page={page} t={t} onNavigate={navigate} />
