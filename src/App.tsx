@@ -102,13 +102,18 @@ const copy = {
     audioChooseWord: "Аудио: выбери английское слово",
     audioChooseTranslation: "Аудио: выбери перевод",
     audioChooseSentenceTranslation: "Аудио: выбери перевод предложения",
-    fillBlank: "Заполни пропуск",
     buildSentence: "Собери предложение",
     trainingComplete: "🎉 Тренировка завершена",
     score: "Счёт",
     xpEarned: "XP получено",
     tryAgain: "Попробовать снова",
     returnToTraining: "Вернуться к тренировке",
+    audioTrainingName: "Аудио тренировка",
+    wordsTrainingName: "Тренировка слов",
+    grammarTrainingName: "Грамматическая тренировка",
+    audioTrainingLabel: "АУДИО",
+    wordsTrainingLabel: "СЛОВА",
+    grammarTrainingLabel: "ГРАММАТИКА",
     trainingPrompt: "Что потренируем сегодня?",
     audioCategory: "🎧 Аудио",
     audioCategoryDescription: "Учись понимать слова и предложения на слух",
@@ -193,13 +198,18 @@ const copy = {
     audioChooseWord: "Audio: choose English word",
     audioChooseTranslation: "Audio: choose translation",
     audioChooseSentenceTranslation: "Audio: choose sentence translation",
-    fillBlank: "Fill in the Blank",
     buildSentence: "Build a Sentence",
     trainingComplete: "🎉 Training Complete",
     score: "Score",
     xpEarned: "XP earned",
     tryAgain: "Try Again",
     returnToTraining: "Return to Training",
+    audioTrainingName: "Audio training",
+    wordsTrainingName: "Words training",
+    grammarTrainingName: "Grammar training",
+    audioTrainingLabel: "AUDIO",
+    wordsTrainingLabel: "WORDS",
+    grammarTrainingLabel: "GRAMMAR",
     trainingPrompt: "What shall we practice today?",
     audioCategory: "🎧 Audio",
     audioCategoryDescription: "Learn to understand words and sentences by ear",
@@ -861,7 +871,7 @@ type TrainingQuestion =
     }
   | {
       id: string;
-      type: "translation" | "english" | "audioEnglish" | "audioTranslation" | "audioSentenceTranslation" | "fillBlank" | "buildSentence" | "audioBuildSentence";
+      type: "translation" | "english" | "audioEnglish" | "audioTranslation" | "audioSentenceTranslation" | "buildSentence";
       word: VocabularyEntry;
       prompt: string;
       answer: string;
@@ -873,6 +883,8 @@ type TrainingCategory = {
   id: "audio" | "words" | "grammar";
   title: string;
   description: string;
+  label: string;
+  sessionName: string;
 };
 
 const grammarSentences = [
@@ -945,9 +957,9 @@ function TrainingPage({
   ];
 
   const trainingCategories: TrainingCategory[] = [
-    { id: "audio", title: t.audioCategory, description: t.audioCategoryDescription },
-    { id: "words", title: t.wordsCategory, description: t.wordsCategoryDescription },
-    { id: "grammar", title: t.grammarCategory, description: t.grammarCategoryDescription },
+    { id: "audio", title: t.audioCategory, description: t.audioCategoryDescription, label: t.audioTrainingLabel, sessionName: t.audioTrainingName },
+    { id: "words", title: t.wordsCategory, description: t.wordsCategoryDescription, label: t.wordsTrainingLabel, sessionName: t.wordsTrainingName },
+    { id: "grammar", title: t.grammarCategory, description: t.grammarCategoryDescription, label: t.grammarTrainingLabel, sessionName: t.grammarTrainingName },
   ];
 
   function startTraining(mode = selectedMode ?? trainingModes[1], category = selectedCategory ?? trainingCategories[1]) {
@@ -1067,10 +1079,11 @@ function TrainingPage({
 
       {currentQuestion && !finished ? (
         <section className="content-card training-card">
-          <ProgressBar value={progressValue} label={`${selectedMode?.label ?? t.standardTraining} · ${questionIndex + 1}/${questions.length}`} />
+          <ProgressBar value={progressValue} label={`${selectedCategory?.sessionName ?? t.wordsTrainingName} · ${questionIndex + 1}/${questions.length}`} />
           <TrainingQuestionView
             question={currentQuestion}
             t={t}
+            categoryLabel={selectedCategory?.label ?? t.wordsTrainingLabel}
             speech={speech.toggle}
             selectedAnswer={selectedAnswer}
             answered={answered}
@@ -1133,6 +1146,7 @@ function TrainingPage({
 function TrainingQuestionView({
   question,
   t,
+  categoryLabel,
   speech,
   selectedAnswer,
   answered,
@@ -1148,6 +1162,7 @@ function TrainingQuestionView({
 }: {
   question: TrainingQuestion;
   t: Copy;
+  categoryLabel: string;
   speech: (text: string) => void;
   selectedAnswer: string | null;
   answered: boolean;
@@ -1164,7 +1179,7 @@ function TrainingQuestionView({
   if (question.type === "match") {
     return (
       <div className="training-question-stack" data-training-type="match">
-        <span className="eyebrow">{t.matchPairs}</span>
+        <span className="eyebrow">{categoryLabel}</span>
         <h2>{t.matchPairs}</h2>
         <div className="match-grid">
           <div className="match-column">
@@ -1198,16 +1213,11 @@ function TrainingQuestionView({
     );
   }
 
-  if (question.type === "buildSentence" || question.type === "audioBuildSentence") {
+  if (question.type === "buildSentence") {
     return (
       <div className="training-question-stack" data-training-type="build">
-        <span className="eyebrow">{t.buildSentence}</span>
+        <span className="eyebrow">{categoryLabel}</span>
         <h2>{t.buildSentence}</h2>
-        {question.type === "audioBuildSentence" ? (
-          <button className="audio-prompt-button" type="button" onClick={() => speech(question.targetSentence ?? question.answer)}>
-            <Volume2 size={26} aria-hidden="true" />
-          </button>
-        ) : null}
         <p className="sentence-translation-prompt">{question.prompt}</p>
         <div className="sentence-build-zone">
           {builtWords.length ? (
@@ -1248,15 +1258,13 @@ function TrainingQuestionView({
         ? t.audioChooseWord
         : question.type === "audioTranslation"
           ? t.audioChooseTranslation
-          : question.type === "audioSentenceTranslation"
-            ? t.audioChooseSentenceTranslation
-            : t.fillBlank;
+          : t.audioChooseSentenceTranslation;
   const isAudioQuestion = question.type === "audioEnglish" || question.type === "audioTranslation" || question.type === "audioSentenceTranslation";
   const audioText = question.type === "audioSentenceTranslation" ? question.targetSentence ?? question.prompt : question.word.word;
 
   return (
     <div className="training-question-stack" data-training-type={question.type}>
-      <span className="eyebrow">{title}</span>
+      <span className="eyebrow">{categoryLabel}</span>
       <h2>{isAudioQuestion ? t.listenAndChoose : question.prompt}</h2>
       {isAudioQuestion ? (
         <button className="audio-prompt-button" type="button" onClick={() => speech(audioText)}>
@@ -1291,14 +1299,14 @@ function buildTrainingSession(preferredWords: VocabularyEntry[], allWords: Vocab
 
 function trainingTypesForCategory(category: TrainingCategory["id"]): TrainingQuestion["type"][] {
   if (category === "audio") {
-    return ["audioEnglish", "audioTranslation", "audioSentenceTranslation", "audioBuildSentence"];
+    return ["audioEnglish", "audioTranslation", "audioSentenceTranslation"];
   }
 
   if (category === "grammar") {
     return ["buildSentence"];
   }
 
-  return ["translation", "english", "match", "fillBlank"];
+  return ["translation", "english", "match"];
 }
 
 function createTrainingQuestion(type: TrainingQuestion["type"], word: VocabularyEntry, allWords: VocabularyEntry[], index: number): TrainingQuestion {
@@ -1341,39 +1349,20 @@ function createTrainingQuestion(type: TrainingQuestion["type"], word: Vocabulary
   }
 
   if (type === "audioSentenceTranslation") {
-    const sentenceSource = bestSentenceWord(word, allWords);
-    const sentence = bestTrainingSentencePair(sentenceSource);
+    const sentence = grammarSentenceForIndex(index);
     const sentenceOptions = answerOptions(
-      sentence.russian,
-      allWords
-        .filter((item) => item.word !== sentenceSource.word)
-        .map((item) => bestTrainingSentencePair(item).russian),
+      sentence.ru,
+      grammarSentences.filter((item) => item.en !== sentence.en).map((item) => item.ru),
     );
 
     return {
       id: `audio-sentence-${index}`,
       type,
-      word: sentenceSource,
-      prompt: tSafeSentencePrompt(sentence.english),
-      answer: sentence.russian,
+      word,
+      prompt: sentence.en,
+      answer: sentence.ru,
       options: sentenceOptions,
-      targetSentence: sentence.english,
-    };
-  }
-
-  if (type === "fillBlank") {
-    const sentenceSource = bestSentenceWord(word, allWords);
-    const sentence = bestTrainingSentencePair(sentenceSource);
-    const blankPrompt = fillBlankPrompt(sentence.english, sentenceSource.word);
-
-    return {
-      id: `fill-blank-${index}`,
-      type,
-      word: sentenceSource,
-      prompt: blankPrompt,
-      answer: sentenceSource.word,
-      options: answerOptions(sentenceSource.word, allWords.filter((item) => item.word !== sentenceSource.word).map((item) => item.word)),
-      targetSentence: sentence.english,
+      targetSentence: sentence.en,
     };
   }
 
@@ -1392,100 +1381,15 @@ function createTrainingQuestion(type: TrainingQuestion["type"], word: Vocabulary
     };
   }
 
-  const sentenceSource = bestSentenceWord(word, allWords);
-  const sentence = bestTrainingSentencePair(sentenceSource);
-  const sentenceWords = sentence.english.replace(/[.!?]+$/g, "").split(/\s+/).slice(0, 8);
-  return {
-    id: `${type}-${index}`,
-    type,
-    word: sentenceSource,
-    prompt: sentence.russian,
-    answer: sentenceWords.join(" "),
-    options: shuffleArray(sentenceWords),
-    targetSentence: sentence.english,
-  };
-}
-
-function hasUsableTrainingSentence(word: VocabularyEntry) {
-  return Boolean(
-    word.example &&
-      word.exampleRu &&
-      !isGeneratedVocabularyExample(word.example) &&
-      !isGeneratedVocabularyExample(word.exampleRu) &&
-      word.example.split(/\s+/).length <= 8 &&
-      word.exampleRu.split(/\s+/).length <= 10,
-  );
+  throw new Error(`Unsupported training question type: ${type}`);
 }
 
 function grammarSentenceForIndex(index: number) {
-  return shuffleArray(grammarSentences)[index % grammarSentences.length];
+  return grammarSentences[index % grammarSentences.length];
 }
 
 function wordsForSentenceBuild(sentence: string) {
   return sentence.replace(/[.!?]+$/g, "").split(/\s+/);
-}
-
-function bestSentenceWord(word: VocabularyEntry, allWords: VocabularyEntry[]) {
-  return hasUsableTrainingSentence(word)
-    ? word
-    : shuffleArray(allWords).find((item) => hasUsableTrainingSentence(item)) ?? word;
-}
-
-function fillBlankPrompt(sentence: string, word: string) {
-  const cleanSentence = sentence.replace(/[.!?]+$/g, "");
-  const cleanWord = word.replace(/[.!?]+$/g, "").trim();
-  const phrasePattern = new RegExp(`\\b${escapeRegExp(cleanWord)}\\b`, "i");
-
-  if (phrasePattern.test(cleanSentence)) {
-    return `${cleanSentence.replace(phrasePattern, "____")}.`;
-  }
-
-  const firstWordPattern = /\b[A-Za-z][A-Za-z'-]*\b/;
-  return `${cleanSentence.replace(firstWordPattern, "____")}.`;
-}
-
-function tSafeSentencePrompt(sentence: string) {
-  return sentence;
-}
-
-function isGeneratedVocabularyExample(value: string) {
-  const normalized = value.toLowerCase();
-  return (
-    normalized.includes("пример со словом") ||
-    normalized.includes("example with") ||
-    normalized.includes("учит слово") ||
-    normalized.includes("learns the word") ||
-    normalized.includes("learns ")
-  );
-}
-
-function bestTrainingSentencePair(word: VocabularyEntry) {
-  if (hasUsableTrainingSentence(word)) {
-    return {
-      english: normalizeTrainingSentence(word.example),
-      russian: normalizeTrainingSentence(word.exampleRu),
-    };
-  }
-
-  const cleanWord = word.word.replace(/[.!?]+$/g, "").trim();
-  const cleanTranslation = word.translation.replace(/[.!?]+$/g, "").trim();
-
-  if (word.category === "actions" || cleanWord.includes(" ")) {
-    return {
-      english: normalizeTrainingSentence(`I can ${cleanWord}`),
-      russian: normalizeTrainingSentence(`Я могу ${cleanTranslation}`),
-    };
-  }
-
-  return {
-    english: normalizeTrainingSentence(`This is ${cleanWord}`),
-    russian: normalizeTrainingSentence(`Это ${cleanTranslation}`),
-  };
-}
-
-function normalizeTrainingSentence(value: string) {
-  const trimmed = value.trim().replace(/[.!?]+$/g, "");
-  return `${trimmed}.`;
 }
 
 function trainingAnswerText(question: TrainingQuestion) {
@@ -1497,10 +1401,6 @@ function trainingAnswerText(question: TrainingQuestion) {
 function isCurrentTrainingAnswerCorrect(question: TrainingQuestion, selectedAnswer: string | null, matchedPairs: Record<string, string>) {
   if (question.type === "match") return question.words.every((word) => matchedPairs[word.word] === word.translation);
   return selectedAnswer === question.answer;
-}
-
-function escapeRegExp(value: string) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 function StatisticsPage({
