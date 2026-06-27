@@ -875,6 +875,29 @@ type TrainingCategory = {
   description: string;
 };
 
+const grammarSentences = [
+  { en: "I open the door.", ru: "Я открываю дверь." },
+  { en: "She has a small dog.", ru: "У неё есть маленькая собака." },
+  { en: "We are in the room.", ru: "Мы в комнате." },
+  { en: "He likes this book.", ru: "Ему нравится эта книга." },
+  { en: "The room was dark and quiet.", ru: "Комната была тёмной и тихой." },
+  { en: "Emma drinks water.", ru: "Эмма пьёт воду." },
+  { en: "Leo goes to school.", ru: "Лео идёт в школу." },
+  { en: "Sara reads a story.", ru: "Сара читает историю." },
+  { en: "Nikita buys fresh bread.", ru: "Никита покупает свежий хлеб." },
+  { en: "My friend lives next door.", ru: "Мой друг живёт по соседству." },
+  { en: "The lesson starts at nine.", ru: "Урок начинается в девять." },
+  { en: "I have a new bicycle.", ru: "У меня есть новый велосипед." },
+  { en: "We walk in the park.", ru: "Мы гуляем в парке." },
+  { en: "She is nervous today.", ru: "Она сегодня нервничает." },
+  { en: "They wait at the station.", ru: "Они ждут на станции." },
+  { en: "The phone is on the table.", ru: "Телефон на столе." },
+  { en: "I make breakfast every morning.", ru: "Я готовлю завтрак каждое утро." },
+  { en: "He closes the window.", ru: "Он закрывает окно." },
+  { en: "We need two tickets.", ru: "Нам нужны два билета." },
+  { en: "The beach is warm and sunny.", ru: "На пляже тепло и солнечно." },
+];
+
 function TrainingPage({
   t,
   savedWords,
@@ -1272,7 +1295,7 @@ function trainingTypesForCategory(category: TrainingCategory["id"]): TrainingQue
   }
 
   if (category === "grammar") {
-    return ["buildSentence", "audioBuildSentence", "buildSentence", "audioBuildSentence"];
+    return ["buildSentence"];
   }
 
   return ["translation", "english", "match", "fillBlank"];
@@ -1354,6 +1377,21 @@ function createTrainingQuestion(type: TrainingQuestion["type"], word: Vocabulary
     };
   }
 
+  if (type === "buildSentence") {
+    const sentence = grammarSentenceForIndex(index);
+    const sentenceWords = wordsForSentenceBuild(sentence.en);
+
+    return {
+      id: `grammar-build-${index}`,
+      type,
+      word,
+      prompt: sentence.ru,
+      answer: sentenceWords.join(" "),
+      options: shuffleArray(sentenceWords),
+      targetSentence: sentence.en,
+    };
+  }
+
   const sentenceSource = bestSentenceWord(word, allWords);
   const sentence = bestTrainingSentencePair(sentenceSource);
   const sentenceWords = sentence.english.replace(/[.!?]+$/g, "").split(/\s+/).slice(0, 8);
@@ -1377,6 +1415,14 @@ function hasUsableTrainingSentence(word: VocabularyEntry) {
       word.example.split(/\s+/).length <= 8 &&
       word.exampleRu.split(/\s+/).length <= 10,
   );
+}
+
+function grammarSentenceForIndex(index: number) {
+  return shuffleArray(grammarSentences)[index % grammarSentences.length];
+}
+
+function wordsForSentenceBuild(sentence: string) {
+  return sentence.replace(/[.!?]+$/g, "").split(/\s+/);
 }
 
 function bestSentenceWord(word: VocabularyEntry, allWords: VocabularyEntry[]) {
