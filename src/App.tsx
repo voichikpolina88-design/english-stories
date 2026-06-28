@@ -22,7 +22,7 @@ import { WordCard } from "./components/WordCard";
 import { getStoryById, stories } from "./data/stories";
 import { getAllVocabulary as getVocabularyDatabase, getVocabularyByStory, type VocabularyEntry } from "./data/vocabulary";
 import { useLearnerProgress } from "./hooks/useLearnerProgress";
-import type { NativeLanguage, Story } from "./types";
+import type { Level, NativeLanguage, Story } from "./types";
 
 type Page = "home" | "learn" | "words" | "training" | "stats" | "settings";
 
@@ -110,6 +110,17 @@ const copy = {
     returnToTraining: "Вернуться к тренировке",
     noTrainingTasks: "Пока нет заданий для этой тренировки",
     backToTrainings: "Вернуться к тренировкам",
+    noTrainingLevelTasks: "\u041f\u043e\u043a\u0430 \u043d\u0435\u0442 \u0437\u0430\u0434\u0430\u043d\u0438\u0439 \u0434\u043b\u044f \u044d\u0442\u043e\u0433\u043e \u0443\u0440\u043e\u0432\u043d\u044f",
+    userLevelUnknown: "\u0422\u0432\u043e\u0439 \u0443\u0440\u043e\u0432\u0435\u043d\u044c: \u043d\u0435 \u043e\u043f\u0440\u0435\u0434\u0435\u043b\u0451\u043d",
+    levelCardDescription: "\u041f\u0440\u043e\u0439\u0434\u0438 \u0431\u044b\u0441\u0442\u0440\u044b\u0439 \u0442\u0435\u0441\u0442 — \u043c\u044b \u043f\u043e\u0434\u0431\u0435\u0440\u0451\u043c \u0442\u0440\u0435\u043d\u0438\u0440\u043e\u0432\u043a\u0438 \u043f\u043e\u0434 \u0442\u0435\u0431\u044f.",
+    defineLevel: "\u041e\u043f\u0440\u0435\u0434\u0435\u043b\u0438\u0442\u044c \u0443\u0440\u043e\u0432\u0435\u043d\u044c",
+    levelTestSoon: "\u0422\u0435\u0441\u0442 \u0443\u0440\u043e\u0432\u043d\u044f \u0441\u043a\u043e\u0440\u043e \u043f\u043e\u044f\u0432\u0438\u0442\u0441\u044f",
+    chooseLevel: "\u0412\u044b\u0431\u0435\u0440\u0438 \u0443\u0440\u043e\u0432\u0435\u043d\u044c",
+    backToCategories: "\u041d\u0430\u0437\u0430\u0434 \u043a \u0442\u0440\u0435\u043d\u0438\u0440\u043e\u0432\u043a\u0430\u043c",
+    easyLevel: "\u043b\u0435\u0433\u043a\u043e",
+    mediumLevel: "\u0441\u0440\u0435\u0434\u043d\u0435",
+    harderLevel: "\u0441\u043b\u043e\u0436\u043d\u0435\u0435",
+    soon: "\u0441\u043a\u043e\u0440\u043e",
     audioTrainingName: "Аудио тренировка",
     wordsTrainingName: "Тренировка слов",
     grammarTrainingName: "Грамматическая тренировка",
@@ -208,6 +219,17 @@ const copy = {
     returnToTraining: "Return to Training",
     noTrainingTasks: "There are no tasks for this training yet",
     backToTrainings: "Back to trainings",
+    noTrainingLevelTasks: "There are no tasks for this level yet",
+    userLevelUnknown: "Your level: not defined",
+    levelCardDescription: "Take a quick test and we will match training to you.",
+    defineLevel: "Define level",
+    levelTestSoon: "The level test is coming soon",
+    chooseLevel: "Choose level",
+    backToCategories: "Back to trainings",
+    easyLevel: "easy",
+    mediumLevel: "medium",
+    harderLevel: "harder",
+    soon: "soon",
     audioTrainingName: "Audio training",
     wordsTrainingName: "Words training",
     grammarTrainingName: "Grammar training",
@@ -900,6 +922,10 @@ type TrainingCategory = {
   sessionName: string;
 };
 
+type TrainingLevelOption =
+  | { level: Level; label: string; description: string; disabled?: false }
+  | { level: "B2" | "C1"; label: string; description: string; disabled: true };
+
 const grammarSentences = [
   { en: "I open the door.", ru: "Я открываю дверь." },
   { en: "She has a small dog.", ru: "У неё есть маленькая собака." },
@@ -948,9 +974,10 @@ function TrainingPage({
     [completedLessons],
   );
   const [questions, setQuestions] = useState<TrainingQuestion[]>([]);
-  const [selectedMode, setSelectedMode] = useState<{ label: string; count: number } | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<TrainingCategory | null>(null);
+  const [selectedLevel, setSelectedLevel] = useState<Level | null>(null);
   const [trainingStarted, setTrainingStarted] = useState(false);
+  const [levelTestOpen, setLevelTestOpen] = useState(false);
   const [questionIndex, setQuestionIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
@@ -964,24 +991,36 @@ function TrainingPage({
   const currentQuestion = questions[questionIndex];
   const trainingPool = savedVocabulary.length ? savedVocabulary : completedVocabulary.length ? completedVocabulary : allWords;
   const progressValue = questions.length ? Math.round(((questionIndex + (finished ? 1 : 0)) / questions.length) * 100) : 0;
-  const trainingModes = [
-    { icon: "⚡", label: t.quickTraining, count: 5 },
-    { icon: "📚", label: t.standardTraining, count: 10 },
-    { icon: "🏆", label: t.bigTraining, count: 20 },
-  ];
-
   const trainingCategories: TrainingCategory[] = [
     { id: "audio", title: t.audioCategory, description: t.audioCategoryDescription, label: t.audioTrainingLabel, sessionName: t.audioTrainingName },
     { id: "words", title: t.wordsCategory, description: t.wordsCategoryDescription, label: t.wordsTrainingLabel, sessionName: t.wordsTrainingName },
     { id: "grammar", title: t.grammarCategory, description: t.grammarCategoryDescription, label: t.grammarTrainingLabel, sessionName: t.grammarTrainingName },
   ];
 
-  function startTraining(mode = selectedMode ?? trainingModes[1], category = selectedCategory ?? trainingCategories[1]) {
-    setSelectedMode(mode);
+  const defaultTrainingCount = 5;
+  const levelOptions: TrainingLevelOption[] = [
+    { level: "A1", label: "A1", description: t.easyLevel },
+    { level: "A2", label: "A2", description: t.mediumLevel },
+    { level: "B1", label: "B1", description: t.harderLevel },
+    { level: "B2", label: "B2", description: t.soon, disabled: true },
+    { level: "C1", label: "C1", description: t.soon, disabled: true },
+  ];
+
+  function chooseTrainingCategory(category: TrainingCategory) {
+    setSelectedCategory(category);
+    setSelectedLevel(null);
+    setQuestions([]);
+    setTrainingStarted(false);
+    setFinished(false);
+    resetQuestionState();
+  }
+
+  function startTraining(level: Level, category = selectedCategory ?? trainingCategories[1]) {
+    setSelectedLevel(level);
     setSelectedCategory(category);
     setTrainingStarted(true);
     try {
-      setQuestions(buildTrainingSession(trainingPool, allWords, mode.count, category.id));
+      setQuestions(buildTrainingSession(trainingPool, allWords, defaultTrainingCount, category.id, level));
     } catch (error) {
       console.error("Training session could not be generated", error);
       setQuestions([]);
@@ -1023,10 +1062,20 @@ function TrainingPage({
 
   function returnToTraining() {
     setQuestions([]);
-    setSelectedMode(null);
     setSelectedCategory(null);
+    setSelectedLevel(null);
+    setLevelTestOpen(false);
     setTrainingStarted(false);
     setQuestionIndex(0);
+    setFinished(false);
+    resetQuestionState();
+  }
+
+  function backToCategorySelection() {
+    setSelectedCategory(null);
+    setSelectedLevel(null);
+    setQuestions([]);
+    setTrainingStarted(false);
     setFinished(false);
     resetQuestionState();
   }
@@ -1066,8 +1115,18 @@ function TrainingPage({
     <main className="page-stack training-page">
       <PageTitle label={`🎯 ${t.training}`} title={t.trainingPrompt} text={t.practiceVocabulary} />
 
-      {!trainingStarted && !questions.length ? (
+      {!levelTestOpen && !selectedCategory && !trainingStarted && !questions.length ? (
         <>
+          <section className="content-card training-level-card">
+            <div>
+              <span className="eyebrow">{t.level}</span>
+              <h2>{t.userLevelUnknown}</h2>
+              <p>{t.levelCardDescription}</p>
+            </div>
+            <button className="training-primary-button" type="button" onClick={() => setLevelTestOpen(true)}>
+              {t.defineLevel}
+            </button>
+          </section>
           <section className="content-card training-start-card">
             <div className="training-start-copy">
               <span className="training-orb">🎯</span>
@@ -1085,9 +1144,9 @@ function TrainingPage({
               {trainingCategories.map((category) => (
                 <button
                   key={category.id}
-                  className={selectedCategory?.id === category.id ? "training-category-card active" : "training-category-card"}
+                  className="training-category-card"
                   type="button"
-                  onClick={() => startTraining(trainingModes[1], category)}
+                  onClick={() => chooseTrainingCategory(category)}
                 >
                   <strong>{category.title}</strong>
                   <small>{category.description}</small>
@@ -1098,17 +1157,55 @@ function TrainingPage({
         </>
       ) : null}
 
+      {levelTestOpen ? (
+        <section className="content-card training-complete-card level-test-placeholder">
+          <span className="celebration-mark">🎓</span>
+          <h2>{t.levelTestSoon}</h2>
+          <button className="ghost-action" type="button" onClick={returnToTraining}>{t.backToTrainings}</button>
+        </section>
+      ) : null}
+
+      {!levelTestOpen && selectedCategory && !trainingStarted && !questions.length ? (
+        <section className="content-card training-level-selection-card">
+          <div className="training-selection-header">
+            <button className="ghost-action compact" type="button" onClick={backToCategorySelection}>
+              ← {t.backToCategories}
+            </button>
+            <div>
+              <span className="eyebrow">{selectedCategory.label}</span>
+              <h2>{t.chooseLevel}</h2>
+            </div>
+          </div>
+          <div className="training-level-grid">
+            {levelOptions.map((option) => (
+              <button
+                key={option.level}
+                className={option.disabled ? "training-level-option disabled" : selectedLevel === option.level ? "training-level-option active" : "training-level-option"}
+                type="button"
+                disabled={option.disabled}
+                onClick={() => {
+                  if (!option.disabled) startTraining(option.level);
+                }}
+              >
+                <strong>{option.label}</strong>
+                <small>{option.description}</small>
+              </button>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
       {trainingStarted && !questions.length && !finished ? (
         <section className="content-card training-complete-card">
           <span className="celebration-mark">🎯</span>
-          <h2>{t.noTrainingTasks}</h2>
+          <h2>{selectedLevel ? t.noTrainingLevelTasks : t.noTrainingTasks}</h2>
           <button className="ghost-action" type="button" onClick={returnToTraining}>{t.backToTrainings}</button>
         </section>
       ) : null}
 
       {currentQuestion && !finished ? (
         <section className="content-card training-card">
-          <ProgressBar value={progressValue} label={`${selectedCategory?.sessionName ?? t.wordsTrainingName} · ${questionIndex + 1}/${questions.length}`} />
+          <ProgressBar value={progressValue} label={`${selectedCategory?.sessionName ?? t.wordsTrainingName} · ${selectedLevel ?? "A1"} · ${questionIndex + 1}/${questions.length}`} />
           <TrainingQuestionView
             question={currentQuestion}
             t={t}
@@ -1164,7 +1261,7 @@ function TrainingPage({
               <strong>+{score * 3} XP</strong>
             </div>
           </div>
-          <button className="training-primary-button full" type="button" onClick={() => startTraining(selectedMode ?? trainingModes[1], selectedCategory ?? trainingCategories[1])}>{t.tryAgain}</button>
+          <button className="training-primary-button full" type="button" onClick={() => startTraining(selectedLevel ?? "A1", selectedCategory ?? trainingCategories[1])}>{t.tryAgain}</button>
           <button className="ghost-action" type="button" onClick={returnToTraining}>{t.returnToTraining}</button>
         </section>
       ) : null}
@@ -1317,8 +1414,18 @@ function TrainingQuestionView({
   );
 }
 
-function buildTrainingSession(preferredWords: VocabularyEntry[], allWords: VocabularyEntry[], questionCount: number, category: TrainingCategory["id"] = "words") {
-  const pool = shuffleArray(preferredWords.length ? preferredWords : allWords);
+function buildTrainingSession(
+  preferredWords: VocabularyEntry[],
+  allWords: VocabularyEntry[],
+  questionCount: number,
+  category: TrainingCategory["id"] = "words",
+  level?: Level,
+) {
+  const preferredPool = preferredWords.length ? preferredWords : allWords;
+  const preferredLevelPool = level ? preferredPool.filter((word) => word.level === level) : preferredPool;
+  const allLevelWords = level ? allWords.filter((word) => word.level === level) : allWords;
+  const pool = shuffleArray(preferredLevelPool.length ? preferredLevelPool : allLevelWords.length ? allLevelWords : preferredPool);
+  const optionWords = allLevelWords.length ? allLevelWords : allWords;
   if (!pool.length) return [];
 
   const sessionWords = Array.from({ length: questionCount }, (_, index) => pool[index % pool.length]);
@@ -1327,7 +1434,7 @@ function buildTrainingSession(preferredWords: VocabularyEntry[], allWords: Vocab
 
   const types = shuffleWithRepeats(Array.from({ length: questionCount }, (_, index) => baseTypes[index % baseTypes.length]));
 
-  return sessionWords.map((word, index) => createTrainingQuestion(types[index], word, allWords, index));
+  return sessionWords.map((word, index) => createTrainingQuestion(types[index], word, optionWords, index, level));
 }
 
 function trainingTypesForCategory(category: TrainingCategory["id"]): TrainingQuestion["type"][] {
@@ -1342,7 +1449,7 @@ function trainingTypesForCategory(category: TrainingCategory["id"]): TrainingQue
   return ["translation", "english", "match"];
 }
 
-function createTrainingQuestion(type: TrainingQuestion["type"], word: VocabularyEntry, allWords: VocabularyEntry[], index: number): TrainingQuestion {
+function createTrainingQuestion(type: TrainingQuestion["type"], word: VocabularyEntry, allWords: VocabularyEntry[], index: number, level?: Level): TrainingQuestion {
   if (type === "match") {
     const words = shuffleArray([word, ...shuffleArray(allWords.filter((item) => item.word !== word.word)).slice(0, 2)]);
     return { id: `match-${index}`, type: "match", words, translations: derangedTranslations(words) };
@@ -1382,7 +1489,7 @@ function createTrainingQuestion(type: TrainingQuestion["type"], word: Vocabulary
   }
 
   if (type === "audioSentenceTranslation") {
-    const sentence = grammarSentenceForIndex(index);
+    const sentence = grammarSentenceForIndex(index, level);
     const sentenceOptions = answerOptions(
       sentence.ru,
       grammarSentences.filter((item) => item.en !== sentence.en).map((item) => item.ru),
@@ -1400,7 +1507,7 @@ function createTrainingQuestion(type: TrainingQuestion["type"], word: Vocabulary
   }
 
   if (type === "buildSentence") {
-    const sentence = grammarSentenceForIndex(index);
+    const sentence = grammarSentenceForIndex(index, level);
     const sentenceWords = wordsForSentenceBuild(sentence.en);
 
     return {
@@ -1417,8 +1524,16 @@ function createTrainingQuestion(type: TrainingQuestion["type"], word: Vocabulary
   throw new Error(`Unsupported training question type: ${type}`);
 }
 
-function grammarSentenceForIndex(index: number) {
-  return grammarSentences[index % grammarSentences.length];
+function grammarSentenceForIndex(index: number, level: Level = "A1") {
+  const sentencesForLevel = grammarSentences.filter((_, sentenceIndex) => grammarLevelForIndex(sentenceIndex) === level);
+  const source = sentencesForLevel.length ? sentencesForLevel : grammarSentences;
+  return source[index % source.length];
+}
+
+function grammarLevelForIndex(index: number): Level {
+  if (index < 10) return "A1";
+  if (index < 17) return "A2";
+  return "B1";
 }
 
 function wordsForSentenceBuild(sentence: string) {

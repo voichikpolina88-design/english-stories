@@ -1908,6 +1908,107 @@ p {
     linear-gradient(135deg, #fff, var(--card-soft));
 }
 
+.training-level-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 18px;
+  background:
+    radial-gradient(circle at 92% 12%, rgba(220, 234, 241, 0.64), transparent 28%),
+    linear-gradient(135deg, #fff, rgba(243, 246, 244, 0.92));
+}
+
+.training-level-card h2,
+.training-level-selection-card h2 {
+  margin: 4px 0 6px;
+  color: var(--ink);
+  font-size: clamp(1.35rem, 2vw, 1.85rem);
+  line-height: 1.12;
+}
+
+.training-level-card p {
+  margin: 0;
+  max-width: 560px;
+  color: var(--muted);
+  font-weight: 650;
+  line-height: 1.5;
+}
+
+.training-level-selection-card {
+  display: grid;
+  gap: 18px;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(191, 217, 208, 0.46), transparent 30%),
+    #fff;
+}
+
+.training-selection-header {
+  display: grid;
+  gap: 12px;
+}
+
+.ghost-action.compact {
+  width: fit-content;
+  min-height: 42px;
+  padding: 0 16px;
+  border-radius: 999px;
+}
+
+.training-level-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.training-level-option {
+  display: grid;
+  gap: 6px;
+  min-height: 118px;
+  align-content: center;
+  justify-items: start;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(243, 246, 244, 0.74)),
+    var(--paper);
+  color: var(--ink);
+  text-align: left;
+  box-shadow: var(--soft-shadow);
+}
+
+.training-level-option:hover:not(:disabled) {
+  transform: translateY(-2px);
+  border-color: rgba(123, 184, 165, 0.32);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.06);
+}
+
+.training-level-option.active {
+  border-color: rgba(123, 184, 165, 0.44);
+  background: var(--lavender);
+}
+
+.training-level-option.disabled {
+  cursor: not-allowed;
+  opacity: 0.52;
+  box-shadow: none;
+}
+
+.training-level-option strong,
+.training-level-option small {
+  display: block;
+}
+
+.training-level-option strong {
+  font-size: 1.28rem;
+  font-weight: 880;
+}
+
+.training-level-option small {
+  color: var(--muted);
+  font-weight: 740;
+}
+
 .training-start-copy {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
@@ -2796,9 +2897,11 @@ p {
   }
 
   .training-start-copy,
+  .training-level-card,
   .training-stats-grid,
   .training-mode-grid,
   .training-category-grid,
+  .training-level-grid,
   .match-grid,
   .build-word-grid {
     grid-template-columns: 1fr;
