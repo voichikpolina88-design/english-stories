@@ -108,6 +108,8 @@ const copy = {
     xpEarned: "XP получено",
     tryAgain: "Попробовать снова",
     returnToTraining: "Вернуться к тренировке",
+    noTrainingTasks: "Пока нет заданий для этой тренировки",
+    backToTrainings: "Вернуться к тренировкам",
     audioTrainingName: "Аудио тренировка",
     wordsTrainingName: "Тренировка слов",
     grammarTrainingName: "Грамматическая тренировка",
@@ -204,6 +206,8 @@ const copy = {
     xpEarned: "XP earned",
     tryAgain: "Try Again",
     returnToTraining: "Return to Training",
+    noTrainingTasks: "There are no tasks for this training yet",
+    backToTrainings: "Back to trainings",
     audioTrainingName: "Audio training",
     wordsTrainingName: "Words training",
     grammarTrainingName: "Grammar training",
@@ -849,6 +853,15 @@ function shuffleArray<T>(items: T[]) {
   return copyItems;
 }
 
+function shuffleWithRepeats<T>(items: T[]) {
+  const copyItems = [...items];
+  for (let index = copyItems.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(Math.random() * (index + 1));
+    [copyItems[index], copyItems[swapIndex]] = [copyItems[swapIndex], copyItems[index]];
+  }
+  return copyItems;
+}
+
 function useVocabularySpeech() {
   function toggle(text: string) {
     if (!("speechSynthesis" in window)) return;
@@ -937,6 +950,7 @@ function TrainingPage({
   const [questions, setQuestions] = useState<TrainingQuestion[]>([]);
   const [selectedMode, setSelectedMode] = useState<{ label: string; count: number } | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<TrainingCategory | null>(null);
+  const [trainingStarted, setTrainingStarted] = useState(false);
   const [questionIndex, setQuestionIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
@@ -965,7 +979,13 @@ function TrainingPage({
   function startTraining(mode = selectedMode ?? trainingModes[1], category = selectedCategory ?? trainingCategories[1]) {
     setSelectedMode(mode);
     setSelectedCategory(category);
-    setQuestions(buildTrainingSession(trainingPool, allWords, mode.count, category.id));
+    setTrainingStarted(true);
+    try {
+      setQuestions(buildTrainingSession(trainingPool, allWords, mode.count, category.id));
+    } catch (error) {
+      console.error("Training session could not be generated", error);
+      setQuestions([]);
+    }
     setQuestionIndex(0);
     setScore(0);
     setSelectedAnswer(null);
@@ -1005,6 +1025,7 @@ function TrainingPage({
     setQuestions([]);
     setSelectedMode(null);
     setSelectedCategory(null);
+    setTrainingStarted(false);
     setQuestionIndex(0);
     setFinished(false);
     resetQuestionState();
@@ -1045,7 +1066,7 @@ function TrainingPage({
     <main className="page-stack training-page">
       <PageTitle label={`🎯 ${t.training}`} title={t.trainingPrompt} text={t.practiceVocabulary} />
 
-      {!questions.length ? (
+      {!trainingStarted && !questions.length ? (
         <>
           <section className="content-card training-start-card">
             <div className="training-start-copy">
@@ -1075,6 +1096,14 @@ function TrainingPage({
             </div>
           </section>
         </>
+      ) : null}
+
+      {trainingStarted && !questions.length && !finished ? (
+        <section className="content-card training-complete-card">
+          <span className="celebration-mark">🎯</span>
+          <h2>{t.noTrainingTasks}</h2>
+          <button className="ghost-action" type="button" onClick={returnToTraining}>{t.backToTrainings}</button>
+        </section>
       ) : null}
 
       {currentQuestion && !finished ? (
@@ -1290,9 +1319,13 @@ function TrainingQuestionView({
 
 function buildTrainingSession(preferredWords: VocabularyEntry[], allWords: VocabularyEntry[], questionCount: number, category: TrainingCategory["id"] = "words") {
   const pool = shuffleArray(preferredWords.length ? preferredWords : allWords);
+  if (!pool.length) return [];
+
   const sessionWords = Array.from({ length: questionCount }, (_, index) => pool[index % pool.length]);
   const baseTypes = trainingTypesForCategory(category);
-  const types = shuffleArray(Array.from({ length: questionCount }, (_, index) => baseTypes[index % baseTypes.length]));
+  if (!baseTypes.length) return [];
+
+  const types = shuffleWithRepeats(Array.from({ length: questionCount }, (_, index) => baseTypes[index % baseTypes.length]));
 
   return sessionWords.map((word, index) => createTrainingQuestion(types[index], word, allWords, index));
 }
@@ -1376,7 +1409,7 @@ function createTrainingQuestion(type: TrainingQuestion["type"], word: Vocabulary
       word,
       prompt: sentence.ru,
       answer: sentenceWords.join(" "),
-      options: shuffleArray(sentenceWords),
+      options: shuffleWithRepeats(sentenceWords),
       targetSentence: sentence.en,
     };
   }
