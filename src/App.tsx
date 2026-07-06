@@ -954,6 +954,10 @@ type PlacementQuestion = {
   answer: string;
 };
 
+type PlacementSessionQuestion = PlacementQuestion & {
+  options: string[];
+};
+
 const USER_ENGLISH_LEVEL_KEY = "userEnglishLevel";
 
 const grammarSentences = [
@@ -1082,6 +1086,7 @@ function TrainingPage({
   const [trainingStarted, setTrainingStarted] = useState(false);
   const [levelTestOpen, setLevelTestOpen] = useState(false);
   const [userEnglishLevel, setUserEnglishLevel] = useState<EnglishLevel | null>(() => readUserEnglishLevel());
+  const [placementSession, setPlacementSession] = useState<PlacementSessionQuestion[]>(() => buildPlacementSession());
   const [placementIndex, setPlacementIndex] = useState(0);
   const [placementScore, setPlacementScore] = useState(0);
   const [placementResult, setPlacementResult] = useState<EnglishLevel | null>(null);
@@ -1096,7 +1101,7 @@ function TrainingPage({
   const speech = useVocabularySpeech();
 
   const currentQuestion = questions[questionIndex];
-  const currentPlacementQuestion = placementQuestions[placementIndex];
+  const currentPlacementQuestion = placementSession[placementIndex] ?? placementSession[0];
   const trainingPool = savedVocabulary.length ? savedVocabulary : completedVocabulary.length ? completedVocabulary : allWords;
   const progressValue = questions.length ? Math.round(((questionIndex + (finished ? 1 : 0)) / questions.length) * 100) : 0;
   const trainingCategories: TrainingCategory[] = [
@@ -1133,6 +1138,7 @@ function TrainingPage({
 
   function openPlacementTest() {
     setLevelTestOpen(true);
+    setPlacementSession(buildPlacementSession());
     setPlacementIndex(0);
     setPlacementScore(0);
     setPlacementResult(null);
@@ -1147,7 +1153,7 @@ function TrainingPage({
     const isCorrect = currentPlacementQuestion?.answer === answer;
     const nextScore = placementScore + (isCorrect ? 1 : 0);
 
-    if (placementIndex >= placementQuestions.length - 1) {
+    if (placementIndex >= placementSession.length - 1) {
       const result = placementLevelFromScore(nextScore);
       setPlacementScore(nextScore);
       setPlacementResult(result);
@@ -1298,10 +1304,10 @@ function TrainingPage({
           ) : (
             <>
               <div className="training-selection-header">
-                <span className="eyebrow">{`${t.questionProgress} ${placementIndex + 1} ${t.of} ${placementQuestions.length}`}</span>
+                <span className="eyebrow">{`${t.questionProgress} ${placementIndex + 1} ${t.of} ${placementSession.length}`}</span>
                 <h2>{t.levelTestTitle}</h2>
               </div>
-              <ProgressBar value={Math.round(((placementIndex + 1) / placementQuestions.length) * 100)} label={`${t.questionProgress} ${placementIndex + 1}/${placementQuestions.length}`} />
+              <ProgressBar value={Math.round(((placementIndex + 1) / placementSession.length) * 100)} label={`${t.questionProgress} ${placementIndex + 1}/${placementSession.length}`} />
               <div className="level-test-question">
                 <h3>{currentPlacementQuestion.question}</h3>
                 <div className="choice-list">
@@ -1556,6 +1562,41 @@ function saveUserEnglishLevel(level: EnglishLevel) {
 
 function isEnglishLevel(value: unknown): value is EnglishLevel {
   return value === "A1" || value === "A2" || value === "B1" || value === "B2" || value === "C1";
+}
+
+function buildPlacementSession(): PlacementSessionQuestion[] {
+  for (let attempt = 0; attempt < 12; attempt += 1) {
+    const session = shuffleWithRepeats(placementQuestions).map((question) => ({
+      ...question,
+      options: shuffleWithRepeats(question.options),
+    }));
+
+    if (!isPlacementOrderLinear(session)) return session;
+  }
+
+  return mixedPlacementFallback().map((question) => ({
+    ...question,
+    options: shuffleWithRepeats(question.options),
+  }));
+}
+
+function isPlacementOrderLinear(session: PlacementSessionQuestion[]) {
+  const rank: Record<EnglishLevel, number> = { A1: 1, A2: 2, B1: 3, B2: 4, C1: 5 };
+  return session.every((question, index) => index === 0 || rank[session[index - 1].level] <= rank[question.level]);
+}
+
+function mixedPlacementFallback() {
+  const byLevel = new Map<EnglishLevel, PlacementQuestion[]>();
+  placementQuestions.forEach((question) => {
+    byLevel.set(question.level, [...(byLevel.get(question.level) ?? []), question]);
+  });
+
+  byLevel.forEach((questions, level) => {
+    byLevel.set(level, shuffleWithRepeats(questions));
+  });
+
+  const levelPattern: EnglishLevel[] = ["A1", "A2", "A1", "B1", "A2", "B2", "A1", "B1", "A2", "C1"];
+  return levelPattern.map((level) => byLevel.get(level)?.shift()).filter((question): question is PlacementQuestion => Boolean(question));
 }
 
 function placementLevelFromScore(score: number): EnglishLevel {
