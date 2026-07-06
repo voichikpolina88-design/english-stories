@@ -112,9 +112,20 @@ const copy = {
     backToTrainings: "Вернуться к тренировкам",
     noTrainingLevelTasks: "\u041f\u043e\u043a\u0430 \u043d\u0435\u0442 \u0437\u0430\u0434\u0430\u043d\u0438\u0439 \u0434\u043b\u044f \u044d\u0442\u043e\u0433\u043e \u0443\u0440\u043e\u0432\u043d\u044f",
     userLevelUnknown: "\u0422\u0432\u043e\u0439 \u0443\u0440\u043e\u0432\u0435\u043d\u044c: \u043d\u0435 \u043e\u043f\u0440\u0435\u0434\u0435\u043b\u0451\u043d",
+    userLevelTitle: "\u0422\u0432\u043e\u0439 \u0443\u0440\u043e\u0432\u0435\u043d\u044c",
     levelCardDescription: "\u041f\u0440\u043e\u0439\u0434\u0438 \u0431\u044b\u0441\u0442\u0440\u044b\u0439 \u0442\u0435\u0441\u0442 — \u043c\u044b \u043f\u043e\u0434\u0431\u0435\u0440\u0451\u043c \u0442\u0440\u0435\u043d\u0438\u0440\u043e\u0432\u043a\u0438 \u043f\u043e\u0434 \u0442\u0435\u0431\u044f.",
+    levelCardSavedDescription: "\u0422\u0440\u0435\u043d\u0438\u0440\u043e\u0432\u043a\u0438 \u0431\u0443\u0434\u0443\u0442 \u043f\u043e\u0434\u0431\u0438\u0440\u0430\u0442\u044c\u0441\u044f \u043f\u043e\u0434 \u0442\u0432\u043e\u0439 \u0443\u0440\u043e\u0432\u0435\u043d\u044c.",
     defineLevel: "\u041e\u043f\u0440\u0435\u0434\u0435\u043b\u0438\u0442\u044c \u0443\u0440\u043e\u0432\u0435\u043d\u044c",
-    levelTestSoon: "\u0422\u0435\u0441\u0442 \u0443\u0440\u043e\u0432\u043d\u044f \u0441\u043a\u043e\u0440\u043e \u043f\u043e\u044f\u0432\u0438\u0442\u0441\u044f",
+    retakeLevelTest: "\u041f\u0440\u043e\u0439\u0442\u0438 \u0442\u0435\u0441\u0442 \u0437\u0430\u043d\u043e\u0432\u043e",
+    levelTestTitle: "\u0411\u044b\u0441\u0442\u0440\u044b\u0439 \u0442\u0435\u0441\u0442 \u0443\u0440\u043e\u0432\u043d\u044f",
+    questionProgress: "\u0412\u043e\u043f\u0440\u043e\u0441",
+    of: "\u0438\u0437",
+    startTrainingAfterTest: "\u041d\u0430\u0447\u0430\u0442\u044c \u0442\u0440\u0435\u043d\u0438\u0440\u043e\u0432\u043a\u0443",
+    levelResultA1: "\u0422\u044b \u0437\u043d\u0430\u0435\u0448\u044c \u0431\u0430\u0437\u043e\u0432\u044b\u0435 \u0441\u043b\u043e\u0432\u0430 \u0438 \u043f\u0440\u043e\u0441\u0442\u044b\u0435 \u0444\u0440\u0430\u0437\u044b. \u041d\u0430\u0447\u043d\u0451\u043c \u0441 \u043b\u0451\u0433\u043a\u0438\u0445 \u0442\u0440\u0435\u043d\u0438\u0440\u043e\u0432\u043e\u043a.",
+    levelResultA2: "\u0422\u044b \u0443\u0436\u0435 \u043f\u043e\u043d\u0438\u043c\u0430\u0435\u0448\u044c \u043f\u0440\u043e\u0441\u0442\u044b\u0435 \u043f\u0440\u0435\u0434\u043b\u043e\u0436\u0435\u043d\u0438\u044f. \u0422\u0440\u0435\u043d\u0438\u0440\u043e\u0432\u043a\u0438 \u0431\u0443\u0434\u0443\u0442 \u0447\u0443\u0442\u044c \u0441\u043b\u043e\u0436\u043d\u0435\u0435.",
+    levelResultB1: "\u0423 \u0442\u0435\u0431\u044f \u0445\u043e\u0440\u043e\u0448\u0438\u0439 \u0431\u0430\u0437\u043e\u0432\u044b\u0439 \u0443\u0440\u043e\u0432\u0435\u043d\u044c. \u0411\u0443\u0434\u0435\u043c \u0442\u0440\u0435\u043d\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u0431\u043e\u043b\u0435\u0435 \u0434\u043b\u0438\u043d\u043d\u044b\u0435 \u043f\u0440\u0435\u0434\u043b\u043e\u0436\u0435\u043d\u0438\u044f.",
+    levelResultB2: "\u0423 \u0442\u0435\u0431\u044f \u0443\u0440\u043e\u0432\u0435\u043d\u044c \u0432\u044b\u0448\u0435 \u0441\u0440\u0435\u0434\u043d\u0435\u0433\u043e. \u0421\u0435\u0439\u0447\u0430\u0441 \u0434\u043e\u0441\u0442\u0443\u043f\u043d\u044b \u0442\u0440\u0435\u043d\u0438\u0440\u043e\u0432\u043a\u0438 \u0434\u043e B1, \u043d\u043e \u043c\u044b \u0431\u0443\u0434\u0435\u043c \u043f\u043e\u0434\u0431\u0438\u0440\u0430\u0442\u044c \u0441\u0430\u043c\u044b\u0435 \u0441\u043b\u043e\u0436\u043d\u044b\u0435 \u0434\u043e\u0441\u0442\u0443\u043f\u043d\u044b\u0435 \u0437\u0430\u0434\u0430\u043d\u0438\u044f.",
+    levelResultC1: "\u0423 \u0442\u0435\u0431\u044f \u043f\u0440\u043e\u0434\u0432\u0438\u043d\u0443\u0442\u044b\u0439 \u0443\u0440\u043e\u0432\u0435\u043d\u044c. \u0421\u0435\u0439\u0447\u0430\u0441 \u0434\u043e\u0441\u0442\u0443\u043f\u043d\u044b \u0442\u0440\u0435\u043d\u0438\u0440\u043e\u0432\u043a\u0438 \u0434\u043e B1, \u043d\u043e \u043c\u044b \u0431\u0443\u0434\u0435\u043c \u043f\u043e\u0434\u0431\u0438\u0440\u0430\u0442\u044c \u0441\u0430\u043c\u044b\u0435 \u0441\u043b\u043e\u0436\u043d\u044b\u0435 \u0434\u043e\u0441\u0442\u0443\u043f\u043d\u044b\u0435 \u0437\u0430\u0434\u0430\u043d\u0438\u044f.",
     chooseLevel: "\u0412\u044b\u0431\u0435\u0440\u0438 \u0443\u0440\u043e\u0432\u0435\u043d\u044c",
     backToCategories: "\u041d\u0430\u0437\u0430\u0434 \u043a \u0442\u0440\u0435\u043d\u0438\u0440\u043e\u0432\u043a\u0430\u043c",
     easyLevel: "\u043b\u0435\u0433\u043a\u043e",
@@ -221,9 +232,20 @@ const copy = {
     backToTrainings: "Back to trainings",
     noTrainingLevelTasks: "There are no tasks for this level yet",
     userLevelUnknown: "Your level: not defined",
+    userLevelTitle: "Your level",
     levelCardDescription: "Take a quick test and we will match training to you.",
+    levelCardSavedDescription: "Training will be matched to your level.",
     defineLevel: "Define level",
-    levelTestSoon: "The level test is coming soon",
+    retakeLevelTest: "Retake test",
+    levelTestTitle: "Quick level test",
+    questionProgress: "Question",
+    of: "of",
+    startTrainingAfterTest: "Start training",
+    levelResultA1: "You know basic words and simple phrases. We will start with easier training.",
+    levelResultA2: "You already understand simple sentences. Training will be a little harder.",
+    levelResultB1: "You have a good basic level. We will practice longer sentences.",
+    levelResultB2: "Your level is above intermediate. Training is currently available up to B1, so we will use the hardest available tasks.",
+    levelResultC1: "You have an advanced level. Training is currently available up to B1, so we will use the hardest available tasks.",
     chooseLevel: "Choose level",
     backToCategories: "Back to trainings",
     easyLevel: "easy",
@@ -922,9 +944,17 @@ type TrainingCategory = {
   sessionName: string;
 };
 
-type TrainingLevelOption =
-  | { level: Level; label: string; description: string; disabled?: false }
-  | { level: "B2" | "C1"; label: string; description: string; disabled: true };
+type EnglishLevel = Level | "B2" | "C1";
+
+type PlacementQuestion = {
+  id: string;
+  level: EnglishLevel;
+  question: string;
+  options: string[];
+  answer: string;
+};
+
+const USER_ENGLISH_LEVEL_KEY = "userEnglishLevel";
 
 const grammarSentences = [
   { en: "I open the door.", ru: "Я открываю дверь." },
@@ -947,6 +977,79 @@ const grammarSentences = [
   { en: "He closes the window.", ru: "Он закрывает окно." },
   { en: "We need two tickets.", ru: "Нам нужны два билета." },
   { en: "The beach is warm and sunny.", ru: "На пляже тепло и солнечно." },
+];
+
+const placementQuestions: PlacementQuestion[] = [
+  {
+    id: "a1-hello",
+    level: "A1",
+    question: "Выбери правильный перевод: Hello",
+    options: ["Привет", "Спасибо", "Пока", "Пожалуйста"],
+    answer: "Привет",
+  },
+  {
+    id: "a1-like-tea",
+    level: "A1",
+    question: "Как сказать по-английски: Я люблю чай.",
+    options: ["I like tea.", "I am tea.", "I have tea?", "I go tea."],
+    answer: "I like tea.",
+  },
+  {
+    id: "a1-small-room",
+    level: "A1",
+    question: "Выбери правильное слово: This room is ___.",
+    options: ["small", "quickly", "yesterday", "swim"],
+    answer: "small",
+  },
+  {
+    id: "a2-breakfast",
+    level: "A2",
+    question: "Что значит: She is making breakfast now.",
+    options: ["Она сейчас готовит завтрак.", "Она уже поужинала.", "Она покупает билет.", "Она закрывает окно."],
+    answer: "Она сейчас готовит завтрак.",
+  },
+  {
+    id: "a2-past",
+    level: "A2",
+    question: "Выбери правильную форму: Yesterday we ___ to the park.",
+    options: ["went", "go", "goes", "going"],
+    answer: "went",
+  },
+  {
+    id: "a2-because",
+    level: "A2",
+    question: "Какое предложение правильное?",
+    options: ["I stayed home because it was raining.", "I stayed home because it raining.", "I stay home yesterday because rain.", "I stayed home because rain is."],
+    answer: "I stayed home because it was raining.",
+  },
+  {
+    id: "b1-message",
+    level: "B1",
+    question: "Что значит: The message surprised her because it arrived late at night.",
+    options: ["Сообщение удивило её, потому что пришло поздно ночью.", "Она отправила сообщение утром.", "Сообщение было коротким и простым.", "Она потеряла телефон ночью."],
+    answer: "Сообщение удивило её, потому что пришло поздно ночью.",
+  },
+  {
+    id: "b1-condition",
+    level: "B1",
+    question: "Выбери правильный вариант: If I have time tomorrow, I ___ you.",
+    options: ["will call", "called", "calling", "call yesterday"],
+    answer: "will call",
+  },
+  {
+    id: "b2-meeting",
+    level: "B2",
+    question: "Выбери самое естественное предложение.",
+    options: ["Although the meeting was long, it helped us make a clear decision.", "Although the meeting long, it helped make clear decision.", "The meeting was long although helped us decision.", "Although long meeting, decision clear helped us."],
+    answer: "Although the meeting was long, it helped us make a clear decision.",
+  },
+  {
+    id: "c1-nuance",
+    level: "C1",
+    question: "Какой вариант лучше передаёт смысл: She barely noticed the noise.",
+    options: ["Она почти не заметила шум.", "Она громко услышала шум.", "Она специально создала шум.", "Она часто слушала шум."],
+    answer: "Она почти не заметила шум.",
+  },
 ];
 
 function TrainingPage({
@@ -978,6 +1081,10 @@ function TrainingPage({
   const [selectedLevel, setSelectedLevel] = useState<Level | null>(null);
   const [trainingStarted, setTrainingStarted] = useState(false);
   const [levelTestOpen, setLevelTestOpen] = useState(false);
+  const [userEnglishLevel, setUserEnglishLevel] = useState<EnglishLevel | null>(() => readUserEnglishLevel());
+  const [placementIndex, setPlacementIndex] = useState(0);
+  const [placementScore, setPlacementScore] = useState(0);
+  const [placementResult, setPlacementResult] = useState<EnglishLevel | null>(null);
   const [questionIndex, setQuestionIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
@@ -989,6 +1096,7 @@ function TrainingPage({
   const speech = useVocabularySpeech();
 
   const currentQuestion = questions[questionIndex];
+  const currentPlacementQuestion = placementQuestions[placementIndex];
   const trainingPool = savedVocabulary.length ? savedVocabulary : completedVocabulary.length ? completedVocabulary : allWords;
   const progressValue = questions.length ? Math.round(((questionIndex + (finished ? 1 : 0)) / questions.length) * 100) : 0;
   const trainingCategories: TrainingCategory[] = [
@@ -998,21 +1106,9 @@ function TrainingPage({
   ];
 
   const defaultTrainingCount = 5;
-  const levelOptions: TrainingLevelOption[] = [
-    { level: "A1", label: "A1", description: t.easyLevel },
-    { level: "A2", label: "A2", description: t.mediumLevel },
-    { level: "B1", label: "B1", description: t.harderLevel },
-    { level: "B2", label: "B2", description: t.soon, disabled: true },
-    { level: "C1", label: "C1", description: t.soon, disabled: true },
-  ];
 
   function chooseTrainingCategory(category: TrainingCategory) {
-    setSelectedCategory(category);
-    setSelectedLevel(null);
-    setQuestions([]);
-    setTrainingStarted(false);
-    setFinished(false);
-    resetQuestionState();
+    startTraining(trainingLevelForUser(userEnglishLevel), category);
   }
 
   function startTraining(level: Level, category = selectedCategory ?? trainingCategories[1]) {
@@ -1033,6 +1129,42 @@ function TrainingPage({
     setSelectedLeft(null);
     setMatchedPairs({});
     setBuiltWords([]);
+  }
+
+  function openPlacementTest() {
+    setLevelTestOpen(true);
+    setPlacementIndex(0);
+    setPlacementScore(0);
+    setPlacementResult(null);
+    setQuestions([]);
+    setSelectedCategory(null);
+    setTrainingStarted(false);
+    setFinished(false);
+    resetQuestionState();
+  }
+
+  function answerPlacementQuestion(answer: string) {
+    const isCorrect = currentPlacementQuestion?.answer === answer;
+    const nextScore = placementScore + (isCorrect ? 1 : 0);
+
+    if (placementIndex >= placementQuestions.length - 1) {
+      const result = placementLevelFromScore(nextScore);
+      setPlacementScore(nextScore);
+      setPlacementResult(result);
+      setUserEnglishLevel(result);
+      saveUserEnglishLevel(result);
+      return;
+    }
+
+    setPlacementScore(nextScore);
+    setPlacementIndex((current) => current + 1);
+  }
+
+  function closePlacementTest() {
+    setLevelTestOpen(false);
+    setPlacementIndex(0);
+    setPlacementScore(0);
+    setPlacementResult(null);
   }
 
   function resetQuestionState() {
@@ -1065,17 +1197,11 @@ function TrainingPage({
     setSelectedCategory(null);
     setSelectedLevel(null);
     setLevelTestOpen(false);
+    setPlacementIndex(0);
+    setPlacementScore(0);
+    setPlacementResult(null);
     setTrainingStarted(false);
     setQuestionIndex(0);
-    setFinished(false);
-    resetQuestionState();
-  }
-
-  function backToCategorySelection() {
-    setSelectedCategory(null);
-    setSelectedLevel(null);
-    setQuestions([]);
-    setTrainingStarted(false);
     setFinished(false);
     resetQuestionState();
   }
@@ -1115,16 +1241,16 @@ function TrainingPage({
     <main className="page-stack training-page">
       <PageTitle label={`🎯 ${t.training}`} title={t.trainingPrompt} text={t.practiceVocabulary} />
 
-      {!levelTestOpen && !selectedCategory && !trainingStarted && !questions.length ? (
+      {!levelTestOpen && !trainingStarted && !questions.length && !finished ? (
         <>
           <section className="content-card training-level-card">
             <div>
               <span className="eyebrow">{t.level}</span>
-              <h2>{t.userLevelUnknown}</h2>
-              <p>{t.levelCardDescription}</p>
+              <h2>{userEnglishLevel ? `${t.userLevelTitle}: ${userEnglishLevel}` : t.userLevelUnknown}</h2>
+              <p>{userEnglishLevel ? t.levelCardSavedDescription : t.levelCardDescription}</p>
             </div>
-            <button className="training-primary-button" type="button" onClick={() => setLevelTestOpen(true)}>
-              {t.defineLevel}
+            <button className="training-primary-button" type="button" onClick={openPlacementTest}>
+              {userEnglishLevel ? t.retakeLevelTest : t.defineLevel}
             </button>
           </section>
           <section className="content-card training-start-card">
@@ -1158,40 +1284,37 @@ function TrainingPage({
       ) : null}
 
       {levelTestOpen ? (
-        <section className="content-card training-complete-card level-test-placeholder">
-          <span className="celebration-mark">🎓</span>
-          <h2>{t.levelTestSoon}</h2>
-          <button className="ghost-action" type="button" onClick={returnToTraining}>{t.backToTrainings}</button>
-        </section>
-      ) : null}
-
-      {!levelTestOpen && selectedCategory && !trainingStarted && !questions.length ? (
-        <section className="content-card training-level-selection-card">
-          <div className="training-selection-header">
-            <button className="ghost-action compact" type="button" onClick={backToCategorySelection}>
-              ← {t.backToCategories}
-            </button>
-            <div>
-              <span className="eyebrow">{selectedCategory.label}</span>
-              <h2>{t.chooseLevel}</h2>
-            </div>
-          </div>
-          <div className="training-level-grid">
-            {levelOptions.map((option) => (
-              <button
-                key={option.level}
-                className={option.disabled ? "training-level-option disabled" : selectedLevel === option.level ? "training-level-option active" : "training-level-option"}
-                type="button"
-                disabled={option.disabled}
-                onClick={() => {
-                  if (!option.disabled) startTraining(option.level);
-                }}
-              >
-                <strong>{option.label}</strong>
-                <small>{option.description}</small>
-              </button>
-            ))}
-          </div>
+        <section className="content-card training-level-test-card">
+          {placementResult ? (
+            <>
+              <span className="celebration-mark">🎓</span>
+              <h2>{`${t.userLevelTitle}: ${placementResult}`}</h2>
+              <p>{levelResultDescription(placementResult, t)}</p>
+              <div className="level-test-actions">
+                <button className="training-primary-button full" type="button" onClick={closePlacementTest}>{t.startTrainingAfterTest}</button>
+                <button className="ghost-action" type="button" onClick={returnToTraining}>{t.backToTrainings}</button>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="training-selection-header">
+                <span className="eyebrow">{`${t.questionProgress} ${placementIndex + 1} ${t.of} ${placementQuestions.length}`}</span>
+                <h2>{t.levelTestTitle}</h2>
+              </div>
+              <ProgressBar value={Math.round(((placementIndex + 1) / placementQuestions.length) * 100)} label={`${t.questionProgress} ${placementIndex + 1}/${placementQuestions.length}`} />
+              <div className="level-test-question">
+                <h3>{currentPlacementQuestion.question}</h3>
+                <div className="choice-list">
+                  {currentPlacementQuestion.options.map((option) => (
+                    <button className="choice-button" type="button" key={option} onClick={() => answerPlacementQuestion(option)}>
+                      {option}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <button className="ghost-action" type="button" onClick={returnToTraining}>{t.backToTrainings}</button>
+            </>
+          )}
         </section>
       ) : null}
 
@@ -1412,6 +1535,49 @@ function TrainingQuestionView({
       </div>
     </div>
   );
+}
+
+function readUserEnglishLevel(): EnglishLevel | null {
+  try {
+    const saved = window.localStorage.getItem(USER_ENGLISH_LEVEL_KEY);
+    return isEnglishLevel(saved) ? saved : null;
+  } catch {
+    return null;
+  }
+}
+
+function saveUserEnglishLevel(level: EnglishLevel) {
+  try {
+    window.localStorage.setItem(USER_ENGLISH_LEVEL_KEY, level);
+  } catch {
+    // The app should keep working in browsers that restrict localStorage.
+  }
+}
+
+function isEnglishLevel(value: unknown): value is EnglishLevel {
+  return value === "A1" || value === "A2" || value === "B1" || value === "B2" || value === "C1";
+}
+
+function placementLevelFromScore(score: number): EnglishLevel {
+  if (score <= 3) return "A1";
+  if (score <= 6) return "A2";
+  if (score <= 8) return "B1";
+  if (score === 9) return "B2";
+  return "C1";
+}
+
+function trainingLevelForUser(level: EnglishLevel | null): Level {
+  if (level === "A2" || level === "B1") return level;
+  if (level === "B2" || level === "C1") return "B1";
+  return "A1";
+}
+
+function levelResultDescription(level: EnglishLevel, t: Copy) {
+  if (level === "A1") return t.levelResultA1;
+  if (level === "A2") return t.levelResultA2;
+  if (level === "B1") return t.levelResultB1;
+  if (level === "B2") return t.levelResultB2;
+  return t.levelResultC1;
 }
 
 function buildTrainingSession(
