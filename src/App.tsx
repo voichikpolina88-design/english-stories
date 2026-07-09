@@ -103,6 +103,7 @@ const copy = {
     audioChooseTranslation: "Аудио: выбери перевод",
     audioChooseSentenceTranslation: "Аудио: выбери перевод предложения",
     buildSentence: "Собери предложение",
+    wordOrder: "Собери порядок слов",
     trainingComplete: "🎉 Тренировка завершена",
     score: "Счёт",
     xpEarned: "XP получено",
@@ -223,6 +224,7 @@ const copy = {
     audioChooseTranslation: "Audio: choose translation",
     audioChooseSentenceTranslation: "Audio: choose sentence translation",
     buildSentence: "Build a Sentence",
+    wordOrder: "Build the word order",
     trainingComplete: "🎉 Training Complete",
     score: "Score",
     xpEarned: "XP earned",
@@ -928,7 +930,7 @@ type TrainingQuestion =
     }
   | {
       id: string;
-      type: "translation" | "english" | "audioEnglish" | "audioTranslation" | "audioSentenceTranslation" | "buildSentence";
+      type: "translation" | "english" | "audioEnglish" | "audioTranslation" | "audioSentenceTranslation" | "buildSentence" | "wordOrder";
       word: VocabularyEntry;
       prompt: string;
       answer: string;
@@ -945,6 +947,12 @@ type TrainingCategory = {
 };
 
 type EnglishLevel = Level | "B2" | "C1";
+
+type GrammarSentence = {
+  en: string;
+  ru: string;
+  level: Level;
+};
 
 type PlacementQuestion = {
   id: string;
@@ -981,6 +989,27 @@ const grammarSentences = [
   { en: "He closes the window.", ru: "Он закрывает окно." },
   { en: "We need two tickets.", ru: "Нам нужны два билета." },
   { en: "The beach is warm and sunny.", ru: "На пляже тепло и солнечно." },
+];
+
+const trainingGrammarSentences: GrammarSentence[] = [
+  { en: "I open the door.", ru: "Я открываю дверь.", level: "A1" },
+  { en: "She has a small dog.", ru: "У неё есть маленькая собака.", level: "A1" },
+  { en: "We are in the room.", ru: "Мы в комнате.", level: "A1" },
+  { en: "He likes this book.", ru: "Ему нравится эта книга.", level: "A1" },
+  { en: "Emma drinks water.", ru: "Эмма пьёт воду.", level: "A1" },
+  { en: "Leo goes to school.", ru: "Лео идёт в школу.", level: "A1" },
+  { en: "The lesson starts at nine.", ru: "Урок начинается в девять.", level: "A2" },
+  { en: "I have a new bicycle.", ru: "У меня есть новый велосипед.", level: "A2" },
+  { en: "We walk in the park.", ru: "Мы гуляем в парке.", level: "A2" },
+  { en: "She is nervous today.", ru: "Она сегодня нервничает.", level: "A2" },
+  { en: "They wait at the station.", ru: "Они ждут на станции.", level: "A2" },
+  { en: "The phone is on the table.", ru: "Телефон на столе.", level: "A2" },
+  { en: "The room was dark and quiet.", ru: "Комната была тёмной и тихой.", level: "B1" },
+  { en: "I make breakfast every morning.", ru: "Я готовлю завтрак каждое утро.", level: "B1" },
+  { en: "Nikita buys fresh bread.", ru: "Никита покупает свежий хлеб.", level: "B1" },
+  { en: "My friend lives next door.", ru: "Мой друг живёт по соседству.", level: "B1" },
+  { en: "We need two tickets.", ru: "Нам нужны два билета.", level: "B1" },
+  { en: "The beach is warm and sunny.", ru: "На пляже тепло и солнечно.", level: "B1" },
 ];
 
 const placementQuestions: PlacementQuestion[] = [
@@ -1102,7 +1131,7 @@ function TrainingPage({
 
   const currentQuestion = questions[questionIndex];
   const currentPlacementQuestion = placementSession[placementIndex] ?? placementSession[0];
-  const trainingPool = savedVocabulary.length ? savedVocabulary : completedVocabulary.length ? completedVocabulary : allWords;
+  const trainingPool = uniqueVocabularyEntries([...savedVocabulary, ...completedVocabulary, ...allWords]);
   const progressValue = questions.length ? Math.round(((questionIndex + (finished ? 1 : 0)) / questions.length) * 100) : 0;
   const trainingCategories: TrainingCategory[] = [
     { id: "audio", title: t.audioCategory, description: t.audioCategoryDescription, label: t.audioTrainingLabel, sessionName: t.audioTrainingName },
@@ -1233,12 +1262,12 @@ function TrainingPage({
   }
 
   function addBuildWord(word: string) {
-    if (!currentQuestion || currentQuestion.type !== "buildSentence" || answered) return;
+    if (!currentQuestion || (currentQuestion.type !== "buildSentence" && currentQuestion.type !== "wordOrder") || answered) return;
     setBuiltWords((current) => [...current, word]);
   }
 
   function checkBuiltSentence() {
-    if (!currentQuestion || currentQuestion.type !== "buildSentence") return;
+    if (!currentQuestion || (currentQuestion.type !== "buildSentence" && currentQuestion.type !== "wordOrder")) return;
     setSelectedAnswer(builtWords.join(" "));
     markAnswer(builtWords.join(" ") === currentQuestion.answer);
   }
@@ -1354,14 +1383,16 @@ function TrainingPage({
           />
           {answered ? (
             <div className={isCurrentTrainingAnswerCorrect(currentQuestion, selectedAnswer, matchedPairs) ? "feedback correct" : "feedback wrong"}>
-              {currentQuestion.type === "buildSentence" ? (
+              {currentQuestion.type === "buildSentence" || currentQuestion.type === "wordOrder" ? (
                 <>
                   <span>
                     <strong>{t.correctAnswer}:</strong> {trainingAnswerText(currentQuestion)}
                   </span>
-                  <span className="feedback-translation">
-                    <strong>{t.sentenceTranslation}:</strong> {currentQuestion.prompt}
-                  </span>
+                  {currentQuestion.type === "buildSentence" ? (
+                    <span className="feedback-translation">
+                      <strong>{t.sentenceTranslation}:</strong> {currentQuestion.prompt}
+                    </span>
+                  ) : null}
                 </>
               ) : isCurrentTrainingAnswerCorrect(currentQuestion, selectedAnswer, matchedPairs) ? (
                 t.correct
@@ -1468,12 +1499,12 @@ function TrainingQuestionView({
     );
   }
 
-  if (question.type === "buildSentence") {
+  if (question.type === "buildSentence" || question.type === "wordOrder") {
     return (
       <div className="training-question-stack" data-training-type="build">
         <span className="eyebrow">{categoryLabel}</span>
-        <h2>{t.buildSentence}</h2>
-        <p className="sentence-translation-prompt">{question.prompt}</p>
+        <h2>{question.type === "buildSentence" ? t.buildSentence : t.wordOrder}</h2>
+        <p className="sentence-translation-prompt">{question.type === "buildSentence" ? question.prompt : t.wordOrder}</p>
         <div className="sentence-build-zone">
           {builtWords.length ? (
             builtWords.map((word, index) => (
@@ -1482,7 +1513,7 @@ function TrainingQuestionView({
               </button>
             ))
           ) : (
-            <span>{t.buildSentence}</span>
+            <span>{question.type === "buildSentence" ? t.buildSentence : t.wordOrder}</span>
           )}
         </div>
         <div className="build-word-grid">
@@ -1520,7 +1551,7 @@ function TrainingQuestionView({
   return (
     <div className="training-question-stack" data-training-type={question.type}>
       <span className="eyebrow">{categoryLabel}</span>
-      <h2>{isAudioQuestion ? t.listenAndChoose : question.prompt}</h2>
+      <h2>{isAudioQuestion ? title : question.prompt}</h2>
       {isAudioQuestion ? (
         <button className="audio-prompt-button" type="button" onClick={() => speech(audioText)}>
           <Volume2 size={26} aria-hidden="true" />
@@ -1621,6 +1652,10 @@ function levelResultDescription(level: EnglishLevel, t: Copy) {
   return t.levelResultC1;
 }
 
+function uniqueVocabularyEntries(words: VocabularyEntry[]) {
+  return Array.from(new Map(words.map((word) => [word.word, word])).values());
+}
+
 function buildTrainingSession(
   preferredWords: VocabularyEntry[],
   allWords: VocabularyEntry[],
@@ -1628,11 +1663,12 @@ function buildTrainingSession(
   category: TrainingCategory["id"] = "words",
   level?: Level,
 ) {
-  const preferredPool = preferredWords.length ? preferredWords : allWords;
+  const preferredPool = uniqueVocabularyEntries(preferredWords.length ? preferredWords : allWords);
   const preferredLevelPool = level ? preferredPool.filter((word) => word.level === level) : preferredPool;
   const allLevelWords = level ? allWords.filter((word) => word.level === level) : allWords;
-  const pool = shuffleArray(preferredLevelPool.length ? preferredLevelPool : allLevelWords.length ? allLevelWords : preferredPool);
-  const optionWords = allLevelWords.length ? allLevelWords : allWords;
+  const targetWords = uniqueVocabularyEntries([...preferredLevelPool, ...allLevelWords]);
+  const pool = shuffleArray(targetWords.length ? targetWords : preferredPool);
+  const optionWords = uniqueVocabularyEntries([...(allLevelWords.length ? allLevelWords : []), ...allWords]);
   if (!pool.length) return [];
 
   const sessionWords = Array.from({ length: questionCount }, (_, index) => pool[index % pool.length]);
@@ -1650,7 +1686,7 @@ function trainingTypesForCategory(category: TrainingCategory["id"]): TrainingQue
   }
 
   if (category === "grammar") {
-    return ["buildSentence"];
+    return ["buildSentence", "wordOrder"];
   }
 
   return ["translation", "english", "match"];
@@ -1699,7 +1735,7 @@ function createTrainingQuestion(type: TrainingQuestion["type"], word: Vocabulary
     const sentence = grammarSentenceForIndex(index, level);
     const sentenceOptions = answerOptions(
       sentence.ru,
-      grammarSentences.filter((item) => item.en !== sentence.en).map((item) => item.ru),
+      trainingGrammarSentences.filter((item) => item.en !== sentence.en).map((item) => item.ru),
     );
 
     return {
@@ -1728,19 +1764,28 @@ function createTrainingQuestion(type: TrainingQuestion["type"], word: Vocabulary
     };
   }
 
+  if (type === "wordOrder") {
+    const sentence = grammarSentenceForIndex(index, level);
+    const sentenceWords = wordsForSentenceBuild(sentence.en);
+
+    return {
+      id: `grammar-order-${index}`,
+      type,
+      word,
+      prompt: "Собери английское предложение в правильном порядке.",
+      answer: sentenceWords.join(" "),
+      options: shuffleWithRepeats(sentenceWords),
+      targetSentence: sentence.en,
+    };
+  }
+
   throw new Error(`Unsupported training question type: ${type}`);
 }
 
 function grammarSentenceForIndex(index: number, level: Level = "A1") {
-  const sentencesForLevel = grammarSentences.filter((_, sentenceIndex) => grammarLevelForIndex(sentenceIndex) === level);
-  const source = sentencesForLevel.length ? sentencesForLevel : grammarSentences;
+  const sentencesForLevel = trainingGrammarSentences.filter((sentence) => sentence.level === level);
+  const source = sentencesForLevel.length ? sentencesForLevel : trainingGrammarSentences;
   return source[index % source.length];
-}
-
-function grammarLevelForIndex(index: number): Level {
-  if (index < 10) return "A1";
-  if (index < 17) return "A2";
-  return "B1";
 }
 
 function wordsForSentenceBuild(sentence: string) {
@@ -1749,7 +1794,7 @@ function wordsForSentenceBuild(sentence: string) {
 
 function trainingAnswerText(question: TrainingQuestion) {
   if (question.type === "match") return question.words.map((word) => `${word.word} ↔ ${word.translation}`).join(", ");
-  if (question.type === "buildSentence") return question.targetSentence;
+  if (question.type === "buildSentence" || question.type === "wordOrder") return question.targetSentence;
   return question.answer;
 }
 
