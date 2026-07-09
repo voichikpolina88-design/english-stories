@@ -105,10 +105,20 @@ const copy = {
     buildSentence: "Собери предложение",
     wordOrder: "Собери порядок слов",
     trainingComplete: "🎉 Тренировка завершена",
+    trainingDoneTitle: "Готово! 🎉",
     score: "Счёт",
     xpEarned: "XP получено",
     tryAgain: "Попробовать снова",
     returnToTraining: "Вернуться к тренировке",
+    correctStat: "Правильно",
+    userLevelStat: "Твой уровень",
+    trainingTypeStat: "Тип тренировки",
+    mistakesToReview: "Ошибки для повторения:",
+    repeatMistakes: "Повторить ошибки",
+    moreTraining: "Ещё тренировка",
+    toTrainings: "К тренировкам",
+    noMistakes: "Ошибок нет — можно идти дальше!",
+    greatWork: "Отличная работа!",
     noTrainingTasks: "Пока нет заданий для этой тренировки",
     backToTrainings: "Вернуться к тренировкам",
     noTrainingLevelTasks: "\u041f\u043e\u043a\u0430 \u043d\u0435\u0442 \u0437\u0430\u0434\u0430\u043d\u0438\u0439 \u0434\u043b\u044f \u044d\u0442\u043e\u0433\u043e \u0443\u0440\u043e\u0432\u043d\u044f",
@@ -125,8 +135,8 @@ const copy = {
     levelResultA1: "\u0422\u044b \u0437\u043d\u0430\u0435\u0448\u044c \u0431\u0430\u0437\u043e\u0432\u044b\u0435 \u0441\u043b\u043e\u0432\u0430 \u0438 \u043f\u0440\u043e\u0441\u0442\u044b\u0435 \u0444\u0440\u0430\u0437\u044b. \u041d\u0430\u0447\u043d\u0451\u043c \u0441 \u043b\u0451\u0433\u043a\u0438\u0445 \u0442\u0440\u0435\u043d\u0438\u0440\u043e\u0432\u043e\u043a.",
     levelResultA2: "\u0422\u044b \u0443\u0436\u0435 \u043f\u043e\u043d\u0438\u043c\u0430\u0435\u0448\u044c \u043f\u0440\u043e\u0441\u0442\u044b\u0435 \u043f\u0440\u0435\u0434\u043b\u043e\u0436\u0435\u043d\u0438\u044f. \u0422\u0440\u0435\u043d\u0438\u0440\u043e\u0432\u043a\u0438 \u0431\u0443\u0434\u0443\u0442 \u0447\u0443\u0442\u044c \u0441\u043b\u043e\u0436\u043d\u0435\u0435.",
     levelResultB1: "\u0423 \u0442\u0435\u0431\u044f \u0445\u043e\u0440\u043e\u0448\u0438\u0439 \u0431\u0430\u0437\u043e\u0432\u044b\u0439 \u0443\u0440\u043e\u0432\u0435\u043d\u044c. \u0411\u0443\u0434\u0435\u043c \u0442\u0440\u0435\u043d\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u0431\u043e\u043b\u0435\u0435 \u0434\u043b\u0438\u043d\u043d\u044b\u0435 \u043f\u0440\u0435\u0434\u043b\u043e\u0436\u0435\u043d\u0438\u044f.",
-    levelResultB2: "\u0423 \u0442\u0435\u0431\u044f \u0443\u0440\u043e\u0432\u0435\u043d\u044c \u0432\u044b\u0448\u0435 \u0441\u0440\u0435\u0434\u043d\u0435\u0433\u043e. \u0421\u0435\u0439\u0447\u0430\u0441 \u0434\u043e\u0441\u0442\u0443\u043f\u043d\u044b \u0442\u0440\u0435\u043d\u0438\u0440\u043e\u0432\u043a\u0438 \u0434\u043e B1, \u043d\u043e \u043c\u044b \u0431\u0443\u0434\u0435\u043c \u043f\u043e\u0434\u0431\u0438\u0440\u0430\u0442\u044c \u0441\u0430\u043c\u044b\u0435 \u0441\u043b\u043e\u0436\u043d\u044b\u0435 \u0434\u043e\u0441\u0442\u0443\u043f\u043d\u044b\u0435 \u0437\u0430\u0434\u0430\u043d\u0438\u044f.",
-    levelResultC1: "\u0423 \u0442\u0435\u0431\u044f \u043f\u0440\u043e\u0434\u0432\u0438\u043d\u0443\u0442\u044b\u0439 \u0443\u0440\u043e\u0432\u0435\u043d\u044c. \u0421\u0435\u0439\u0447\u0430\u0441 \u0434\u043e\u0441\u0442\u0443\u043f\u043d\u044b \u0442\u0440\u0435\u043d\u0438\u0440\u043e\u0432\u043a\u0438 \u0434\u043e B1, \u043d\u043e \u043c\u044b \u0431\u0443\u0434\u0435\u043c \u043f\u043e\u0434\u0431\u0438\u0440\u0430\u0442\u044c \u0441\u0430\u043c\u044b\u0435 \u0441\u043b\u043e\u0436\u043d\u044b\u0435 \u0434\u043e\u0441\u0442\u0443\u043f\u043d\u044b\u0435 \u0437\u0430\u0434\u0430\u043d\u0438\u044f.",
+    levelResultB2: "У тебя уровень выше среднего. Будем тренировать полезные связки, лексику и более сложные предложения.",
+    levelResultC1: "У тебя продвинутый уровень. Будем тренировать нюансы смысла, формальные фразы и сложные структуры без лишней академичности.",
     chooseLevel: "\u0412\u044b\u0431\u0435\u0440\u0438 \u0443\u0440\u043e\u0432\u0435\u043d\u044c",
     backToCategories: "\u041d\u0430\u0437\u0430\u0434 \u043a \u0442\u0440\u0435\u043d\u0438\u0440\u043e\u0432\u043a\u0430\u043c",
     easyLevel: "\u043b\u0435\u0433\u043a\u043e",
@@ -139,6 +149,9 @@ const copy = {
     audioTrainingLabel: "АУДИО",
     wordsTrainingLabel: "СЛОВА",
     grammarTrainingLabel: "ГРАММАТИКА",
+    audioTrainingPlain: "Аудио",
+    wordsTrainingPlain: "Слова",
+    grammarTrainingPlain: "Грамматика",
     trainingPrompt: "Что потренируем сегодня?",
     audioCategory: "🎧 Аудио",
     audioCategoryDescription: "Учись понимать слова и предложения на слух",
@@ -226,10 +239,20 @@ const copy = {
     buildSentence: "Build a Sentence",
     wordOrder: "Build the word order",
     trainingComplete: "🎉 Training Complete",
+    trainingDoneTitle: "Done! 🎉",
     score: "Score",
     xpEarned: "XP earned",
     tryAgain: "Try Again",
     returnToTraining: "Return to Training",
+    correctStat: "Correct",
+    userLevelStat: "Your level",
+    trainingTypeStat: "Training type",
+    mistakesToReview: "Mistakes to review:",
+    repeatMistakes: "Repeat mistakes",
+    moreTraining: "More training",
+    toTrainings: "To trainings",
+    noMistakes: "No mistakes — keep going!",
+    greatWork: "Great work!",
     noTrainingTasks: "There are no tasks for this training yet",
     backToTrainings: "Back to trainings",
     noTrainingLevelTasks: "There are no tasks for this level yet",
@@ -246,8 +269,8 @@ const copy = {
     levelResultA1: "You know basic words and simple phrases. We will start with easier training.",
     levelResultA2: "You already understand simple sentences. Training will be a little harder.",
     levelResultB1: "You have a good basic level. We will practice longer sentences.",
-    levelResultB2: "Your level is above intermediate. Training is currently available up to B1, so we will use the hardest available tasks.",
-    levelResultC1: "You have an advanced level. Training is currently available up to B1, so we will use the hardest available tasks.",
+    levelResultB2: "Your level is upper-intermediate. We will practice useful connectors, vocabulary, and more complex sentences.",
+    levelResultC1: "You have an advanced level. We will practice nuance, formal phrasing, and complex structures without making it too academic.",
     chooseLevel: "Choose level",
     backToCategories: "Back to trainings",
     easyLevel: "easy",
@@ -260,6 +283,9 @@ const copy = {
     audioTrainingLabel: "AUDIO",
     wordsTrainingLabel: "WORDS",
     grammarTrainingLabel: "GRAMMAR",
+    audioTrainingPlain: "Audio",
+    wordsTrainingPlain: "Words",
+    grammarTrainingPlain: "Grammar",
     trainingPrompt: "What shall we practice today?",
     audioCategory: "🎧 Audio",
     audioCategoryDescription: "Learn to understand words and sentences by ear",
@@ -946,7 +972,7 @@ type TrainingCategory = {
   sessionName: string;
 };
 
-type EnglishLevel = Level | "B2" | "C1";
+type EnglishLevel = Level;
 
 type GrammarSentence = {
   en: string;
@@ -1010,6 +1036,47 @@ const trainingGrammarSentences: GrammarSentence[] = [
   { en: "My friend lives next door.", ru: "Мой друг живёт по соседству.", level: "B1" },
   { en: "We need two tickets.", ru: "Нам нужны два билета.", level: "B1" },
   { en: "The beach is warm and sunny.", ru: "На пляже тепло и солнечно.", level: "B1" },
+  { en: "Although the plan was risky, we decided to try it.", ru: "Хотя план был рискованным, мы решили попробовать.", level: "B2" },
+  { en: "Despite the delay, the team finished the project on time.", ru: "Несмотря на задержку, команда закончила проект вовремя.", level: "B2" },
+  { en: "I have visited London twice, but I went to Paris last year.", ru: "Я был в Лондоне дважды, но в Париж ездил в прошлом году.", level: "B2" },
+  { en: "The report was written by our manager yesterday.", ru: "Отчёт был написан нашим менеджером вчера.", level: "B2" },
+  { en: "If I had more free time, I would learn another language.", ru: "Если бы у меня было больше свободного времени, я бы выучил ещё один язык.", level: "B2" },
+  { en: "She said that she needed more information.", ru: "Она сказала, что ей нужно больше информации.", level: "B2" },
+  { en: "Only after the meeting did I understand the problem.", ru: "Только после встречи я понял проблему.", level: "C1" },
+  { en: "Had I known about the traffic, I would have left earlier.", ru: "Если бы я знал о пробках, я бы вышел раньше.", level: "C1" },
+  { en: "The decision is expected to be announced tomorrow.", ru: "Ожидается, что решение объявят завтра.", level: "C1" },
+  { en: "Whereas the first option is cheaper, the second is more reliable.", ru: "В то время как первый вариант дешевле, второй более надёжный.", level: "C1" },
+  { en: "Please take into account how much time the task will require.", ru: "Пожалуйста, учти, сколько времени потребует задача.", level: "C1" },
+  { en: "The informal phrase works in chat, but it sounds too casual in an email.", ru: "Неформальная фраза подходит для чата, но в письме звучит слишком непринуждённо.", level: "C1" },
+];
+
+const curatedTrainingVocabulary: VocabularyEntry[] = [
+  { id: "training-b2-although", word: "although", translation: "хотя", ipa: "/ol-thoh/", level: "B2", sourceStory: "Training B2", sourceStories: ["Training B2"], sourceStoryIds: ["training-b2"], example: "Although it was late, we kept working.", exampleRu: "Хотя было поздно, мы продолжили работать.", category: "actions" },
+  { id: "training-b2-despite", word: "despite", translation: "несмотря на", ipa: "/di-spyt/", level: "B2", sourceStory: "Training B2", sourceStories: ["Training B2"], sourceStoryIds: ["training-b2"], example: "Despite the rain, we went outside.", exampleRu: "Несмотря на дождь, мы вышли на улицу.", category: "actions" },
+  { id: "training-b2-however", word: "however", translation: "однако", ipa: "/how-ev-er/", level: "B2", sourceStory: "Training B2", sourceStories: ["Training B2"], sourceStoryIds: ["training-b2"], example: "The idea is good. However, it needs more time.", exampleRu: "Идея хорошая. Однако ей нужно больше времени.", category: "actions" },
+  { id: "training-b2-therefore", word: "therefore", translation: "поэтому", ipa: "/thair-for/", level: "B2", sourceStory: "Training B2", sourceStories: ["Training B2"], sourceStoryIds: ["training-b2"], example: "The file was missing; therefore, we called again.", exampleRu: "Файла не было, поэтому мы позвонили снова.", category: "actions" },
+  { id: "training-b2-instead", word: "instead", translation: "вместо этого", ipa: "/in-sted/", level: "B2", sourceStory: "Training B2", sourceStories: ["Training B2"], sourceStoryIds: ["training-b2"], example: "I was tired, so I stayed home instead.", exampleRu: "Я устал, поэтому вместо этого остался дома.", category: "daily life" },
+  { id: "training-b2-probably", word: "probably", translation: "вероятно", ipa: "/prob-uh-blee/", level: "B2", sourceStory: "Training B2", sourceStories: ["Training B2"], sourceStoryIds: ["training-b2"], example: "She will probably arrive after lunch.", exampleRu: "Она, вероятно, приедет после обеда.", category: "daily life" },
+  { id: "training-b2-actually", word: "actually", translation: "на самом деле", ipa: "/ak-choo-uh-lee/", level: "B2", sourceStory: "Training B2", sourceStories: ["Training B2"], sourceStoryIds: ["training-b2"], example: "Actually, I have already seen this film.", exampleRu: "На самом деле, я уже видел этот фильм.", category: "daily life" },
+  { id: "training-b2-especially", word: "especially", translation: "особенно", ipa: "/uh-spesh-uh-lee/", level: "B2", sourceStory: "Training B2", sourceStories: ["Training B2"], sourceStoryIds: ["training-b2"], example: "I like quiet places, especially in the morning.", exampleRu: "Мне нравятся тихие места, особенно утром.", category: "daily life" },
+  { id: "training-b2-environment", word: "environment", translation: "окружающая среда", ipa: "/en-vy-ruhn-muhnt/", level: "B2", sourceStory: "Training B2", sourceStories: ["Training B2"], sourceStoryIds: ["training-b2"], example: "Clean transport is better for the environment.", exampleRu: "Чистый транспорт лучше для окружающей среды.", category: "daily life" },
+  { id: "training-b2-relationship", word: "relationship", translation: "отношения", ipa: "/ri-lay-shuhn-ship/", level: "B2", sourceStory: "Training B2", sourceStories: ["Training B2"], sourceStoryIds: ["training-b2"], example: "A good relationship needs trust.", exampleRu: "Хорошим отношениям нужно доверие.", category: "emotions" },
+  { id: "training-b2-decision", word: "decision", translation: "решение", ipa: "/di-sizh-uhn/", level: "B2", sourceStory: "Training B2", sourceStories: ["Training B2"], sourceStoryIds: ["training-b2"], example: "It was a difficult decision.", exampleRu: "Это было трудное решение.", category: "work" },
+  { id: "training-b2-experience", word: "experience", translation: "опыт", ipa: "/ik-speer-ee-uhns/", level: "B2", sourceStory: "Training B2", sourceStories: ["Training B2"], sourceStoryIds: ["training-b2"], example: "This job gave me useful experience.", exampleRu: "Эта работа дала мне полезный опыт.", category: "work" },
+  { id: "training-b2-opportunity", word: "opportunity", translation: "возможность", ipa: "/op-er-too-nuh-tee/", level: "B2", sourceStory: "Training B2", sourceStories: ["Training B2"], sourceStoryIds: ["training-b2"], example: "It is a great opportunity to learn.", exampleRu: "Это отличная возможность учиться.", category: "work" },
+  { id: "training-b2-advantage", word: "advantage", translation: "преимущество", ipa: "/ad-van-tij/", level: "B2", sourceStory: "Training B2", sourceStories: ["Training B2"], sourceStoryIds: ["training-b2"], example: "One advantage is the flexible schedule.", exampleRu: "Одно преимущество - гибкий график.", category: "work" },
+  { id: "training-b2-disadvantage", word: "disadvantage", translation: "недостаток", ipa: "/dis-ad-van-tij/", level: "B2", sourceStory: "Training B2", sourceStories: ["Training B2"], sourceStoryIds: ["training-b2"], example: "The main disadvantage is the price.", exampleRu: "Главный недостаток - цена.", category: "work" },
+  { id: "training-c1-nevertheless", word: "nevertheless", translation: "тем не менее", ipa: "/nev-er-thuh-les/", level: "C1", sourceStory: "Training C1", sourceStories: ["Training C1"], sourceStoryIds: ["training-c1"], example: "The task was hard. Nevertheless, we finished it.", exampleRu: "Задача была трудной. Тем не менее, мы её закончили.", category: "work" },
+  { id: "training-c1-whereas", word: "whereas", translation: "в то время как", ipa: "/wair-az/", level: "C1", sourceStory: "Training C1", sourceStories: ["Training C1"], sourceStoryIds: ["training-c1"], example: "I prefer calls, whereas my sister prefers messages.", exampleRu: "Я предпочитаю звонки, в то время как моя сестра предпочитает сообщения.", category: "daily life" },
+  { id: "training-c1-assumption", word: "assumption", translation: "предположение", ipa: "/uh-sump-shuhn/", level: "C1", sourceStory: "Training C1", sourceStories: ["Training C1"], sourceStoryIds: ["training-c1"], example: "Your assumption may be correct.", exampleRu: "Твоё предположение может быть верным.", category: "work" },
+  { id: "training-c1-consequence", word: "consequence", translation: "последствие", ipa: "/kon-si-kwens/", level: "C1", sourceStory: "Training C1", sourceStories: ["Training C1"], sourceStoryIds: ["training-c1"], example: "Every decision has a consequence.", exampleRu: "У каждого решения есть последствие.", category: "work" },
+  { id: "training-c1-approach", word: "approach", translation: "подход", ipa: "/uh-prohch/", level: "C1", sourceStory: "Training C1", sourceStories: ["Training C1"], sourceStoryIds: ["training-c1"], example: "We need a different approach.", exampleRu: "Нам нужен другой подход.", category: "work" },
+  { id: "training-c1-reliable", word: "reliable", translation: "надёжный", ipa: "/ri-ly-uh-buhl/", level: "C1", sourceStory: "Training C1", sourceStories: ["Training C1"], sourceStoryIds: ["training-c1"], example: "This source is reliable.", exampleRu: "Этот источник надёжный.", category: "work" },
+  { id: "training-c1-require", word: "require", translation: "требовать", ipa: "/ri-kwy-er/", level: "C1", sourceStory: "Training C1", sourceStories: ["Training C1"], sourceStoryIds: ["training-c1"], example: "This task will require patience.", exampleRu: "Эта задача потребует терпения.", category: "actions" },
+  { id: "training-c1-tend-to", word: "tend to", translation: "иметь склонность", ipa: "/tend too/", level: "C1", sourceStory: "Training C1", sourceStories: ["Training C1"], sourceStoryIds: ["training-c1"], example: "People tend to remember stories better than rules.", exampleRu: "Люди обычно лучше запоминают истории, чем правила.", category: "actions" },
+  { id: "training-c1-carry-out", word: "carry out", translation: "выполнять", ipa: "/kar-ee out/", level: "C1", sourceStory: "Training C1", sourceStories: ["Training C1"], sourceStoryIds: ["training-c1"], example: "We need to carry out a simple test.", exampleRu: "Нам нужно выполнить простой тест.", category: "actions" },
+  { id: "training-c1-figure-out", word: "figure out", translation: "разобраться", ipa: "/fig-yer out/", level: "C1", sourceStory: "Training C1", sourceStories: ["Training C1"], sourceStoryIds: ["training-c1"], example: "I will figure out the best route.", exampleRu: "Я разберусь с лучшим маршрутом.", category: "actions" },
+  { id: "training-c1-take-into-account", word: "take into account", translation: "принимать во внимание", ipa: "/tayk in-too uh-kownt/", level: "C1", sourceStory: "Training C1", sourceStories: ["Training C1"], sourceStoryIds: ["training-c1"], example: "Take into account the time you need.", exampleRu: "Прими во внимание время, которое тебе нужно.", category: "actions" },
 ];
 
 const placementQuestions: PlacementQuestion[] = [
@@ -1028,13 +1095,6 @@ const placementQuestions: PlacementQuestion[] = [
     answer: "I like tea.",
   },
   {
-    id: "a1-small-room",
-    level: "A1",
-    question: "Выбери правильное слово: This room is ___.",
-    options: ["small", "quickly", "yesterday", "swim"],
-    answer: "small",
-  },
-  {
     id: "a2-breakfast",
     level: "A2",
     question: "Что значит: She is making breakfast now.",
@@ -1047,13 +1107,6 @@ const placementQuestions: PlacementQuestion[] = [
     question: "Выбери правильную форму: Yesterday we ___ to the park.",
     options: ["went", "go", "goes", "going"],
     answer: "went",
-  },
-  {
-    id: "a2-because",
-    level: "A2",
-    question: "Какое предложение правильное?",
-    options: ["I stayed home because it was raining.", "I stayed home because it raining.", "I stay home yesterday because rain.", "I stayed home because rain is."],
-    answer: "I stayed home because it was raining.",
   },
   {
     id: "b1-message",
@@ -1077,11 +1130,25 @@ const placementQuestions: PlacementQuestion[] = [
     answer: "Although the meeting was long, it helped us make a clear decision.",
   },
   {
+    id: "b2-despite",
+    level: "B2",
+    question: "Выбери правильный вариант: ___ the bad weather, they arrived on time.",
+    options: ["Despite", "Although", "However", "Therefore"],
+    answer: "Despite",
+  },
+  {
     id: "c1-nuance",
     level: "C1",
     question: "Какой вариант лучше передаёт смысл: She barely noticed the noise.",
     options: ["Она почти не заметила шум.", "Она громко услышала шум.", "Она специально создала шум.", "Она часто слушала шум."],
     answer: "Она почти не заметила шум.",
+  },
+  {
+    id: "c1-inversion",
+    level: "C1",
+    question: "Выбери естественный вариант с инверсией.",
+    options: ["Only then did I understand the mistake.", "Only then I did understand the mistake.", "Only then understood I the mistake.", "Only then I understood did the mistake."],
+    answer: "Only then did I understand the mistake.",
   },
 ];
 
@@ -1127,6 +1194,7 @@ function TrainingPage({
   const [selectedLeft, setSelectedLeft] = useState<string | null>(null);
   const [matchedPairs, setMatchedPairs] = useState<Record<string, string>>({});
   const [builtWords, setBuiltWords] = useState<string[]>([]);
+  const [missedQuestions, setMissedQuestions] = useState<TrainingQuestion[]>([]);
   const speech = useVocabularySpeech();
 
   const currentQuestion = questions[questionIndex];
@@ -1163,6 +1231,7 @@ function TrainingPage({
     setSelectedLeft(null);
     setMatchedPairs({});
     setBuiltWords([]);
+    setMissedQuestions([]);
   }
 
   function openPlacementTest() {
@@ -1216,6 +1285,13 @@ function TrainingPage({
     if (isCorrect) setScore((current) => current + 1);
   }
 
+  function trackMissedQuestion(question: TrainingQuestion) {
+    setMissedQuestions((current) => {
+      if (current.some((item) => item.id === question.id)) return current;
+      return [...current, question];
+    });
+  }
+
   function nextTrainingQuestion() {
     if (questionIndex >= questions.length - 1) {
       setFinished(true);
@@ -1238,7 +1314,23 @@ function TrainingPage({
     setTrainingStarted(false);
     setQuestionIndex(0);
     setFinished(false);
+    setMissedQuestions([]);
     resetQuestionState();
+  }
+
+  function repeatMistakes() {
+    if (!missedQuestions.length) return;
+    setQuestions(missedQuestions);
+    setTrainingStarted(true);
+    setQuestionIndex(0);
+    setScore(0);
+    setFinished(false);
+    setMissedQuestions([]);
+    resetQuestionState();
+  }
+
+  function startAnotherTraining() {
+    startTraining(trainingLevelForUser(userEnglishLevel), selectedCategory ?? trainingCategories[1]);
   }
 
   function chooseMatchRight(translation: string) {
@@ -1246,7 +1338,9 @@ function TrainingPage({
     const selectedWord = currentQuestion.words.find((word) => word.word === selectedLeft);
     if (!selectedWord) return;
 
-    const nextMatched = selectedWord.translation === translation ? { ...matchedPairs, [selectedLeft]: translation } : matchedPairs;
+    const isCorrectMatch = selectedWord.translation === translation;
+    if (!isCorrectMatch) trackMissedQuestion(currentQuestion);
+    const nextMatched = isCorrectMatch ? { ...matchedPairs, [selectedLeft]: translation } : matchedPairs;
     setMatchedPairs(nextMatched);
     setSelectedLeft(null);
 
@@ -1258,7 +1352,9 @@ function TrainingPage({
   function chooseTrainingAnswer(answer: string) {
     if (!currentQuestion || currentQuestion.type === "match" || answered) return;
     setSelectedAnswer(answer);
-    markAnswer(answer === currentQuestion.answer);
+    const isCorrect = answer === currentQuestion.answer;
+    if (!isCorrect) trackMissedQuestion(currentQuestion);
+    markAnswer(isCorrect);
   }
 
   function addBuildWord(word: string) {
@@ -1269,7 +1365,9 @@ function TrainingPage({
   function checkBuiltSentence() {
     if (!currentQuestion || (currentQuestion.type !== "buildSentence" && currentQuestion.type !== "wordOrder")) return;
     setSelectedAnswer(builtWords.join(" "));
-    markAnswer(builtWords.join(" ") === currentQuestion.answer);
+    const isCorrect = builtWords.join(" ") === currentQuestion.answer;
+    if (!isCorrect) trackMissedQuestion(currentQuestion);
+    markAnswer(isCorrect);
   }
 
   return (
@@ -1410,19 +1508,47 @@ function TrainingPage({
       {finished ? (
         <section className="content-card training-complete-card">
           <span className="celebration-mark">🎉</span>
-          <h2>{t.trainingComplete}</h2>
-          <div className="reward-grid">
+          <h2>{t.trainingDoneTitle}</h2>
+          <div className="reward-grid training-completion-stats">
             <div>
-              <span>{t.score}</span>
-              <strong>{score} / {questions.length}</strong>
+              <span>{t.correctStat}</span>
+              <strong>{score}/{questions.length}</strong>
+            </div>
+            <div>
+              <span>{t.userLevelStat}</span>
+              <strong>{selectedLevel ?? userEnglishLevel ?? "A1"}</strong>
+            </div>
+            <div>
+              <span>{t.trainingTypeStat}</span>
+              <strong>{trainingCategoryPlainName(selectedCategory?.id ?? "words", t)}</strong>
             </div>
             <div>
               <span>{t.xpEarned}</span>
               <strong>+{score * 3} XP</strong>
             </div>
           </div>
-          <button className="training-primary-button full" type="button" onClick={() => startTraining(selectedLevel ?? "A1", selectedCategory ?? trainingCategories[1])}>{t.tryAgain}</button>
-          <button className="ghost-action" type="button" onClick={returnToTraining}>{t.returnToTraining}</button>
+          {missedQuestions.length ? (
+            <div className="mistake-review-block">
+              <h3>{t.mistakesToReview}</h3>
+              <ul className="mistake-review-list">
+                {missedQuestions.slice(0, 3).map((question) => (
+                  <li key={question.id}>
+                    <span>{mistakePromptText(question)}</span>
+                    <strong>{mistakeAnswerText(question)}</strong>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            <p className="training-no-mistakes">{t.noMistakes}</p>
+          )}
+          <div className="training-completion-actions">
+            {missedQuestions.length ? (
+              <button className="training-primary-button full" type="button" onClick={repeatMistakes}>{t.repeatMistakes}</button>
+            ) : null}
+            <button className="training-primary-button full" type="button" onClick={startAnotherTraining}>{t.moreTraining}</button>
+            <button className="ghost-action" type="button" onClick={returnToTraining}>{t.toTrainings}</button>
+          </div>
         </section>
       ) : null}
     </main>
@@ -1574,6 +1700,26 @@ function TrainingQuestionView({
   );
 }
 
+function trainingCategoryPlainName(category: TrainingCategory["id"], t: Copy) {
+  if (category === "audio") return t.audioTrainingPlain;
+  if (category === "grammar") return t.grammarTrainingPlain;
+  return t.wordsTrainingPlain;
+}
+
+function mistakePromptText(question: TrainingQuestion) {
+  if (question.type === "match") return question.words.map((word) => word.word).join(", ");
+  if (question.type === "buildSentence" || question.type === "wordOrder") return question.targetSentence ?? question.answer;
+  if (question.type === "audioSentenceTranslation") return question.targetSentence ?? question.prompt;
+  if (question.type === "english" || question.type === "audioEnglish") return question.word.translation;
+  return question.word.word;
+}
+
+function mistakeAnswerText(question: TrainingQuestion) {
+  if (question.type === "match") return trainingAnswerText(question);
+  if (question.type === "buildSentence" || question.type === "wordOrder") return question.targetSentence ?? question.answer;
+  return question.answer;
+}
+
 function readUserEnglishLevel(): EnglishLevel | null {
   try {
     const saved = window.localStorage.getItem(USER_ENGLISH_LEVEL_KEY);
@@ -1597,7 +1743,7 @@ function isEnglishLevel(value: unknown): value is EnglishLevel {
 
 function buildPlacementSession(): PlacementSessionQuestion[] {
   for (let attempt = 0; attempt < 12; attempt += 1) {
-    const session = shuffleWithRepeats(placementQuestions).map((question) => ({
+    const session = shuffleWithRepeats(selectPlacementQuestions()).map((question) => ({
       ...question,
       options: shuffleWithRepeats(question.options),
     }));
@@ -1626,22 +1772,30 @@ function mixedPlacementFallback() {
     byLevel.set(level, shuffleWithRepeats(questions));
   });
 
-  const levelPattern: EnglishLevel[] = ["A1", "A2", "A1", "B1", "A2", "B2", "A1", "B1", "A2", "C1"];
+  const levelPattern: EnglishLevel[] = ["A1", "B2", "A2", "C1", "B1", "A1", "C1", "A2", "B1", "B2"];
   return levelPattern.map((level) => byLevel.get(level)?.shift()).filter((question): question is PlacementQuestion => Boolean(question));
 }
 
+function selectPlacementQuestions() {
+  const byLevel = new Map<EnglishLevel, PlacementQuestion[]>();
+  placementQuestions.forEach((question) => {
+    byLevel.set(question.level, [...(byLevel.get(question.level) ?? []), question]);
+  });
+
+  const levels: EnglishLevel[] = ["A1", "A2", "B1", "B2", "C1"];
+  return levels.flatMap((level) => shuffleWithRepeats(byLevel.get(level) ?? []).slice(0, 2));
+}
+
 function placementLevelFromScore(score: number): EnglishLevel {
-  if (score <= 3) return "A1";
-  if (score <= 6) return "A2";
-  if (score <= 8) return "B1";
-  if (score === 9) return "B2";
+  if (score <= 2) return "A1";
+  if (score <= 5) return "A2";
+  if (score <= 7) return "B1";
+  if (score <= 9) return "B2";
   return "C1";
 }
 
 function trainingLevelForUser(level: EnglishLevel | null): Level {
-  if (level === "A2" || level === "B1") return level;
-  if (level === "B2" || level === "C1") return "B1";
-  return "A1";
+  return level ?? "A1";
 }
 
 function levelResultDescription(level: EnglishLevel, t: Copy) {
@@ -1663,12 +1817,15 @@ function buildTrainingSession(
   category: TrainingCategory["id"] = "words",
   level?: Level,
 ) {
-  const preferredPool = uniqueVocabularyEntries(preferredWords.length ? preferredWords : allWords);
-  const preferredLevelPool = level ? preferredPool.filter((word) => word.level === level) : preferredPool;
-  const allLevelWords = level ? allWords.filter((word) => word.level === level) : allWords;
+  const fullWordPool = uniqueVocabularyEntries([...allWords, ...curatedTrainingVocabulary]);
+  const effectiveLevel = trainingContentLevel(category, level);
+  const fallbackLevels = availableTrainingWordLevels(fullWordPool, category, effectiveLevel);
+  const preferredPool = uniqueVocabularyEntries(preferredWords.length ? [...preferredWords, ...curatedTrainingVocabulary] : fullWordPool);
+  const preferredLevelPool = fallbackLevels.length ? preferredPool.filter((word) => fallbackLevels.includes(word.level)) : preferredPool;
+  const allLevelWords = fallbackLevels.length ? fullWordPool.filter((word) => fallbackLevels.includes(word.level)) : fullWordPool;
   const targetWords = uniqueVocabularyEntries([...preferredLevelPool, ...allLevelWords]);
   const pool = shuffleArray(targetWords.length ? targetWords : preferredPool);
-  const optionWords = uniqueVocabularyEntries([...(allLevelWords.length ? allLevelWords : []), ...allWords]);
+  const optionWords = uniqueVocabularyEntries([...(allLevelWords.length ? allLevelWords : []), ...fullWordPool]);
   if (!pool.length) return [];
 
   const sessionWords = Array.from({ length: questionCount }, (_, index) => pool[index % pool.length]);
@@ -1677,7 +1834,26 @@ function buildTrainingSession(
 
   const types = shuffleWithRepeats(Array.from({ length: questionCount }, (_, index) => baseTypes[index % baseTypes.length]));
 
-  return sessionWords.map((word, index) => createTrainingQuestion(types[index], word, optionWords, index, level));
+  return sessionWords.map((word, index) => createTrainingQuestion(types[index], word, optionWords, index, effectiveLevel));
+}
+
+function trainingContentLevel(category: TrainingCategory["id"], level: Level = "A1") {
+  if (category === "audio" && (level === "B2" || level === "C1")) return "B1";
+  return level;
+}
+
+function trainingLevelFallbacks(category: TrainingCategory["id"], level?: Level): Level[] {
+  if (!level) return [];
+  if (category === "audio") return [level];
+  if (level === "C1") return ["C1", "B2", "B1"];
+  if (level === "B2") return ["B2", "B1"];
+  return [level];
+}
+
+function availableTrainingWordLevels(words: VocabularyEntry[], category: TrainingCategory["id"], level?: Level): Level[] {
+  const fallbackLevels = trainingLevelFallbacks(category, level);
+  const firstAvailableLevel = fallbackLevels.find((fallbackLevel) => words.some((word) => word.level === fallbackLevel));
+  return firstAvailableLevel ? [firstAvailableLevel] : fallbackLevels;
 }
 
 function trainingTypesForCategory(category: TrainingCategory["id"]): TrainingQuestion["type"][] {
@@ -1783,7 +1959,9 @@ function createTrainingQuestion(type: TrainingQuestion["type"], word: Vocabulary
 }
 
 function grammarSentenceForIndex(index: number, level: Level = "A1") {
-  const sentencesForLevel = trainingGrammarSentences.filter((sentence) => sentence.level === level);
+  const levels = trainingLevelFallbacks("grammar", level);
+  const firstAvailableLevel = levels.find((fallbackLevel) => trainingGrammarSentences.some((sentence) => sentence.level === fallbackLevel));
+  const sentencesForLevel = trainingGrammarSentences.filter((sentence) => sentence.level === firstAvailableLevel);
   const source = sentencesForLevel.length ? sentencesForLevel : trainingGrammarSentences;
   return source[index % source.length];
 }

@@ -2270,6 +2270,62 @@ p {
   text-align: center;
 }
 
+.training-completion-stats {
+  width: min(100%, 620px);
+}
+
+.mistake-review-block {
+  display: grid;
+  gap: 12px;
+  width: min(100%, 620px);
+  text-align: left;
+}
+
+.mistake-review-block h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 1rem;
+}
+
+.mistake-review-list {
+  display: grid;
+  gap: 10px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.mistake-review-list li {
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.mistake-review-list span {
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 750;
+}
+
+.mistake-review-list strong {
+  color: var(--ink);
+}
+
+.training-no-mistakes {
+  margin: 0;
+  color: var(--mint-dark);
+  font-weight: 850;
+}
+
+.training-completion-actions {
+  display: grid;
+  gap: 10px;
+  width: min(100%, 420px);
+}
+
 .mobile-nav {
   display: none;
 }

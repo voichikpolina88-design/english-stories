@@ -728,7 +728,7 @@ function pluralizeRussian(translation: string) {
 }
 
 function lowestLevel(current: Level, next: Level): Level {
-  const order: Level[] = ["A1", "A2", "B1"];
+  const order: Level[] = ["A1", "A2", "B1", "B2", "C1"];
   return order[Math.min(order.indexOf(current), order.indexOf(next))];
 }
 
