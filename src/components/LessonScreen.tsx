@@ -61,7 +61,7 @@ type SpeechControls = {
 };
 
 type LessonStep =
-  | { type: "story"; content: string; index: number }
+  | { type: "story"; content: string; title: string; index: number }
   | { type: "vocabulary"; challenge: RuntimeChallenge }
   | { type: "quiz"; quiz: RuntimeQuizQuestion[] }
   | { type: "complete" };
@@ -190,6 +190,7 @@ export function LessonScreen({
         {step.type === "story" ? (
           <StoryCard
             story={story}
+            title={step.title}
             content={step.content}
             index={step.index}
             speech={speech}
@@ -253,34 +254,30 @@ export function LessonScreen({
 }
 
 function buildLessonSteps(story: Story, language: NativeLanguage): LessonStep[] {
-  const storyContent = (story.sections.length ? story.sections : story.text).join(" ");
+  const storyCards = story.sections.length ? story.sections.slice(0, 4) : story.text.slice(0, 4);
+  const firstStoryCard = storyCards[0] ?? story.sections[0] ?? story.text[0] ?? "";
+  const firstChallenge = story.challenges[0];
+  const secondTranslationChallenge = story.challenges.find((challenge) => challenge.type === "match");
+  const challengeOne = firstChallenge ? makeRuntimeChallenge(firstChallenge, story.vocabulary, language) : null;
+  const challengeTwo = firstChallenge ? makeRuntimeChallenge(secondTranslationChallenge ?? firstChallenge, story.vocabulary, language) : null;
   const steps: LessonStep[] = [
-    { type: "story", content: storyContent, index: 0 },
+    { type: "story", title: "1", content: firstStoryCard, index: 0 },
   ];
 
-  if (!story.challenges.length) {
-    if (story.quiz.length) {
-      steps.push({ type: "quiz", quiz: story.quiz.map((question) => ({ ...question, shuffledOptions: shuffleUnique([question.answer, ...question.options]) })) });
-    }
-    steps.push({ type: "complete" });
-    return steps;
-  }
-
-  const challengeOne = makeRuntimeChallenge(story.challenges[0], story.vocabulary, language);
-  const secondTranslationChallenge = story.challenges.find((challenge) => challenge.type === "match");
-  const challengeTwo = makeRuntimeChallenge(secondTranslationChallenge ?? story.challenges[0], story.vocabulary, language);
-
-  steps.push({ type: "vocabulary", challenge: challengeOne });
-  steps.push({ type: "vocabulary", challenge: challengeTwo });
+  if (storyCards[1]) steps.push({ type: "story", title: "2", content: storyCards[1], index: 1 });
+  if (challengeOne) steps.push({ type: "vocabulary", challenge: challengeOne });
+  if (storyCards[2]) steps.push({ type: "story", title: "3", content: storyCards[2], index: 2 });
+  if (challengeTwo) steps.push({ type: "vocabulary", challenge: challengeTwo });
+  if (storyCards[3]) steps.push({ type: "story", title: "4", content: storyCards[3], index: 3 });
   if (story.quiz.length) {
     steps.push({ type: "quiz", quiz: story.quiz.map((question) => ({ ...question, shuffledOptions: shuffleUnique([question.answer, ...question.options]) })) });
   }
-  steps.push({ type: "complete" });
-  return steps;
+  return [...steps, { type: "complete" }];
 }
 
 function StoryCard({
   story,
+  title,
   content,
   index,
   ui,
@@ -289,6 +286,7 @@ function StoryCard({
   onNext,
 }: {
   story: Story;
+  title: string;
   content: string;
   index: number;
   ui: LessonScreenProps["ui"];
@@ -306,8 +304,8 @@ function StoryCard({
         <div className="character-chip">
           <span>{character.avatar}</span>
           <div>
-            <strong>{story.title}</strong>
-            <small>{story.level} · {character.name}</small>
+            <strong>{character.name}</strong>
+            <small>{story.title} · {ui.storyCard} {title}</small>
           </div>
         </div>
         <button className={isCardSpeaking ? "round-button active" : "round-button"} type="button" aria-label="Audio" onClick={() => speech.toggle(content)}>
