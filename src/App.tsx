@@ -1047,7 +1047,7 @@ const trainingGrammarSentences: GrammarSentence[] = [
   { en: "The decision is expected to be announced tomorrow.", ru: "Ожидается, что решение объявят завтра.", level: "C1" },
   { en: "Whereas the first option is cheaper, the second is more reliable.", ru: "В то время как первый вариант дешевле, второй более надёжный.", level: "C1" },
   { en: "Please take into account how much time the task will require.", ru: "Пожалуйста, учти, сколько времени потребует задача.", level: "C1" },
-  { en: "The informal phrase works in chat, but it sounds too casual in an email.", ru: "Неформальная фраза подходит для чата, но в письме звучит слишком непринуждённо.", level: "C1" },
+  { en: "The informal phrase works in a text message, but it sounds too casual in an email.", ru: "Неформальная фраза подходит для сообщения, но в письме звучит слишком непринуждённо.", level: "C1" },
 ];
 
 const curatedTrainingVocabulary: VocabularyEntry[] = [

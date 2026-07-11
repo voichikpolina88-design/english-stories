@@ -54,14 +54,6 @@ type RuntimeChallenge = Challenge & {
   localizedAnswer: string;
 };
 
-type ReadingMode = "story" | "chat";
-
-type ChatMessage = {
-  speaker: string;
-  avatar: string;
-  text: string;
-};
-
 type SpeechControls = {
   speakingText: string | null;
   toggle: (text: string) => void;
@@ -69,7 +61,7 @@ type SpeechControls = {
 };
 
 type LessonStep =
-  | { type: "story"; content: string; title: string; index: number }
+  | { type: "story"; content: string; index: number }
   | { type: "vocabulary"; challenge: RuntimeChallenge }
   | { type: "quiz"; quiz: RuntimeQuizQuestion[] }
   | { type: "complete" };
@@ -137,7 +129,6 @@ export function LessonScreen({
   const [answeredKeys, setAnsweredKeys] = useState<string[]>([]);
   const [quizAnswers, setQuizAnswers] = useState<Record<number, string>>({});
   const [quizSubmitted, setQuizSubmitted] = useState(false);
-  const [readingMode, setReadingMode] = useState<ReadingMode>("story");
   const [activeWord, setActiveWord] = useState<WordCardData | null>(null);
   const speech = useSpeech();
 
@@ -195,48 +186,17 @@ export function LessonScreen({
         <span className="heart-pill">{story.xpReward} XP</span>
       </div>
 
-      <div className="reading-mode-switch" role="group" aria-label="Reading mode">
-        <button
-          className={readingMode === "story" ? "active" : ""}
-          type="button"
-          onClick={() => setReadingMode("story")}
-        >
-          📖 Story Mode
-        </button>
-        <button
-          className={readingMode === "chat" ? "active" : ""}
-          type="button"
-          onClick={() => setReadingMode("chat")}
-        >
-          💬 Chat Mode
-        </button>
-      </div>
-
       <section className="lesson-card-stage">
         {step.type === "story" ? (
-          readingMode === "chat" ? (
-            <ChatStoryCard
-              story={story}
-              title={step.title}
-              content={step.content}
-              index={step.index}
-              speech={speech}
-              onWordClick={setActiveWord}
-              onNext={moveNext}
-              ui={ui}
-            />
-          ) : (
-            <StoryCard
-              story={story}
-              title={step.title}
-              content={step.content}
-              index={step.index}
-              speech={speech}
-              onWordClick={setActiveWord}
-              onNext={moveNext}
-              ui={ui}
-            />
-          )
+          <StoryCard
+            story={story}
+            content={step.content}
+            index={step.index}
+            speech={speech}
+            onWordClick={setActiveWord}
+            onNext={moveNext}
+            ui={ui}
+          />
         ) : null}
 
         {step.type === "vocabulary" ? (
@@ -293,26 +253,34 @@ export function LessonScreen({
 }
 
 function buildLessonSteps(story: Story, language: NativeLanguage): LessonStep[] {
-  const storyCards = story.sections.slice(0, 4);
+  const storyContent = (story.sections.length ? story.sections : story.text).join(" ");
+  const steps: LessonStep[] = [
+    { type: "story", content: storyContent, index: 0 },
+  ];
+
+  if (!story.challenges.length) {
+    if (story.quiz.length) {
+      steps.push({ type: "quiz", quiz: story.quiz.map((question) => ({ ...question, shuffledOptions: shuffleUnique([question.answer, ...question.options]) })) });
+    }
+    steps.push({ type: "complete" });
+    return steps;
+  }
+
   const challengeOne = makeRuntimeChallenge(story.challenges[0], story.vocabulary, language);
   const secondTranslationChallenge = story.challenges.find((challenge) => challenge.type === "match");
   const challengeTwo = makeRuntimeChallenge(secondTranslationChallenge ?? story.challenges[0], story.vocabulary, language);
 
-  return [
-    { type: "story", title: "1", content: storyCards[0] ?? story.sections[0], index: 0 },
-    { type: "story", title: "2", content: storyCards[1] ?? story.sections[1] ?? story.sections[0], index: 1 },
-    { type: "vocabulary", challenge: challengeOne },
-    { type: "story", title: "3", content: storyCards[2] ?? story.sections[2] ?? story.sections[0], index: 2 },
-    { type: "vocabulary", challenge: challengeTwo },
-    { type: "story", title: "4", content: storyCards[3] ?? story.sections[3] ?? story.sections[0], index: 3 },
-    { type: "quiz", quiz: story.quiz.map((question) => ({ ...question, shuffledOptions: shuffleUnique([question.answer, ...question.options]) })) },
-    { type: "complete" },
-  ];
+  steps.push({ type: "vocabulary", challenge: challengeOne });
+  steps.push({ type: "vocabulary", challenge: challengeTwo });
+  if (story.quiz.length) {
+    steps.push({ type: "quiz", quiz: story.quiz.map((question) => ({ ...question, shuffledOptions: shuffleUnique([question.answer, ...question.options]) })) });
+  }
+  steps.push({ type: "complete" });
+  return steps;
 }
 
 function StoryCard({
   story,
-  title,
   content,
   index,
   ui,
@@ -321,7 +289,6 @@ function StoryCard({
   onNext,
 }: {
   story: Story;
-  title: string;
   content: string;
   index: number;
   ui: LessonScreenProps["ui"];
@@ -339,8 +306,8 @@ function StoryCard({
         <div className="character-chip">
           <span>{character.avatar}</span>
           <div>
-            <strong>{character.name}</strong>
-            <small>{ui.storyCard} {title}</small>
+            <strong>{story.title}</strong>
+            <small>{story.level} · {character.name}</small>
           </div>
         </div>
         <button className={isCardSpeaking ? "round-button active" : "round-button"} type="button" aria-label="Audio" onClick={() => speech.toggle(content)}>
@@ -352,91 +319,13 @@ function StoryCard({
         <span className="scene-emoji">{sceneForStory(story, index)}</span>
       </div>
 
-      <div className="story-bubbles">
+      <div className="story-text-block">
         {sentences.map((sentence) => (
           <p className="sentence-row" key={sentence}>
             <AudioButton text={sentence} speech={speech} />
             <span><ClickableText text={sentence} onWordClick={onWordClick} /></span>
           </p>
         ))}
-      </div>
-
-      <button className="primary-button full" type="button" onClick={onNext}>
-        {ui.continueLearning}
-        <MoveRight size={18} aria-hidden="true" />
-      </button>
-    </article>
-  );
-}
-
-function ChatStoryCard({
-  story,
-  title,
-  content,
-  index,
-  ui,
-  speech,
-  onWordClick,
-  onNext,
-}: {
-  story: Story;
-  title: string;
-  content: string;
-  index: number;
-  ui: LessonScreenProps["ui"];
-  speech: SpeechControls;
-  onWordClick: (word: WordCardData) => void;
-  onNext: () => void;
-}) {
-  const messages = chatMessagesForStory(story, index, content);
-  const chatCharacters = chatCharactersForStory(story.id);
-  const cardText = messages.map((message) => message.text).join(" ");
-  const isCardSpeaking = speech.speakingText === cardText.trim();
-
-  return (
-    <article className="learning-card chat-story-card polished-card">
-      <div className="story-scene-header">
-        <div className="character-chip">
-          <span>💬</span>
-          <div>
-            <strong>{story.title}</strong>
-            <small>{ui.storyCard} {title}</small>
-          </div>
-        </div>
-        <button className={isCardSpeaking ? "round-button active" : "round-button"} type="button" aria-label="Audio" onClick={() => speech.toggle(cardText)}>
-          <Volume2 size={19} aria-hidden="true" />
-        </button>
-      </div>
-
-      <div className="chat-phone">
-        <div className="chat-phone-top">
-          <span>{chatCharacters[0].avatar}</span>
-          <div>
-            <strong>{chatCharacters.map((character) => character.name).join(" & ")}</strong>
-            <small>online</small>
-          </div>
-        </div>
-        <div className="chat-thread">
-          {messages.map((message, messageIndex) => (
-            <div className="chat-moment" key={`${message.speaker}-${message.text}`}>
-              <div className={messageIndex % 2 === 0 ? "chat-row" : "chat-row right"}>
-                <span className="chat-avatar">{message.avatar}</span>
-                <div className="chat-message">
-                  <strong>{message.speaker}</strong>
-                  <p className="sentence-row">
-                    <AudioButton text={message.text} speech={speech} />
-                    <span><ClickableText text={message.text} onWordClick={onWordClick} /></span>
-                  </p>
-                </div>
-              </div>
-              {messageIndex === 0 ? (
-                <div className="chat-inline-illustration" style={{ backgroundColor: story.color }}>
-                  <span>{sceneForStory(story, index)}</span>
-                </div>
-              ) : null}
-            </div>
-          ))}
-        </div>
       </div>
 
       <button className="primary-button full" type="button" onClick={onNext}>
@@ -653,79 +542,6 @@ function AudioButton({ text, speech }: { text: string; speech: SpeechControls })
   );
 }
 
-function chatMessagesForStory(story: Story, index: number, content: string): ChatMessage[] {
-  const characters = chatCharactersForStory(story.id);
-
-  if (story.id === "best-friend") {
-    const scenes: ChatMessage[][] = [
-    [
-      { speaker: "Leo", avatar: "🙂", text: "Hi! This is my best friend, Tom." },
-      { speaker: "Tom", avatar: "😄", text: "Hello! I live next door to Leo." },
-      { speaker: "Leo", avatar: "🙂", text: "We go to the same school every day." },
-    ],
-    [
-      { speaker: "Tom", avatar: "😄", text: "After school, we meet in the park." },
-      { speaker: "Leo", avatar: "🙂", text: "We ride bikes, play games, and share cookies." },
-      { speaker: "Tom", avatar: "😄", text: "Leo always brings good snacks in his bag." },
-    ],
-    [
-      { speaker: "Leo", avatar: "🙂", text: "Tom helps me with English words." },
-      { speaker: "Tom", avatar: "😄", text: "And Leo helps me with math." },
-      { speaker: "Leo", avatar: "🙂", text: "We laugh when we make small mistakes." },
-    ],
-    [
-      { speaker: "Tom", avatar: "😄", text: "A good friend listens." },
-      { speaker: "Leo", avatar: "🙂", text: "A good friend helps, laughs, and shares." },
-      { speaker: "Tom", avatar: "😄", text: "That is why simple days feel better together." },
-    ],
-    ];
-
-    return scenes[index] ?? scenes[0];
-  }
-
-  return splitIntoSentences(content).map((sentence, sentenceIndex) => {
-    const character = characters[sentenceIndex % characters.length];
-    return {
-      speaker: character.name,
-      avatar: character.avatar,
-      text: sentence,
-    };
-  });
-}
-
-function chatCharactersForStory(storyId: string) {
-  const characters: Record<string, Array<{ name: string; avatar: string }>> = {
-    "morning-routine": [{ name: "Emma", avatar: "🙂" }, { name: "Max", avatar: "😴" }],
-    "beach-day": [{ name: "Leo", avatar: "🙂" }, { name: "Sara", avatar: "😊" }],
-    supermarket: [{ name: "Mila", avatar: "🙂" }, { name: "Cashier", avatar: "🧑‍💼" }],
-    "my-family": [{ name: "Emma", avatar: "🙂" }, { name: "Family", avatar: "👨‍👩‍👧‍👦" }],
-    "best-friend": [{ name: "Leo", avatar: "🙂" }, { name: "Tom", avatar: "😄" }],
-    "at-school": [{ name: "Sara", avatar: "🙂" }, { name: "Teacher", avatar: "👩‍🏫" }],
-    "my-room": [{ name: "Nina", avatar: "🙂" }, { name: "Room", avatar: "🛋️" }],
-    "rainy-day": [{ name: "Max", avatar: "🙂" }, { name: "Mom", avatar: "👩" }],
-    "weekend-plans": [{ name: "Emma", avatar: "🙂" }, { name: "Friend", avatar: "😊" }],
-    "new-bicycle": [{ name: "Leo", avatar: "🙂" }, { name: "Dad", avatar: "👨" }],
-    "my-first-trip": [{ name: "Nikita", avatar: "🙂" }, { name: "Traveler", avatar: "🚆" }],
-    "lost-phone": [{ name: "Mira", avatar: "😟" }, { name: "Waiter", avatar: "☕" }],
-    "learning-to-drive": [{ name: "Oleg", avatar: "🙂" }, { name: "Instructor", avatar: "🧑‍🏫" }],
-    "busy-day": [{ name: "Sara", avatar: "🙂" }, { name: "Mom", avatar: "👩" }],
-    "new-hobby": [{ name: "Mira", avatar: "🙂" }, { name: "Friend", avatar: "🎨" }],
-    "birthday-surprise-a2": [{ name: "Sara", avatar: "😊" }, { name: "Friends", avatar: "🎂" }],
-    airport: [{ name: "Nikita", avatar: "🙂" }, { name: "Airport", avatar: "✈️" }],
-    "moving-city": [{ name: "Lena", avatar: "🙂" }, { name: "Neighbor", avatar: "👋" }],
-    "weekend-hiking": [{ name: "Leo", avatar: "🙂" }, { name: "Sara", avatar: "😊" }],
-    "missing-keys": [{ name: "Mira", avatar: "😟" }, { name: "Brother", avatar: "🙂" }],
-    "new-job": [{ name: "Oleg", avatar: "🙂" }, { name: "Marina", avatar: "🧑‍💼" }],
-    "surprise-gift": [{ name: "Lena", avatar: "🙂" }, { name: "Grandmother", avatar: "👵" }],
-    "first-day-university": [{ name: "Nikita", avatar: "🙂" }, { name: "Roommate", avatar: "🎓" }],
-    "difficult-decision": [{ name: "Sara", avatar: "🤔" }, { name: "Mom", avatar: "👩" }],
-    "unexpected-message": [{ name: "Mira", avatar: "😟" }, { name: "Friend", avatar: "💬" }],
-    "lost-abroad": [{ name: "Leo", avatar: "😟" }, { name: "Local woman", avatar: "👩" }],
-  };
-
-  return characters[storyId] ?? [{ name: "Learner", avatar: "🙂" }, { name: "Friend", avatar: "😊" }];
-}
-
 function makeRuntimeChallenge(challenge: Challenge, words: VocabularyItem[], language: NativeLanguage): RuntimeChallenge {
   const localizedAnswer = localizedAnswerForChallenge(challenge, language);
   const shuffledOptions = shuffleUnique([localizedAnswer, ...localizedOptionsForChallenge(challenge, words, language)]);
@@ -774,13 +590,6 @@ function shuffleUnique(values: string[]) {
     [uniqueValues[index], uniqueValues[swapIndex]] = [uniqueValues[swapIndex], uniqueValues[index]];
   }
   return uniqueValues;
-}
-
-function splitReadable(content: string) {
-  const sentences = content.match(/[^.!?]+[.!?"]+/g) ?? [content];
-  const first = sentences.slice(0, 2).join(" ").trim();
-  const second = sentences.slice(2, 4).join(" ").trim();
-  return [first, second].filter(Boolean);
 }
 
 function splitIntoSentences(content: string) {
