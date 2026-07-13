@@ -1,2216 +1,523 @@
-import {
-  BarChart3,
-  BookOpen,
-  CheckCircle2,
-  Flame,
-  GraduationCap,
-  Home,
-  Languages,
-  Leaf,
-  LockKeyhole,
-  Settings,
-  Sparkles,
-  Star,
-  Target,
-  Trophy,
-  Volume2,
-} from "lucide-react";
+import { BookOpen, Home, Languages, Library, Search, User, Volume2 } from "lucide-react";
 import { useMemo, useState, type ReactNode } from "react";
-import { LessonScreen } from "./components/LessonScreen";
-import { ProgressBar } from "./components/ProgressBar";
-import { WordCard } from "./components/WordCard";
-import { getStoryById, stories } from "./data/stories";
-import { getAllVocabulary as getVocabularyDatabase, getVocabularyByStory, type VocabularyEntry } from "./data/vocabulary";
+import { getAllVocabulary, type VocabularyEntry } from "./data/vocabulary";
 import { useLearnerProgress } from "./hooks/useLearnerProgress";
-import type { Level, NativeLanguage, Story } from "./types";
+import type { NativeLanguage } from "./types";
 
-type Page = "home" | "learn" | "words" | "training" | "stats" | "settings";
+type Page = "home" | "library" | "dictionary" | "profile";
 
-const languages: NativeLanguage[] = ["Russian", "English"];
-
-const copy = {
-  Russian: {
-    appName: "English Stories",
-    cozy: "уютное обучение",
-    chooseLanguage: "Выберите родной язык",
-    chooseHelp: "Интерфейс и переводы будут использовать этот язык.",
-    home: "Главная",
-    learn: "Учиться",
-    wordsPage: "Слова",
-    training: "Тренировка",
-    profile: "Профиль",
-    stats: "Статистика",
-    settings: "Настройки",
-    learner: "Ежедневный ученик",
-    welcome: "Готовы к маленькому английскому приключению?",
-    welcomeText: "Проходите короткие карточки и открывайте уроки по порядку.",
-    continueLearning: "Продолжить",
-    start: "Начать",
-    review: "Повторить",
-    locked: "Закрыто",
-    xp: "XP",
-    streak: "Серия",
-    level: "Уровень",
-    progress: "Прогресс",
-    lessonPath: "Путь уроков",
-    completed: "уроков завершено",
-    check: "Проверить",
-    next: "Дальше",
-    finalQuiz: "Финальный квиз",
-    submit: "Ответить",
-    reward: "К награде",
-    totalXp: "Всего XP",
-    completedLessons: "Завершенные уроки",
-    languageSettings: "Язык интерфейса",
-    changeLanguage: "Можно изменить родной язык в любой момент.",
-    correct: "Верно! +3 XP",
-    answer: "Ответ",
-    correctAnswer: "Правильный ответ",
-    sentenceTranslation: "Перевод",
-    path: "путь",
-    lessonComplete: "🎉 Урок завершен",
-    nextLesson: "Следующий урок",
-    backHome: "На главную",
-    storyCard: "Карточка",
-    chooseAnswer: "Выберите ответ",
-    trueLabel: "Правда",
-    falseLabel: "Ложь",
-    words: "слов",
-    myWords: "Мои слова",
-    allWords: "Все слова",
-    trainMyWords: "Тренировать мои слова",
-    addWord: "Добавить в мои слова",
-    saved: "Сохранено",
-    addStoryWords: "Добавить все слова истории",
-    chooseTranslation: "Выбери перевод",
-    chooseEnglish: "Выбери английское слово",
-    audioTest: "Аудио-тест",
-    listenAndChoose: "Послушай и выбери слово",
-    noSavedWords: "Сохраняйте слова в историях, чтобы тренировать их здесь.",
-    nextQuestion: "Следующий вопрос",
-    finishTraining: "Завершить",
-    trainingResult: "Результат тренировки",
-    practiceVocabulary: "Тренируйте свой словарь",
-    totalVocabulary: "Всего слов",
-    savedWordsCount: "Сохранено слов",
-    startTraining: "Начать тренировку",
-    quickTraining: "Быстрая тренировка",
-    standardTraining: "Стандартная тренировка",
-    bigTraining: "Большая тренировка",
-    questionsCount: "вопросов",
-    matchPairs: "Соедини пары",
-    audioChooseWord: "Аудио: выбери английское слово",
-    audioChooseTranslation: "Аудио: выбери перевод",
-    audioChooseSentenceTranslation: "Аудио: выбери перевод предложения",
-    buildSentence: "Собери предложение",
-    wordOrder: "Собери порядок слов",
-    trainingComplete: "🎉 Тренировка завершена",
-    trainingDoneTitle: "Готово! 🎉",
-    score: "Счёт",
-    xpEarned: "XP получено",
-    tryAgain: "Попробовать снова",
-    returnToTraining: "Вернуться к тренировке",
-    correctStat: "Правильно",
-    userLevelStat: "Твой уровень",
-    trainingTypeStat: "Тип тренировки",
-    mistakesToReview: "Ошибки для повторения:",
-    repeatMistakes: "Повторить ошибки",
-    moreTraining: "Ещё тренировка",
-    toTrainings: "К тренировкам",
-    noMistakes: "Ошибок нет — можно идти дальше!",
-    greatWork: "Отличная работа!",
-    noTrainingTasks: "Пока нет заданий для этой тренировки",
-    backToTrainings: "Вернуться к тренировкам",
-    noTrainingLevelTasks: "\u041f\u043e\u043a\u0430 \u043d\u0435\u0442 \u0437\u0430\u0434\u0430\u043d\u0438\u0439 \u0434\u043b\u044f \u044d\u0442\u043e\u0433\u043e \u0443\u0440\u043e\u0432\u043d\u044f",
-    userLevelUnknown: "\u0422\u0432\u043e\u0439 \u0443\u0440\u043e\u0432\u0435\u043d\u044c: \u043d\u0435 \u043e\u043f\u0440\u0435\u0434\u0435\u043b\u0451\u043d",
-    userLevelTitle: "\u0422\u0432\u043e\u0439 \u0443\u0440\u043e\u0432\u0435\u043d\u044c",
-    levelCardDescription: "\u041f\u0440\u043e\u0439\u0434\u0438 \u0431\u044b\u0441\u0442\u0440\u044b\u0439 \u0442\u0435\u0441\u0442 — \u043c\u044b \u043f\u043e\u0434\u0431\u0435\u0440\u0451\u043c \u0442\u0440\u0435\u043d\u0438\u0440\u043e\u0432\u043a\u0438 \u043f\u043e\u0434 \u0442\u0435\u0431\u044f.",
-    levelCardSavedDescription: "\u0422\u0440\u0435\u043d\u0438\u0440\u043e\u0432\u043a\u0438 \u0431\u0443\u0434\u0443\u0442 \u043f\u043e\u0434\u0431\u0438\u0440\u0430\u0442\u044c\u0441\u044f \u043f\u043e\u0434 \u0442\u0432\u043e\u0439 \u0443\u0440\u043e\u0432\u0435\u043d\u044c.",
-    defineLevel: "\u041e\u043f\u0440\u0435\u0434\u0435\u043b\u0438\u0442\u044c \u0443\u0440\u043e\u0432\u0435\u043d\u044c",
-    retakeLevelTest: "\u041f\u0440\u043e\u0439\u0442\u0438 \u0442\u0435\u0441\u0442 \u0437\u0430\u043d\u043e\u0432\u043e",
-    levelTestTitle: "\u0411\u044b\u0441\u0442\u0440\u044b\u0439 \u0442\u0435\u0441\u0442 \u0443\u0440\u043e\u0432\u043d\u044f",
-    questionProgress: "\u0412\u043e\u043f\u0440\u043e\u0441",
-    of: "\u0438\u0437",
-    startTrainingAfterTest: "\u041d\u0430\u0447\u0430\u0442\u044c \u0442\u0440\u0435\u043d\u0438\u0440\u043e\u0432\u043a\u0443",
-    levelResultA1: "\u0422\u044b \u0437\u043d\u0430\u0435\u0448\u044c \u0431\u0430\u0437\u043e\u0432\u044b\u0435 \u0441\u043b\u043e\u0432\u0430 \u0438 \u043f\u0440\u043e\u0441\u0442\u044b\u0435 \u0444\u0440\u0430\u0437\u044b. \u041d\u0430\u0447\u043d\u0451\u043c \u0441 \u043b\u0451\u0433\u043a\u0438\u0445 \u0442\u0440\u0435\u043d\u0438\u0440\u043e\u0432\u043e\u043a.",
-    levelResultA2: "\u0422\u044b \u0443\u0436\u0435 \u043f\u043e\u043d\u0438\u043c\u0430\u0435\u0448\u044c \u043f\u0440\u043e\u0441\u0442\u044b\u0435 \u043f\u0440\u0435\u0434\u043b\u043e\u0436\u0435\u043d\u0438\u044f. \u0422\u0440\u0435\u043d\u0438\u0440\u043e\u0432\u043a\u0438 \u0431\u0443\u0434\u0443\u0442 \u0447\u0443\u0442\u044c \u0441\u043b\u043e\u0436\u043d\u0435\u0435.",
-    levelResultB1: "\u0423 \u0442\u0435\u0431\u044f \u0445\u043e\u0440\u043e\u0448\u0438\u0439 \u0431\u0430\u0437\u043e\u0432\u044b\u0439 \u0443\u0440\u043e\u0432\u0435\u043d\u044c. \u0411\u0443\u0434\u0435\u043c \u0442\u0440\u0435\u043d\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u0431\u043e\u043b\u0435\u0435 \u0434\u043b\u0438\u043d\u043d\u044b\u0435 \u043f\u0440\u0435\u0434\u043b\u043e\u0436\u0435\u043d\u0438\u044f.",
-    levelResultB2: "У тебя уровень выше среднего. Будем тренировать полезные связки, лексику и более сложные предложения.",
-    levelResultC1: "У тебя продвинутый уровень. Будем тренировать нюансы смысла, формальные фразы и сложные структуры без лишней академичности.",
-    chooseLevel: "\u0412\u044b\u0431\u0435\u0440\u0438 \u0443\u0440\u043e\u0432\u0435\u043d\u044c",
-    backToCategories: "\u041d\u0430\u0437\u0430\u0434 \u043a \u0442\u0440\u0435\u043d\u0438\u0440\u043e\u0432\u043a\u0430\u043c",
-    easyLevel: "\u043b\u0435\u0433\u043a\u043e",
-    mediumLevel: "\u0441\u0440\u0435\u0434\u043d\u0435",
-    harderLevel: "\u0441\u043b\u043e\u0436\u043d\u0435\u0435",
-    soon: "\u0441\u043a\u043e\u0440\u043e",
-    audioTrainingName: "Аудио тренировка",
-    wordsTrainingName: "Тренировка слов",
-    grammarTrainingName: "Грамматическая тренировка",
-    audioTrainingLabel: "АУДИО",
-    wordsTrainingLabel: "СЛОВА",
-    grammarTrainingLabel: "ГРАММАТИКА",
-    audioTrainingPlain: "Аудио",
-    wordsTrainingPlain: "Слова",
-    grammarTrainingPlain: "Грамматика",
-    trainingPrompt: "Что потренируем сегодня?",
-    audioCategory: "🎧 Аудио",
-    audioCategoryDescription: "Учись понимать слова и предложения на слух",
-    wordsCategory: "📚 Слова",
-    wordsCategoryDescription: "Повторяй слова из историй",
-    grammarCategory: "✍️ Грамматика",
-    grammarCategoryDescription: "Собирай предложения и тренируй структуру языка",
-    audioTraining: "Аудио тренировка",
-    vocabTrainer: "Словарный тренажёр",
-    grammarTasks: "Грамматика / задания",
-  },
-  English: {
-    appName: "English Stories",
-    cozy: "cozy learning",
-    chooseLanguage: "Choose your native language",
-    chooseHelp: "Interface text and translations will use this language.",
-    home: "Home",
-    learn: "Learn",
-    wordsPage: "Words",
-    training: "Training",
-    profile: "Profile",
-    stats: "Statistics",
-    settings: "Settings",
-    learner: "Daily learner",
-    welcome: "Ready for a tiny English adventure?",
-    welcomeText: "Move through short cards and unlock lessons in order.",
-    continueLearning: "Continue",
-    start: "Start",
-    review: "Review",
-    locked: "Locked",
-    xp: "XP",
-    streak: "Streak",
-    level: "Level",
-    progress: "Progress",
-    lessonPath: "Lesson path",
-    completed: "lessons complete",
-    check: "Check",
-    next: "Next",
-    finalQuiz: "Final quiz",
-    submit: "Submit",
-    reward: "See reward",
-    totalXp: "Total XP",
-    completedLessons: "Completed lessons",
-    languageSettings: "Interface language",
-    changeLanguage: "You can change your native language any time.",
-    correct: "Correct! +3 XP",
-    answer: "Answer",
-    correctAnswer: "Correct answer",
-    sentenceTranslation: "Translation",
-    path: "path",
-    lessonComplete: "🎉 Lesson Complete",
-    nextLesson: "Next Lesson",
-    backHome: "Back to Home",
-    storyCard: "Story",
-    chooseAnswer: "Choose the answer",
-    trueLabel: "True",
-    falseLabel: "False",
-    words: "words",
-    myWords: "My Words",
-    allWords: "All Words",
-    trainMyWords: "Train my words",
-    addWord: "Add to my words",
-    saved: "Saved",
-    addStoryWords: "Add all story words",
-    chooseTranslation: "Choose translation",
-    chooseEnglish: "Choose English word",
-    audioTest: "Audio test",
-    listenAndChoose: "Listen and choose the word",
-    noSavedWords: "Save words inside stories to practice them here.",
-    nextQuestion: "Next question",
-    finishTraining: "Finish",
-    trainingResult: "Training result",
-    practiceVocabulary: "Practice your vocabulary",
-    totalVocabulary: "Total vocabulary",
-    savedWordsCount: "Saved words",
-    startTraining: "Start Training",
-    quickTraining: "Quick Training",
-    standardTraining: "Standard Training",
-    bigTraining: "Big Training",
-    questionsCount: "questions",
-    matchPairs: "Match Pairs",
-    audioChooseWord: "Audio: choose English word",
-    audioChooseTranslation: "Audio: choose translation",
-    audioChooseSentenceTranslation: "Audio: choose sentence translation",
-    buildSentence: "Build a Sentence",
-    wordOrder: "Build the word order",
-    trainingComplete: "🎉 Training Complete",
-    trainingDoneTitle: "Done! 🎉",
-    score: "Score",
-    xpEarned: "XP earned",
-    tryAgain: "Try Again",
-    returnToTraining: "Return to Training",
-    correctStat: "Correct",
-    userLevelStat: "Your level",
-    trainingTypeStat: "Training type",
-    mistakesToReview: "Mistakes to review:",
-    repeatMistakes: "Repeat mistakes",
-    moreTraining: "More training",
-    toTrainings: "To trainings",
-    noMistakes: "No mistakes — keep going!",
-    greatWork: "Great work!",
-    noTrainingTasks: "There are no tasks for this training yet",
-    backToTrainings: "Back to trainings",
-    noTrainingLevelTasks: "There are no tasks for this level yet",
-    userLevelUnknown: "Your level: not defined",
-    userLevelTitle: "Your level",
-    levelCardDescription: "Take a quick test and we will match training to you.",
-    levelCardSavedDescription: "Training will be matched to your level.",
-    defineLevel: "Define level",
-    retakeLevelTest: "Retake test",
-    levelTestTitle: "Quick level test",
-    questionProgress: "Question",
-    of: "of",
-    startTrainingAfterTest: "Start training",
-    levelResultA1: "You know basic words and simple phrases. We will start with easier training.",
-    levelResultA2: "You already understand simple sentences. Training will be a little harder.",
-    levelResultB1: "You have a good basic level. We will practice longer sentences.",
-    levelResultB2: "Your level is upper-intermediate. We will practice useful connectors, vocabulary, and more complex sentences.",
-    levelResultC1: "You have an advanced level. We will practice nuance, formal phrasing, and complex structures without making it too academic.",
-    chooseLevel: "Choose level",
-    backToCategories: "Back to trainings",
-    easyLevel: "easy",
-    mediumLevel: "medium",
-    harderLevel: "harder",
-    soon: "soon",
-    audioTrainingName: "Audio training",
-    wordsTrainingName: "Words training",
-    grammarTrainingName: "Grammar training",
-    audioTrainingLabel: "AUDIO",
-    wordsTrainingLabel: "WORDS",
-    grammarTrainingLabel: "GRAMMAR",
-    audioTrainingPlain: "Audio",
-    wordsTrainingPlain: "Words",
-    grammarTrainingPlain: "Grammar",
-    trainingPrompt: "What shall we practice today?",
-    audioCategory: "🎧 Audio",
-    audioCategoryDescription: "Learn to understand words and sentences by ear",
-    wordsCategory: "📚 Words",
-    wordsCategoryDescription: "Review words from stories",
-    grammarCategory: "✍️ Grammar",
-    grammarCategoryDescription: "Build sentences and practice language structure",
-    audioTraining: "Audio training",
-    vocabTrainer: "Vocabulary trainer",
-    grammarTasks: "Grammar / tasks",
-  },
+type DemoBook = {
+  id: string;
+  title: string;
+  author: string;
+  type: "book" | "story";
+  chapter: string;
+  readingTime: string;
+  progress: number;
+  tone: string;
+  excerpt: string;
 };
 
-type Copy = typeof copy.English;
+const continueBooks: DemoBook[] = [
+  {
+    id: "alice",
+    title: "Alice's Adventures in Wonderland",
+    author: "Lewis Carroll",
+    type: "book",
+    chapter: "Глава 3",
+    readingTime: "25 мин",
+    progress: 42,
+    tone: "violet",
+    excerpt: "Alice was beginning to get very tired of sitting by her sister on the bank.",
+  },
+  {
+    id: "secret-garden",
+    title: "The Secret Garden",
+    author: "Frances Hodgson Burnett",
+    type: "book",
+    chapter: "Глава 5",
+    readingTime: "30 мин",
+    progress: 28,
+    tone: "rose",
+    excerpt: "When Mary Lennox was sent to Misselthwaite Manor she felt lonely and curious.",
+  },
+  {
+    id: "oz",
+    title: "The Wonderful Wizard of Oz",
+    author: "L. Frank Baum",
+    type: "book",
+    chapter: "Глава 2",
+    readingTime: "22 мин",
+    progress: 64,
+    tone: "gold",
+    excerpt: "Dorothy lived in the midst of the great Kansas prairies with Uncle Henry.",
+  },
+  {
+    id: "anne",
+    title: "Anne of Green Gables",
+    author: "L. M. Montgomery",
+    type: "book",
+    chapter: "Глава 7",
+    readingTime: "28 мин",
+    progress: 53,
+    tone: "plum",
+    excerpt: "Anne looked at the world with bright eyes and a heart full of stories.",
+  },
+];
+
+const popularStories: DemoBook[] = [
+  {
+    id: "seen-217",
+    title: "Seen at 2:17 AM",
+    author: "StoryLingo Original",
+    type: "story",
+    chapter: "Короткий рассказ",
+    readingTime: "12 мин",
+    progress: 0,
+    tone: "midnight",
+    excerpt: "At 2:17 AM, the old reading lamp turned on by itself.",
+  },
+  {
+    id: "magi",
+    title: "The Gift of the Magi",
+    author: "O. Henry",
+    type: "story",
+    chapter: "Классика",
+    readingTime: "18 мин",
+    progress: 0,
+    tone: "candle",
+    excerpt: "One dollar and eighty-seven cents. That was all.",
+  },
+  {
+    id: "last-leaf",
+    title: "The Last Leaf",
+    author: "O. Henry",
+    type: "story",
+    chapter: "Классика",
+    readingTime: "16 мин",
+    progress: 0,
+    tone: "leaf",
+    excerpt: "In a little district west of Washington Square the streets have run crazy.",
+  },
+  {
+    id: "open-door",
+    title: "The Open Door",
+    author: "StoryLingo Original",
+    type: "story",
+    chapter: "Короткий рассказ",
+    readingTime: "10 мин",
+    progress: 0,
+    tone: "door",
+    excerpt: "The door at the end of the hall was always open, but nobody entered.",
+  },
+];
 
 function App() {
   const [page, setPage] = useState<Page>("home");
-  const [activeStoryId, setActiveStoryId] = useState<string | null>(null);
-  const {
-    progress,
-    currentLevel,
-    saveLessonProgress,
-    completeLesson,
-    selectLanguage,
-    toggleSavedWord,
-    saveWords,
-    saveTestScore,
-  } = useLearnerProgress();
-
-  const language = progress.selectedLanguage ?? "Russian";
-  const t = copy[language];
-  const activeStory = activeStoryId ? getStoryById(activeStoryId) : undefined;
-  const totalProgress = Math.round((progress.completedLessons.length / stories.length) * 100);
-  const currentLevelLabel = translateLevel(currentLevel, language);
-
-  function isLessonUnlocked(index: number) {
-    return (
-      index === 0 ||
-      progress.unlockedLessons.includes(stories[index].id) ||
-      progress.completedLessons.includes(stories[index - 1].id)
-    );
-  }
-
-  function openLesson(storyId: string) {
-    const index = stories.findIndex((story) => story.id === storyId);
-    if (index < 0 || !isLessonUnlocked(index)) return;
-    setActiveStoryId(storyId);
-    setPage("learn");
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
+  const [activeBookId, setActiveBookId] = useState<string | null>(null);
+  const { progress, saveReadingProgress, selectLanguage } = useLearnerProgress();
+  const allItems = [...continueBooks, ...popularStories];
+  const activeBook = allItems.find((book) => book.id === activeBookId) ?? null;
 
   function navigate(nextPage: Page) {
     setPage(nextPage);
-    setActiveStoryId(null);
+    setActiveBookId(null);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   return (
-    <div className="premium-shell">
-      <Sidebar page={page} t={t} onNavigate={navigate} />
+    <div className="app-shell">
+      <Sidebar page={page} onNavigate={navigate} />
       <div className="app-main">
-        <TopBar progress={progress} currentLevel={currentLevelLabel} language={language} t={t} />
-        {activeStory ? (
-          <LessonScreen
-            key={activeStory.id}
-            story={activeStory}
-            language={language}
-            ui={t}
-            initialProgress={progress.lessonProgress[activeStory.id] ?? 0}
-            isCompleted={progress.completedLessons.includes(activeStory.id)}
-            savedWords={progress.savedWords}
-            streak={progress.streak}
-            onBack={() => setActiveStoryId(null)}
-            onToggleSavedWord={toggleSavedWord}
-            onSaveStoryWords={saveWords}
-            onStepChange={saveLessonProgress}
-            onComplete={(storyId, xpReward) => {
-              const storyIndex = stories.findIndex((story) => story.id === storyId);
-              completeLesson(storyId, xpReward, stories[storyIndex + 1]?.id);
-            }}
-            onNextLesson={() => {
-              const storyIndex = stories.findIndex((story) => story.id === activeStory.id);
-              const nextStory = stories[storyIndex + 1];
-              if (nextStory) {
-                setActiveStoryId(nextStory.id);
-                setPage("learn");
-                window.scrollTo({ top: 0, behavior: "smooth" });
-              } else {
-                navigate("learn");
-              }
-            }}
+        <MobileTopBar onProfile={() => navigate("profile")} />
+        {activeBook ? (
+          <ReaderPreview
+            book={activeBook}
+            progressValue={progress.readingProgress[activeBook.id] ?? activeBook.progress}
+            onBack={() => setActiveBookId(null)}
+            onProgress={(value) => saveReadingProgress(activeBook.id, value)}
           />
         ) : (
           <>
-            {page === "home" ? (
-              <HomePage
-                t={t}
-                progress={progress}
-                currentLevel={currentLevelLabel}
-                totalProgress={totalProgress}
-                onStartLesson={openLesson}
-                onNavigate={navigate}
-                isLessonUnlocked={isLessonUnlocked}
-              />
-            ) : null}
-            {page === "learn" ? (
-              <LearnPage t={t} progress={progress} onStartLesson={openLesson} isLessonUnlocked={isLessonUnlocked} />
-            ) : null}
-            {page === "words" ? (
-              <WordsPage
-                t={t}
-                savedWords={progress.savedWords}
-                onToggleSavedWord={toggleSavedWord}
-                onSaveTestScore={saveTestScore}
-              />
-            ) : null}
-            {page === "training" ? (
-              <TrainingPage
-                t={t}
-                savedWords={progress.savedWords}
-                completedLessons={progress.completedLessons}
-                onSaveTestScore={saveTestScore}
-              />
-            ) : null}
-            {page === "stats" ? (
-              <StatisticsPage t={t} progress={progress} currentLevel={currentLevelLabel} totalProgress={totalProgress} />
-            ) : null}
-            {page === "settings" ? (
-              <SettingsPage
-                t={t}
-                selectedLanguage={language}
-                onSelectLanguage={selectLanguage}
-                progress={progress}
-                currentLevel={currentLevelLabel}
-                totalProgress={totalProgress}
-                onNavigate={navigate}
-              />
-            ) : null}
+            {page === "home" ? <HomePage onNavigate={navigate} onOpenBook={setActiveBookId} progress={progress.readingProgress} /> : null}
+            {page === "library" ? <LibraryPage onOpenBook={setActiveBookId} progress={progress.readingProgress} /> : null}
+            {page === "dictionary" ? <DictionaryPage /> : null}
+            {page === "profile" ? <ProfilePage language={progress.selectedLanguage ?? "Russian"} onSelectLanguage={selectLanguage} progress={progress.readingProgress} /> : null}
           </>
         )}
       </div>
-      <MobileNav page={page} t={t} onNavigate={navigate} />
+      <MobileNav page={page} onNavigate={navigate} />
     </div>
   );
 }
 
-function Onboarding({ t, onSelect }: { t: Copy; onSelect: (language: NativeLanguage) => void }) {
-  return (
-    <main className="onboarding-screen">
-      <section className="onboarding-card">
-        <span className="mascot-large">🌸</span>
-        <span className="eyebrow">English Stories</span>
-        <h1>{t.chooseLanguage}</h1>
-        <p>{t.chooseHelp}</p>
-        <div className="language-grid">
-          {languages.map((language) => (
-            <button key={language} type="button" onClick={() => onSelect(language)}>
-              <Languages size={20} aria-hidden="true" />
-              {language}
-            </button>
-          ))}
-        </div>
-      </section>
-    </main>
-  );
-}
-
-function Sidebar({ page, t, onNavigate }: { page: Page; t: Copy; onNavigate: (page: Page) => void }) {
+function Sidebar({ page, onNavigate }: { page: Page; onNavigate: (page: Page) => void }) {
   return (
     <aside className="sidebar">
-      <div className="brand">
-        <span className="brand-icon">✨</span>
-        <div>
-          <strong>{t.appName}</strong>
-          <span>{t.cozy}</span>
-        </div>
-      </div>
-      <nav className="sidebar-nav" aria-label="Main navigation">
-        {navItems(t).map((item) => (
+      <Logo />
+      <nav className="sidebar-nav" aria-label="Основная навигация">
+        {navItems.map((item) => (
           <button key={item.page} className={page === item.page ? "active" : ""} type="button" onClick={() => onNavigate(item.page)}>
             {item.icon}
             {item.label}
           </button>
         ))}
       </nav>
+      <div className="premium-card">
+        <span>Premium</span>
+        <strong>Больше книг скоро</strong>
+        <p>Заглушка для будущей подписки. Оплата пока не подключена.</p>
+      </div>
     </aside>
   );
 }
 
-function MobileNav({ page, t, onNavigate }: { page: Page; t: Copy; onNavigate: (page: Page) => void }) {
-  const items: Array<{ page: Page; label: string; icon: ReactNode; activePages?: Page[] }> = [
-    { page: "home", label: t.home, icon: <Home size={20} /> },
-    { page: "learn", label: t.learn, icon: <BookOpen size={20} /> },
-    { page: "training", label: t.training, icon: <Target size={20} /> },
-    { page: "settings", label: t.profile, icon: <Settings size={20} />, activePages: ["settings", "words", "stats"] },
-  ];
-
+function MobileTopBar({ onProfile }: { onProfile: () => void }) {
   return (
-    <nav className="mobile-nav" aria-label="Mobile navigation">
-      {items.map((item) => {
-        const isActive = item.activePages ? item.activePages.includes(page) : page === item.page;
-
-        return (
-          <button key={item.page} className={isActive ? "active" : ""} type="button" onClick={() => onNavigate(item.page)}>
-            {item.icon}
-            <span>{item.label}</span>
-          </button>
-        );
-      })}
-    </nav>
-  );
-}
-
-function TopBar({
-  progress,
-  currentLevel,
-  language,
-  t,
-}: {
-  progress: ReturnType<typeof useLearnerProgress>["progress"];
-  currentLevel: string;
-  language: NativeLanguage;
-  t: Copy;
-}) {
-  return (
-    <header className="top-bar">
-      <div className="user-chip">
-        <span className="avatar">😊</span>
-        <div>
-          <strong>{t.learner}</strong>
-          <span>{currentLevel} · {language}</span>
-        </div>
-      </div>
-      <div className="top-stats">
-        <span><Sparkles size={17} />{progress.xp} XP</span>
-        <span><Flame size={17} />{progress.streak}</span>
-      </div>
+    <header className="mobile-topbar">
+      <Logo compact />
+      <button className="icon-pill" type="button" aria-label="Поиск">
+        <Search size={18} aria-hidden="true" />
+      </button>
+      <button className="icon-pill" type="button" aria-label="Профиль" onClick={onProfile}>
+        <User size={18} aria-hidden="true" />
+      </button>
     </header>
   );
 }
 
-function HomePage({
-  t,
-  progress,
-  currentLevel,
-  totalProgress,
-  onStartLesson,
-  onNavigate,
-  isLessonUnlocked,
-}: {
-  t: Copy;
-  progress: ReturnType<typeof useLearnerProgress>["progress"];
-  currentLevel: string;
-  totalProgress: number;
-  onStartLesson: (storyId: string) => void;
-  onNavigate: (page: Page) => void;
-  isLessonUnlocked: (index: number) => boolean;
-}) {
-  const nextStory = stories.find((story, index) => isLessonUnlocked(index) && !progress.completedLessons.includes(story.id)) ?? stories[0];
-
+function MobileNav({ page, onNavigate }: { page: Page; onNavigate: (page: Page) => void }) {
   return (
-    <main className="page-stack compact-home">
-      <section className="hero-dashboard">
-        <div className="hero-copy">
-          <span className="eyebrow">{t.cozy}</span>
-          <h1>{t.welcome}</h1>
-          <p>{t.welcomeText}</p>
-          <button className="primary-button" type="button" onClick={() => onStartLesson(nextStory.id)}>
-            {t.continueLearning}
-          </button>
-        </div>
-        <div className="hero-visual" aria-hidden="true">
-          <div className="hero-book-card">
-            <BookOpen size={58} strokeWidth={1.7} />
-            <span className="hero-leaf hero-leaf-one"><Leaf size={22} /></span>
-            <span className="hero-leaf hero-leaf-two"><Leaf size={18} /></span>
-          </div>
-          <div className="hero-progress-chip">
-            <strong>{totalProgress}%</strong>
-            <span>{t.path}</span>
-          </div>
-        </div>
-      </section>
-
-      <div className="dashboard-grid home-stats-grid">
-        <MetricCard icon={<Sparkles />} label={t.xp} value={progress.xp.toString()} />
-        <MetricCard icon={<Flame />} label={t.streak} value={`${progress.streak}`} />
-        <MetricCard icon={<Star />} label={t.level} value={currentLevel} />
-      </div>
-
-      <section className="content-card home-continue-section">
-        <div className="section-header">
-          <div>
-            <span className="eyebrow">{t.continueLearning}</span>
-            <h2>{nextStory.title}</h2>
-          </div>
-          <span className="soft-pill">{nextStory.xpReward} XP</span>
-        </div>
-        <LessonPathCard
-          t={t}
-          story={nextStory}
-          index={stories.findIndex((story) => story.id === nextStory.id)}
-          progressValue={progress.lessonProgress[nextStory.id] ?? 0}
-          completed={progress.completedLessons.includes(nextStory.id)}
-          unlocked
-          onStartLesson={onStartLesson}
-        />
-      </section>
-
-      <section className="home-training-preview">
-        <button className="training-preview-card" type="button" onClick={() => onNavigate("training")}>
-          <span><Volume2 size={22} /></span>
-          <strong>{t.audioTraining}</strong>
+    <nav className="mobile-nav" aria-label="Мобильная навигация">
+      {navItems.map((item) => (
+        <button key={item.page} className={page === item.page ? "active" : ""} type="button" onClick={() => onNavigate(item.page)}>
+          {item.icon}
+          <span>{item.label}</span>
         </button>
-        <button className="training-preview-card" type="button" onClick={() => onNavigate("training")}>
-          <span><BookOpen size={22} /></span>
-          <strong>{t.vocabTrainer}</strong>
-        </button>
-        <button className="training-preview-card" type="button" onClick={() => onNavigate("training")}>
-          <span><GraduationCap size={22} /></span>
-          <strong>{t.grammarTasks}</strong>
-        </button>
-      </section>
-
-      <section className="content-card home-path-card">
-        <div className="section-header">
-          <div>
-            <span className="eyebrow">{t.lessonPath}</span>
-            <h2>{t.lessonPath}</h2>
-          </div>
-          <button className="text-button" type="button" onClick={() => onNavigate("learn")}>{t.learn}</button>
-        </div>
-        <div className="mini-path">
-          {stories.slice(0, 4).map((story, index) => (
-            <button
-              key={story.id}
-              type="button"
-              className={isLessonUnlocked(index) ? "path-node" : "path-node locked"}
-              disabled={!isLessonUnlocked(index)}
-              onClick={() => onStartLesson(story.id)}
-            >
-              <span>{progress.completedLessons.includes(story.id) ? "✓" : isLessonUnlocked(index) ? index + 1 : <LockKeyhole size={15} />}</span>
-              <strong>{story.title}</strong>
-            </button>
-          ))}
-        </div>
-      </section>
-    </main>
+      ))}
+    </nav>
   );
 }
 
-function LearnPage({
-  t,
-  progress,
-  onStartLesson,
-  isLessonUnlocked,
-}: {
-  t: Copy;
-  progress: ReturnType<typeof useLearnerProgress>["progress"];
-  onStartLesson: (storyId: string) => void;
-  isLessonUnlocked: (index: number) => boolean;
-}) {
+function Logo({ compact = false }: { compact?: boolean }) {
   return (
-    <main className="page-stack">
-      <PageTitle label={t.learn} title={t.lessonPath} text={t.welcomeText} />
-      <div className="lesson-path-list">
-        {stories.map((story, index) => (
-          <LessonPathCard
-            key={story.id}
-            t={t}
-            story={story}
-            index={index}
-            progressValue={progress.lessonProgress[story.id] ?? 0}
-            completed={progress.completedLessons.includes(story.id)}
-            unlocked={isLessonUnlocked(index)}
-            onStartLesson={onStartLesson}
-          />
-        ))}
-      </div>
-    </main>
-  );
-}
-
-type VocabularyQuestion = {
-  type: "translation" | "english" | "audio";
-  prompt: string;
-  answer: string;
-  options: string[];
-  word: VocabularyEntry;
-};
-
-function WordsPage({
-  t,
-  savedWords,
-  onToggleSavedWord,
-  onSaveTestScore,
-}: {
-  t: Copy;
-  savedWords: string[];
-  onToggleSavedWord: (word: string) => void;
-  onSaveTestScore: (score: number, total: number, type: string) => void;
-}) {
-  const allWords = useMemo(() => getVocabularyDatabase(), []);
-  const savedVocabulary = allWords.filter((word) => savedWords.includes(word.word));
-  const [training, setTraining] = useState<VocabularyQuestion[] | null>(null);
-  const [questionIndex, setQuestionIndex] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
-  const [score, setScore] = useState(0);
-  const [finished, setFinished] = useState(false);
-  const speech = useVocabularySpeech();
-
-  const currentQuestion = training?.[questionIndex];
-
-  function startTraining() {
-    const questions = buildVocabularyTraining(savedVocabulary, allWords);
-    setTraining(questions);
-    setQuestionIndex(0);
-    setSelectedAnswer(null);
-    setScore(0);
-    setFinished(false);
-  }
-
-  function answerQuestion(answer: string) {
-    if (!currentQuestion || selectedAnswer) return;
-    setSelectedAnswer(answer);
-    if (answer === currentQuestion.answer) {
-      setScore((current) => current + 1);
-    }
-  }
-
-  function moveTrainingNext() {
-    if (!training) return;
-    if (questionIndex >= training.length - 1) {
-      setFinished(true);
-      onSaveTestScore(score, training.length, "vocabulary");
-      return;
-    }
-
-    setQuestionIndex((current) => current + 1);
-    setSelectedAnswer(null);
-  }
-
-  return (
-    <main className="page-stack words-page">
-      <PageTitle label={t.wordsPage} title={t.wordsPage} text={t.noSavedWords} />
-
-      <section className="content-card words-hero-card">
-        <div>
-          <span className="eyebrow">⭐ {t.myWords}</span>
-          <h2>{savedVocabulary.length} {t.words}</h2>
-          <p>{savedVocabulary.length ? t.trainMyWords : t.noSavedWords}</p>
-        </div>
-        <button className="primary-button" type="button" disabled={!savedVocabulary.length} onClick={startTraining}>
-          {t.trainMyWords}
-        </button>
-      </section>
-
-      {training && currentQuestion ? (
-        <section className="content-card vocab-training-card">
-          {finished ? (
-            <div className="training-result">
-              <span className="celebration-mark">✨</span>
-              <h2>{t.trainingResult}</h2>
-              <strong>{score}/{training.length}</strong>
-              <button className="primary-button full" type="button" onClick={startTraining}>
-                {t.trainMyWords}
-              </button>
-            </div>
-          ) : (
-            <>
-              <div className="section-header">
-                <div>
-                  <span className="eyebrow">
-                    {currentQuestion.type === "translation" ? t.chooseTranslation : currentQuestion.type === "english" ? t.chooseEnglish : t.audioTest}
-                  </span>
-                  <h2>{currentQuestion.type === "audio" ? t.listenAndChoose : currentQuestion.prompt}</h2>
-                </div>
-                <span className="soft-pill">{questionIndex + 1}/{training.length}</span>
-              </div>
-              {currentQuestion.type === "audio" ? (
-                <button className="audio-prompt-button" type="button" onClick={() => speech.toggle(currentQuestion.word.word)}>
-                  <Volume2 size={24} aria-hidden="true" />
-                </button>
-              ) : null}
-              <div className="choice-list">
-                {currentQuestion.options.map((option) => (
-                  <button
-                    key={option}
-                    className={selectedAnswer === option ? "choice-button selected" : "choice-button"}
-                    type="button"
-                    disabled={selectedAnswer !== null}
-                    onClick={() => answerQuestion(option)}
-                  >
-                    {option}
-                  </button>
-                ))}
-              </div>
-              {selectedAnswer ? (
-                <div className={selectedAnswer === currentQuestion.answer ? "feedback correct" : "feedback wrong"}>
-                  {selectedAnswer === currentQuestion.answer ? t.correct : `${t.answer}: ${currentQuestion.answer}`}
-                </div>
-              ) : null}
-              <button className="primary-button full" type="button" disabled={!selectedAnswer} onClick={moveTrainingNext}>
-                {questionIndex >= training.length - 1 ? t.finishTraining : t.nextQuestion}
-              </button>
-            </>
-          )}
-        </section>
-      ) : null}
-
-      <VocabularySection
-        title={`⭐ ${t.myWords}`}
-        words={savedVocabulary}
-        savedWords={savedWords}
-        labels={t}
-        defaultOpen
-        onSpeak={speech.toggle}
-        onToggleSavedWord={onToggleSavedWord}
-      />
-      <VocabularySection
-        title={`📚 ${t.allWords}`}
-        words={allWords}
-        savedWords={savedWords}
-        labels={t}
-        defaultOpen={false}
-        onSpeak={speech.toggle}
-        onToggleSavedWord={onToggleSavedWord}
-      />
-    </main>
-  );
-}
-
-function VocabularySection({
-  title,
-  words,
-  savedWords,
-  labels,
-  defaultOpen = true,
-  onSpeak,
-  onToggleSavedWord,
-}: {
-  title: string;
-  words: VocabularyEntry[];
-  savedWords: string[];
-  labels: Copy;
-  defaultOpen?: boolean;
-  onSpeak: (text: string) => void;
-  onToggleSavedWord: (word: string) => void;
-}) {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
-
-  return (
-    <section className="content-card vocabulary-section-card">
-      <button className="vocabulary-section-toggle" type="button" onClick={() => setIsOpen((current) => !current)}>
-        <span>{title} ({words.length})</span>
-        <strong>{isOpen ? "▲" : "▶"}</strong>
-      </button>
-      {isOpen ? (
-        words.length ? (
-          <div className="smart-vocab-grid">
-            {words.map((word) => (
-              <WordCard
-                key={word.id}
-                word={word}
-                saved={savedWords.includes(word.word)}
-                labels={{ addWord: labels.addWord, saved: labels.saved }}
-                onSpeak={onSpeak}
-                onToggleSave={onToggleSavedWord}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="empty-state">
-            <span>📚</span>
-            <p>{labels.noSavedWords}</p>
-          </div>
-        )
-      ) : null}
-    </section>
-  );
-}
-
-function buildVocabularyTraining(savedVocabulary: VocabularyEntry[], allWords: VocabularyEntry[]) {
-  return shuffleArray(savedVocabulary)
-    .slice(0, 8)
-    .map((word, index) => {
-      const type = (["translation", "english", "audio"] as const)[index % 3];
-      if (type === "translation") {
-        const options = answerOptions(
-          word.translation,
-          allWords.filter((item) => item.word !== word.word).map((item) => item.translation),
-        );
-        return {
-          type,
-          prompt: word.word,
-          answer: word.translation,
-          options,
-          word,
-        };
-      }
-      const englishOptions = answerOptions(
-        word.word,
-        allWords.filter((item) => item.word !== word.word).map((item) => item.word),
-      );
-      return {
-        type,
-        prompt: type === "audio" ? word.word : word.translation,
-        answer: word.word,
-        options: englishOptions,
-        word,
-      };
-    });
-}
-
-function answerOptions(answer: string, distractors: string[]) {
-  return shuffleArray([answer, ...shuffleArray(distractors).slice(0, 3)]);
-}
-
-function derangedTranslations(words: VocabularyEntry[]) {
-  const original = words.map((word) => word.translation);
-  if (original.length < 2) return original;
-
-  for (let attempt = 0; attempt < 12; attempt += 1) {
-    const shuffled = shuffleArray(original);
-    if (shuffled.every((translation, index) => translation !== original[index])) return shuffled;
-  }
-
-  return [...original.slice(1), original[0]];
-}
-
-function shuffleArray<T>(items: T[]) {
-  const copyItems = Array.from(new Set(items));
-  for (let index = copyItems.length - 1; index > 0; index -= 1) {
-    const swapIndex = Math.floor(Math.random() * (index + 1));
-    [copyItems[index], copyItems[swapIndex]] = [copyItems[swapIndex], copyItems[index]];
-  }
-  return copyItems;
-}
-
-function shuffleWithRepeats<T>(items: T[]) {
-  const copyItems = [...items];
-  for (let index = copyItems.length - 1; index > 0; index -= 1) {
-    const swapIndex = Math.floor(Math.random() * (index + 1));
-    [copyItems[index], copyItems[swapIndex]] = [copyItems[swapIndex], copyItems[index]];
-  }
-  return copyItems;
-}
-
-function useVocabularySpeech() {
-  function toggle(text: string) {
-    if (!("speechSynthesis" in window)) return;
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "en-US";
-    utterance.rate = 0.88;
-    window.speechSynthesis.speak(utterance);
-  }
-
-  return { toggle };
-}
-
-type TrainingQuestion =
-  | {
-      id: string;
-      type: "match";
-      words: VocabularyEntry[];
-      translations: string[];
-    }
-  | {
-      id: string;
-      type: "translation" | "english" | "audioEnglish" | "audioTranslation" | "audioSentenceTranslation" | "buildSentence" | "wordOrder";
-      word: VocabularyEntry;
-      prompt: string;
-      answer: string;
-      options: string[];
-      targetSentence?: string;
-    };
-
-type TrainingCategory = {
-  id: "audio" | "words" | "grammar";
-  title: string;
-  description: string;
-  label: string;
-  sessionName: string;
-};
-
-type EnglishLevel = Level;
-
-type GrammarSentence = {
-  en: string;
-  ru: string;
-  level: Level;
-};
-
-type PlacementQuestion = {
-  id: string;
-  level: EnglishLevel;
-  question: string;
-  options: string[];
-  answer: string;
-};
-
-type PlacementSessionQuestion = PlacementQuestion & {
-  options: string[];
-};
-
-const USER_ENGLISH_LEVEL_KEY = "userEnglishLevel";
-
-const grammarSentences = [
-  { en: "I open the door.", ru: "Я открываю дверь." },
-  { en: "She has a small dog.", ru: "У неё есть маленькая собака." },
-  { en: "We are in the room.", ru: "Мы в комнате." },
-  { en: "He likes this book.", ru: "Ему нравится эта книга." },
-  { en: "The room was dark and quiet.", ru: "Комната была тёмной и тихой." },
-  { en: "Emma drinks water.", ru: "Эмма пьёт воду." },
-  { en: "Leo goes to school.", ru: "Лео идёт в школу." },
-  { en: "Sara reads a story.", ru: "Сара читает историю." },
-  { en: "Nikita buys fresh bread.", ru: "Никита покупает свежий хлеб." },
-  { en: "My friend lives next door.", ru: "Мой друг живёт по соседству." },
-  { en: "The lesson starts at nine.", ru: "Урок начинается в девять." },
-  { en: "I have a new bicycle.", ru: "У меня есть новый велосипед." },
-  { en: "We walk in the park.", ru: "Мы гуляем в парке." },
-  { en: "She is nervous today.", ru: "Она сегодня нервничает." },
-  { en: "They wait at the station.", ru: "Они ждут на станции." },
-  { en: "The phone is on the table.", ru: "Телефон на столе." },
-  { en: "I make breakfast every morning.", ru: "Я готовлю завтрак каждое утро." },
-  { en: "He closes the window.", ru: "Он закрывает окно." },
-  { en: "We need two tickets.", ru: "Нам нужны два билета." },
-  { en: "The beach is warm and sunny.", ru: "На пляже тепло и солнечно." },
-];
-
-const trainingGrammarSentences: GrammarSentence[] = [
-  { en: "I open the door.", ru: "Я открываю дверь.", level: "A1" },
-  { en: "She has a small dog.", ru: "У неё есть маленькая собака.", level: "A1" },
-  { en: "We are in the room.", ru: "Мы в комнате.", level: "A1" },
-  { en: "He likes this book.", ru: "Ему нравится эта книга.", level: "A1" },
-  { en: "Emma drinks water.", ru: "Эмма пьёт воду.", level: "A1" },
-  { en: "Leo goes to school.", ru: "Лео идёт в школу.", level: "A1" },
-  { en: "The lesson starts at nine.", ru: "Урок начинается в девять.", level: "A2" },
-  { en: "I have a new bicycle.", ru: "У меня есть новый велосипед.", level: "A2" },
-  { en: "We walk in the park.", ru: "Мы гуляем в парке.", level: "A2" },
-  { en: "She is nervous today.", ru: "Она сегодня нервничает.", level: "A2" },
-  { en: "They wait at the station.", ru: "Они ждут на станции.", level: "A2" },
-  { en: "The phone is on the table.", ru: "Телефон на столе.", level: "A2" },
-  { en: "The room was dark and quiet.", ru: "Комната была тёмной и тихой.", level: "B1" },
-  { en: "I make breakfast every morning.", ru: "Я готовлю завтрак каждое утро.", level: "B1" },
-  { en: "Nikita buys fresh bread.", ru: "Никита покупает свежий хлеб.", level: "B1" },
-  { en: "My friend lives next door.", ru: "Мой друг живёт по соседству.", level: "B1" },
-  { en: "We need two tickets.", ru: "Нам нужны два билета.", level: "B1" },
-  { en: "The beach is warm and sunny.", ru: "На пляже тепло и солнечно.", level: "B1" },
-  { en: "Although the plan was risky, we decided to try it.", ru: "Хотя план был рискованным, мы решили попробовать.", level: "B2" },
-  { en: "Despite the delay, the team finished the project on time.", ru: "Несмотря на задержку, команда закончила проект вовремя.", level: "B2" },
-  { en: "I have visited London twice, but I went to Paris last year.", ru: "Я был в Лондоне дважды, но в Париж ездил в прошлом году.", level: "B2" },
-  { en: "The report was written by our manager yesterday.", ru: "Отчёт был написан нашим менеджером вчера.", level: "B2" },
-  { en: "If I had more free time, I would learn another language.", ru: "Если бы у меня было больше свободного времени, я бы выучил ещё один язык.", level: "B2" },
-  { en: "She said that she needed more information.", ru: "Она сказала, что ей нужно больше информации.", level: "B2" },
-  { en: "Only after the meeting did I understand the problem.", ru: "Только после встречи я понял проблему.", level: "C1" },
-  { en: "Had I known about the traffic, I would have left earlier.", ru: "Если бы я знал о пробках, я бы вышел раньше.", level: "C1" },
-  { en: "The decision is expected to be announced tomorrow.", ru: "Ожидается, что решение объявят завтра.", level: "C1" },
-  { en: "Whereas the first option is cheaper, the second is more reliable.", ru: "В то время как первый вариант дешевле, второй более надёжный.", level: "C1" },
-  { en: "Please take into account how much time the task will require.", ru: "Пожалуйста, учти, сколько времени потребует задача.", level: "C1" },
-  { en: "The informal phrase works in a text message, but it sounds too casual in an email.", ru: "Неформальная фраза подходит для сообщения, но в письме звучит слишком непринуждённо.", level: "C1" },
-];
-
-const curatedTrainingVocabulary: VocabularyEntry[] = [
-  { id: "training-b2-although", word: "although", translation: "хотя", ipa: "/ol-thoh/", level: "B2", sourceStory: "Training B2", sourceStories: ["Training B2"], sourceStoryIds: ["training-b2"], example: "Although it was late, we kept working.", exampleRu: "Хотя было поздно, мы продолжили работать.", category: "actions" },
-  { id: "training-b2-despite", word: "despite", translation: "несмотря на", ipa: "/di-spyt/", level: "B2", sourceStory: "Training B2", sourceStories: ["Training B2"], sourceStoryIds: ["training-b2"], example: "Despite the rain, we went outside.", exampleRu: "Несмотря на дождь, мы вышли на улицу.", category: "actions" },
-  { id: "training-b2-however", word: "however", translation: "однако", ipa: "/how-ev-er/", level: "B2", sourceStory: "Training B2", sourceStories: ["Training B2"], sourceStoryIds: ["training-b2"], example: "The idea is good. However, it needs more time.", exampleRu: "Идея хорошая. Однако ей нужно больше времени.", category: "actions" },
-  { id: "training-b2-therefore", word: "therefore", translation: "поэтому", ipa: "/thair-for/", level: "B2", sourceStory: "Training B2", sourceStories: ["Training B2"], sourceStoryIds: ["training-b2"], example: "The file was missing; therefore, we called again.", exampleRu: "Файла не было, поэтому мы позвонили снова.", category: "actions" },
-  { id: "training-b2-instead", word: "instead", translation: "вместо этого", ipa: "/in-sted/", level: "B2", sourceStory: "Training B2", sourceStories: ["Training B2"], sourceStoryIds: ["training-b2"], example: "I was tired, so I stayed home instead.", exampleRu: "Я устал, поэтому вместо этого остался дома.", category: "daily life" },
-  { id: "training-b2-probably", word: "probably", translation: "вероятно", ipa: "/prob-uh-blee/", level: "B2", sourceStory: "Training B2", sourceStories: ["Training B2"], sourceStoryIds: ["training-b2"], example: "She will probably arrive after lunch.", exampleRu: "Она, вероятно, приедет после обеда.", category: "daily life" },
-  { id: "training-b2-actually", word: "actually", translation: "на самом деле", ipa: "/ak-choo-uh-lee/", level: "B2", sourceStory: "Training B2", sourceStories: ["Training B2"], sourceStoryIds: ["training-b2"], example: "Actually, I have already seen this film.", exampleRu: "На самом деле, я уже видел этот фильм.", category: "daily life" },
-  { id: "training-b2-especially", word: "especially", translation: "особенно", ipa: "/uh-spesh-uh-lee/", level: "B2", sourceStory: "Training B2", sourceStories: ["Training B2"], sourceStoryIds: ["training-b2"], example: "I like quiet places, especially in the morning.", exampleRu: "Мне нравятся тихие места, особенно утром.", category: "daily life" },
-  { id: "training-b2-environment", word: "environment", translation: "окружающая среда", ipa: "/en-vy-ruhn-muhnt/", level: "B2", sourceStory: "Training B2", sourceStories: ["Training B2"], sourceStoryIds: ["training-b2"], example: "Clean transport is better for the environment.", exampleRu: "Чистый транспорт лучше для окружающей среды.", category: "daily life" },
-  { id: "training-b2-relationship", word: "relationship", translation: "отношения", ipa: "/ri-lay-shuhn-ship/", level: "B2", sourceStory: "Training B2", sourceStories: ["Training B2"], sourceStoryIds: ["training-b2"], example: "A good relationship needs trust.", exampleRu: "Хорошим отношениям нужно доверие.", category: "emotions" },
-  { id: "training-b2-decision", word: "decision", translation: "решение", ipa: "/di-sizh-uhn/", level: "B2", sourceStory: "Training B2", sourceStories: ["Training B2"], sourceStoryIds: ["training-b2"], example: "It was a difficult decision.", exampleRu: "Это было трудное решение.", category: "work" },
-  { id: "training-b2-experience", word: "experience", translation: "опыт", ipa: "/ik-speer-ee-uhns/", level: "B2", sourceStory: "Training B2", sourceStories: ["Training B2"], sourceStoryIds: ["training-b2"], example: "This job gave me useful experience.", exampleRu: "Эта работа дала мне полезный опыт.", category: "work" },
-  { id: "training-b2-opportunity", word: "opportunity", translation: "возможность", ipa: "/op-er-too-nuh-tee/", level: "B2", sourceStory: "Training B2", sourceStories: ["Training B2"], sourceStoryIds: ["training-b2"], example: "It is a great opportunity to learn.", exampleRu: "Это отличная возможность учиться.", category: "work" },
-  { id: "training-b2-advantage", word: "advantage", translation: "преимущество", ipa: "/ad-van-tij/", level: "B2", sourceStory: "Training B2", sourceStories: ["Training B2"], sourceStoryIds: ["training-b2"], example: "One advantage is the flexible schedule.", exampleRu: "Одно преимущество - гибкий график.", category: "work" },
-  { id: "training-b2-disadvantage", word: "disadvantage", translation: "недостаток", ipa: "/dis-ad-van-tij/", level: "B2", sourceStory: "Training B2", sourceStories: ["Training B2"], sourceStoryIds: ["training-b2"], example: "The main disadvantage is the price.", exampleRu: "Главный недостаток - цена.", category: "work" },
-  { id: "training-c1-nevertheless", word: "nevertheless", translation: "тем не менее", ipa: "/nev-er-thuh-les/", level: "C1", sourceStory: "Training C1", sourceStories: ["Training C1"], sourceStoryIds: ["training-c1"], example: "The task was hard. Nevertheless, we finished it.", exampleRu: "Задача была трудной. Тем не менее, мы её закончили.", category: "work" },
-  { id: "training-c1-whereas", word: "whereas", translation: "в то время как", ipa: "/wair-az/", level: "C1", sourceStory: "Training C1", sourceStories: ["Training C1"], sourceStoryIds: ["training-c1"], example: "I prefer calls, whereas my sister prefers messages.", exampleRu: "Я предпочитаю звонки, в то время как моя сестра предпочитает сообщения.", category: "daily life" },
-  { id: "training-c1-assumption", word: "assumption", translation: "предположение", ipa: "/uh-sump-shuhn/", level: "C1", sourceStory: "Training C1", sourceStories: ["Training C1"], sourceStoryIds: ["training-c1"], example: "Your assumption may be correct.", exampleRu: "Твоё предположение может быть верным.", category: "work" },
-  { id: "training-c1-consequence", word: "consequence", translation: "последствие", ipa: "/kon-si-kwens/", level: "C1", sourceStory: "Training C1", sourceStories: ["Training C1"], sourceStoryIds: ["training-c1"], example: "Every decision has a consequence.", exampleRu: "У каждого решения есть последствие.", category: "work" },
-  { id: "training-c1-approach", word: "approach", translation: "подход", ipa: "/uh-prohch/", level: "C1", sourceStory: "Training C1", sourceStories: ["Training C1"], sourceStoryIds: ["training-c1"], example: "We need a different approach.", exampleRu: "Нам нужен другой подход.", category: "work" },
-  { id: "training-c1-reliable", word: "reliable", translation: "надёжный", ipa: "/ri-ly-uh-buhl/", level: "C1", sourceStory: "Training C1", sourceStories: ["Training C1"], sourceStoryIds: ["training-c1"], example: "This source is reliable.", exampleRu: "Этот источник надёжный.", category: "work" },
-  { id: "training-c1-require", word: "require", translation: "требовать", ipa: "/ri-kwy-er/", level: "C1", sourceStory: "Training C1", sourceStories: ["Training C1"], sourceStoryIds: ["training-c1"], example: "This task will require patience.", exampleRu: "Эта задача потребует терпения.", category: "actions" },
-  { id: "training-c1-tend-to", word: "tend to", translation: "иметь склонность", ipa: "/tend too/", level: "C1", sourceStory: "Training C1", sourceStories: ["Training C1"], sourceStoryIds: ["training-c1"], example: "People tend to remember stories better than rules.", exampleRu: "Люди обычно лучше запоминают истории, чем правила.", category: "actions" },
-  { id: "training-c1-carry-out", word: "carry out", translation: "выполнять", ipa: "/kar-ee out/", level: "C1", sourceStory: "Training C1", sourceStories: ["Training C1"], sourceStoryIds: ["training-c1"], example: "We need to carry out a simple test.", exampleRu: "Нам нужно выполнить простой тест.", category: "actions" },
-  { id: "training-c1-figure-out", word: "figure out", translation: "разобраться", ipa: "/fig-yer out/", level: "C1", sourceStory: "Training C1", sourceStories: ["Training C1"], sourceStoryIds: ["training-c1"], example: "I will figure out the best route.", exampleRu: "Я разберусь с лучшим маршрутом.", category: "actions" },
-  { id: "training-c1-take-into-account", word: "take into account", translation: "принимать во внимание", ipa: "/tayk in-too uh-kownt/", level: "C1", sourceStory: "Training C1", sourceStories: ["Training C1"], sourceStoryIds: ["training-c1"], example: "Take into account the time you need.", exampleRu: "Прими во внимание время, которое тебе нужно.", category: "actions" },
-];
-
-const placementQuestions: PlacementQuestion[] = [
-  {
-    id: "a1-hello",
-    level: "A1",
-    question: "Выбери правильный перевод: Hello",
-    options: ["Привет", "Спасибо", "Пока", "Пожалуйста"],
-    answer: "Привет",
-  },
-  {
-    id: "a1-like-tea",
-    level: "A1",
-    question: "Как сказать по-английски: Я люблю чай.",
-    options: ["I like tea.", "I am tea.", "I have tea?", "I go tea."],
-    answer: "I like tea.",
-  },
-  {
-    id: "a2-breakfast",
-    level: "A2",
-    question: "Что значит: She is making breakfast now.",
-    options: ["Она сейчас готовит завтрак.", "Она уже поужинала.", "Она покупает билет.", "Она закрывает окно."],
-    answer: "Она сейчас готовит завтрак.",
-  },
-  {
-    id: "a2-past",
-    level: "A2",
-    question: "Выбери правильную форму: Yesterday we ___ to the park.",
-    options: ["went", "go", "goes", "going"],
-    answer: "went",
-  },
-  {
-    id: "b1-message",
-    level: "B1",
-    question: "Что значит: The message surprised her because it arrived late at night.",
-    options: ["Сообщение удивило её, потому что пришло поздно ночью.", "Она отправила сообщение утром.", "Сообщение было коротким и простым.", "Она потеряла телефон ночью."],
-    answer: "Сообщение удивило её, потому что пришло поздно ночью.",
-  },
-  {
-    id: "b1-condition",
-    level: "B1",
-    question: "Выбери правильный вариант: If I have time tomorrow, I ___ you.",
-    options: ["will call", "called", "calling", "call yesterday"],
-    answer: "will call",
-  },
-  {
-    id: "b2-meeting",
-    level: "B2",
-    question: "Выбери самое естественное предложение.",
-    options: ["Although the meeting was long, it helped us make a clear decision.", "Although the meeting long, it helped make clear decision.", "The meeting was long although helped us decision.", "Although long meeting, decision clear helped us."],
-    answer: "Although the meeting was long, it helped us make a clear decision.",
-  },
-  {
-    id: "b2-despite",
-    level: "B2",
-    question: "Выбери правильный вариант: ___ the bad weather, they arrived on time.",
-    options: ["Despite", "Although", "However", "Therefore"],
-    answer: "Despite",
-  },
-  {
-    id: "c1-nuance",
-    level: "C1",
-    question: "Какой вариант лучше передаёт смысл: She barely noticed the noise.",
-    options: ["Она почти не заметила шум.", "Она громко услышала шум.", "Она специально создала шум.", "Она часто слушала шум."],
-    answer: "Она почти не заметила шум.",
-  },
-  {
-    id: "c1-inversion",
-    level: "C1",
-    question: "Выбери естественный вариант с инверсией.",
-    options: ["Only then did I understand the mistake.", "Only then I did understand the mistake.", "Only then understood I the mistake.", "Only then I understood did the mistake."],
-    answer: "Only then did I understand the mistake.",
-  },
-];
-
-function TrainingPage({
-  t,
-  savedWords,
-  completedLessons,
-  onSaveTestScore,
-}: {
-  t: Copy;
-  savedWords: string[];
-  completedLessons: string[];
-  onSaveTestScore: (score: number, total: number, type: string) => void;
-}) {
-  const allWords = useMemo(() => getVocabularyDatabase(), []);
-  const savedVocabulary = allWords.filter((word) => savedWords.includes(word.word));
-  const completedVocabulary = useMemo(
-    () => {
-      const words = completedLessons.reduce<VocabularyEntry[]>((items, storyId) => {
-        getVocabularyByStory(storyId).forEach((word) => items.push(word));
-        return items;
-      }, []);
-
-      return Array.from(new Map(words.map((word) => [word.word, word])).values());
-    },
-    [completedLessons],
-  );
-  const [questions, setQuestions] = useState<TrainingQuestion[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<TrainingCategory | null>(null);
-  const [selectedLevel, setSelectedLevel] = useState<Level | null>(null);
-  const [trainingStarted, setTrainingStarted] = useState(false);
-  const [levelTestOpen, setLevelTestOpen] = useState(false);
-  const [userEnglishLevel, setUserEnglishLevel] = useState<EnglishLevel | null>(() => readUserEnglishLevel());
-  const [placementSession, setPlacementSession] = useState<PlacementSessionQuestion[]>(() => buildPlacementSession());
-  const [placementIndex, setPlacementIndex] = useState(0);
-  const [placementScore, setPlacementScore] = useState(0);
-  const [placementResult, setPlacementResult] = useState<EnglishLevel | null>(null);
-  const [questionIndex, setQuestionIndex] = useState(0);
-  const [score, setScore] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
-  const [answered, setAnswered] = useState(false);
-  const [finished, setFinished] = useState(false);
-  const [selectedLeft, setSelectedLeft] = useState<string | null>(null);
-  const [matchedPairs, setMatchedPairs] = useState<Record<string, string>>({});
-  const [builtWords, setBuiltWords] = useState<string[]>([]);
-  const [missedQuestions, setMissedQuestions] = useState<TrainingQuestion[]>([]);
-  const speech = useVocabularySpeech();
-
-  const currentQuestion = questions[questionIndex];
-  const currentPlacementQuestion = placementSession[placementIndex] ?? placementSession[0];
-  const trainingPool = uniqueVocabularyEntries([...savedVocabulary, ...completedVocabulary, ...allWords]);
-  const progressValue = questions.length ? Math.round(((questionIndex + (finished ? 1 : 0)) / questions.length) * 100) : 0;
-  const trainingCategories: TrainingCategory[] = [
-    { id: "audio", title: t.audioCategory, description: t.audioCategoryDescription, label: t.audioTrainingLabel, sessionName: t.audioTrainingName },
-    { id: "words", title: t.wordsCategory, description: t.wordsCategoryDescription, label: t.wordsTrainingLabel, sessionName: t.wordsTrainingName },
-    { id: "grammar", title: t.grammarCategory, description: t.grammarCategoryDescription, label: t.grammarTrainingLabel, sessionName: t.grammarTrainingName },
-  ];
-
-  const defaultTrainingCount = 5;
-
-  function chooseTrainingCategory(category: TrainingCategory) {
-    startTraining(trainingLevelForUser(userEnglishLevel), category);
-  }
-
-  function startTraining(level: Level, category = selectedCategory ?? trainingCategories[1]) {
-    setSelectedLevel(level);
-    setSelectedCategory(category);
-    setTrainingStarted(true);
-    try {
-      setQuestions(buildTrainingSession(trainingPool, allWords, defaultTrainingCount, category.id, level));
-    } catch (error) {
-      console.error("Training session could not be generated", error);
-      setQuestions([]);
-    }
-    setQuestionIndex(0);
-    setScore(0);
-    setSelectedAnswer(null);
-    setAnswered(false);
-    setFinished(false);
-    setSelectedLeft(null);
-    setMatchedPairs({});
-    setBuiltWords([]);
-    setMissedQuestions([]);
-  }
-
-  function openPlacementTest() {
-    setLevelTestOpen(true);
-    setPlacementSession(buildPlacementSession());
-    setPlacementIndex(0);
-    setPlacementScore(0);
-    setPlacementResult(null);
-    setQuestions([]);
-    setSelectedCategory(null);
-    setTrainingStarted(false);
-    setFinished(false);
-    resetQuestionState();
-  }
-
-  function answerPlacementQuestion(answer: string) {
-    const isCorrect = currentPlacementQuestion?.answer === answer;
-    const nextScore = placementScore + (isCorrect ? 1 : 0);
-
-    if (placementIndex >= placementSession.length - 1) {
-      const result = placementLevelFromScore(nextScore);
-      setPlacementScore(nextScore);
-      setPlacementResult(result);
-      setUserEnglishLevel(result);
-      saveUserEnglishLevel(result);
-      return;
-    }
-
-    setPlacementScore(nextScore);
-    setPlacementIndex((current) => current + 1);
-  }
-
-  function closePlacementTest() {
-    setLevelTestOpen(false);
-    setPlacementIndex(0);
-    setPlacementScore(0);
-    setPlacementResult(null);
-  }
-
-  function resetQuestionState() {
-    setSelectedAnswer(null);
-    setAnswered(false);
-    setSelectedLeft(null);
-    setMatchedPairs({});
-    setBuiltWords([]);
-  }
-
-  function markAnswer(isCorrect: boolean) {
-    if (answered) return;
-    setAnswered(true);
-    if (isCorrect) setScore((current) => current + 1);
-  }
-
-  function trackMissedQuestion(question: TrainingQuestion) {
-    setMissedQuestions((current) => {
-      if (current.some((item) => item.id === question.id)) return current;
-      return [...current, question];
-    });
-  }
-
-  function nextTrainingQuestion() {
-    if (questionIndex >= questions.length - 1) {
-      setFinished(true);
-      onSaveTestScore(score, questions.length, "training");
-      return;
-    }
-
-    setQuestionIndex((current) => current + 1);
-    resetQuestionState();
-  }
-
-  function returnToTraining() {
-    setQuestions([]);
-    setSelectedCategory(null);
-    setSelectedLevel(null);
-    setLevelTestOpen(false);
-    setPlacementIndex(0);
-    setPlacementScore(0);
-    setPlacementResult(null);
-    setTrainingStarted(false);
-    setQuestionIndex(0);
-    setFinished(false);
-    setMissedQuestions([]);
-    resetQuestionState();
-  }
-
-  function repeatMistakes() {
-    if (!missedQuestions.length) return;
-    setQuestions(missedQuestions);
-    setTrainingStarted(true);
-    setQuestionIndex(0);
-    setScore(0);
-    setFinished(false);
-    setMissedQuestions([]);
-    resetQuestionState();
-  }
-
-  function startAnotherTraining() {
-    startTraining(trainingLevelForUser(userEnglishLevel), selectedCategory ?? trainingCategories[1]);
-  }
-
-  function chooseMatchRight(translation: string) {
-    if (!selectedLeft || currentQuestion?.type !== "match" || matchedPairs[selectedLeft]) return;
-    const selectedWord = currentQuestion.words.find((word) => word.word === selectedLeft);
-    if (!selectedWord) return;
-
-    const isCorrectMatch = selectedWord.translation === translation;
-    if (!isCorrectMatch) trackMissedQuestion(currentQuestion);
-    const nextMatched = isCorrectMatch ? { ...matchedPairs, [selectedLeft]: translation } : matchedPairs;
-    setMatchedPairs(nextMatched);
-    setSelectedLeft(null);
-
-    if (Object.keys(nextMatched).length === currentQuestion.words.length) {
-      markAnswer(true);
-    }
-  }
-
-  function chooseTrainingAnswer(answer: string) {
-    if (!currentQuestion || currentQuestion.type === "match" || answered) return;
-    setSelectedAnswer(answer);
-    const isCorrect = answer === currentQuestion.answer;
-    if (!isCorrect) trackMissedQuestion(currentQuestion);
-    markAnswer(isCorrect);
-  }
-
-  function addBuildWord(word: string) {
-    if (!currentQuestion || (currentQuestion.type !== "buildSentence" && currentQuestion.type !== "wordOrder") || answered) return;
-    setBuiltWords((current) => [...current, word]);
-  }
-
-  function checkBuiltSentence() {
-    if (!currentQuestion || (currentQuestion.type !== "buildSentence" && currentQuestion.type !== "wordOrder")) return;
-    setSelectedAnswer(builtWords.join(" "));
-    const isCorrect = builtWords.join(" ") === currentQuestion.answer;
-    if (!isCorrect) trackMissedQuestion(currentQuestion);
-    markAnswer(isCorrect);
-  }
-
-  return (
-    <main className="page-stack training-page">
-      <PageTitle label={`🎯 ${t.training}`} title={t.trainingPrompt} text={t.practiceVocabulary} />
-
-      {!levelTestOpen && !trainingStarted && !questions.length && !finished ? (
-        <>
-          <section className="content-card training-level-card">
-            <div>
-              <span className="eyebrow">{t.level}</span>
-              <h2>{userEnglishLevel ? `${t.userLevelTitle}: ${userEnglishLevel}` : t.userLevelUnknown}</h2>
-              <p>{userEnglishLevel ? t.levelCardSavedDescription : t.levelCardDescription}</p>
-            </div>
-            <button className="training-primary-button" type="button" onClick={openPlacementTest}>
-              {userEnglishLevel ? t.retakeLevelTest : t.defineLevel}
-            </button>
-          </section>
-          <section className="content-card training-start-card">
-            <div className="training-start-copy">
-              <span className="training-orb">🎯</span>
-              <div>
-                <span className="eyebrow">{t.training}</span>
-                <h2>{t.trainingPrompt}</h2>
-                <p>{savedVocabulary.length ? t.trainMyWords : t.noSavedWords}</p>
-              </div>
-            </div>
-            <div className="training-stats-grid">
-              <MetricCard icon={<BookOpen />} label={t.totalVocabulary} value={allWords.length.toString()} />
-              <MetricCard icon={<Star />} label={t.savedWordsCount} value={savedVocabulary.length.toString()} />
-            </div>
-            <div className="training-category-grid">
-              {trainingCategories.map((category) => (
-                <button
-                  key={category.id}
-                  className="training-category-card"
-                  type="button"
-                  onClick={() => chooseTrainingCategory(category)}
-                >
-                  <strong>{category.title}</strong>
-                  <small>{category.description}</small>
-                </button>
-              ))}
-            </div>
-          </section>
-        </>
-      ) : null}
-
-      {levelTestOpen ? (
-        <section className="content-card training-level-test-card">
-          {placementResult ? (
-            <>
-              <span className="celebration-mark">🎓</span>
-              <h2>{`${t.userLevelTitle}: ${placementResult}`}</h2>
-              <p>{levelResultDescription(placementResult, t)}</p>
-              <div className="level-test-actions">
-                <button className="training-primary-button full" type="button" onClick={closePlacementTest}>{t.startTrainingAfterTest}</button>
-                <button className="ghost-action" type="button" onClick={returnToTraining}>{t.backToTrainings}</button>
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="training-selection-header">
-                <span className="eyebrow">{`${t.questionProgress} ${placementIndex + 1} ${t.of} ${placementSession.length}`}</span>
-                <h2>{t.levelTestTitle}</h2>
-              </div>
-              <ProgressBar value={Math.round(((placementIndex + 1) / placementSession.length) * 100)} label={`${t.questionProgress} ${placementIndex + 1}/${placementSession.length}`} />
-              <div className="level-test-question">
-                <h3>{currentPlacementQuestion.question}</h3>
-                <div className="choice-list">
-                  {currentPlacementQuestion.options.map((option) => (
-                    <button className="choice-button" type="button" key={option} onClick={() => answerPlacementQuestion(option)}>
-                      {option}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <button className="ghost-action" type="button" onClick={returnToTraining}>{t.backToTrainings}</button>
-            </>
-          )}
-        </section>
-      ) : null}
-
-      {trainingStarted && !questions.length && !finished ? (
-        <section className="content-card training-complete-card">
-          <span className="celebration-mark">🎯</span>
-          <h2>{selectedLevel ? t.noTrainingLevelTasks : t.noTrainingTasks}</h2>
-          <button className="ghost-action" type="button" onClick={returnToTraining}>{t.backToTrainings}</button>
-        </section>
-      ) : null}
-
-      {currentQuestion && !finished ? (
-        <section className="content-card training-card">
-          <ProgressBar value={progressValue} label={`${selectedCategory?.sessionName ?? t.wordsTrainingName} · ${selectedLevel ?? "A1"} · ${questionIndex + 1}/${questions.length}`} />
-          <TrainingQuestionView
-            question={currentQuestion}
-            t={t}
-            categoryLabel={selectedCategory?.label ?? t.wordsTrainingLabel}
-            speech={speech.toggle}
-            selectedAnswer={selectedAnswer}
-            answered={answered}
-            selectedLeft={selectedLeft}
-            matchedPairs={matchedPairs}
-            builtWords={builtWords}
-            onSelectLeft={setSelectedLeft}
-            onSelectRight={chooseMatchRight}
-            onChooseAnswer={chooseTrainingAnswer}
-            onBuildWord={addBuildWord}
-            onRemoveBuildWord={(index) => setBuiltWords((current) => current.filter((_, currentIndex) => currentIndex !== index))}
-            onCheckBuiltSentence={checkBuiltSentence}
-          />
-          {answered ? (
-            <div className={isCurrentTrainingAnswerCorrect(currentQuestion, selectedAnswer, matchedPairs) ? "feedback correct" : "feedback wrong"}>
-              {currentQuestion.type === "buildSentence" || currentQuestion.type === "wordOrder" ? (
-                <>
-                  <span>
-                    <strong>{t.correctAnswer}:</strong> {trainingAnswerText(currentQuestion)}
-                  </span>
-                  {currentQuestion.type === "buildSentence" ? (
-                    <span className="feedback-translation">
-                      <strong>{t.sentenceTranslation}:</strong> {currentQuestion.prompt}
-                    </span>
-                  ) : null}
-                </>
-              ) : isCurrentTrainingAnswerCorrect(currentQuestion, selectedAnswer, matchedPairs) ? (
-                t.correct
-              ) : (
-                `${t.answer}: ${trainingAnswerText(currentQuestion)}`
-              )}
-            </div>
-          ) : null}
-          <button className="training-primary-button full" type="button" disabled={!answered} onClick={nextTrainingQuestion}>
-            {questionIndex >= questions.length - 1 ? t.finishTraining : t.nextQuestion}
-          </button>
-        </section>
-      ) : null}
-
-      {finished ? (
-        <section className="content-card training-complete-card">
-          <span className="celebration-mark">🎉</span>
-          <h2>{t.trainingDoneTitle}</h2>
-          <div className="reward-grid training-completion-stats">
-            <div>
-              <span>{t.correctStat}</span>
-              <strong>{score}/{questions.length}</strong>
-            </div>
-            <div>
-              <span>{t.userLevelStat}</span>
-              <strong>{selectedLevel ?? userEnglishLevel ?? "A1"}</strong>
-            </div>
-            <div>
-              <span>{t.trainingTypeStat}</span>
-              <strong>{trainingCategoryPlainName(selectedCategory?.id ?? "words", t)}</strong>
-            </div>
-            <div>
-              <span>{t.xpEarned}</span>
-              <strong>+{score * 3} XP</strong>
-            </div>
-          </div>
-          {missedQuestions.length ? (
-            <div className="mistake-review-block">
-              <h3>{t.mistakesToReview}</h3>
-              <ul className="mistake-review-list">
-                {missedQuestions.slice(0, 3).map((question) => (
-                  <li key={question.id}>
-                    <span>{mistakePromptText(question)}</span>
-                    <strong>{mistakeAnswerText(question)}</strong>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ) : (
-            <p className="training-no-mistakes">{t.noMistakes}</p>
-          )}
-          <div className="training-completion-actions">
-            {missedQuestions.length ? (
-              <button className="training-primary-button full" type="button" onClick={repeatMistakes}>{t.repeatMistakes}</button>
-            ) : null}
-            <button className="training-primary-button full" type="button" onClick={startAnotherTraining}>{t.moreTraining}</button>
-            <button className="ghost-action" type="button" onClick={returnToTraining}>{t.toTrainings}</button>
-          </div>
-        </section>
-      ) : null}
-    </main>
-  );
-}
-
-function TrainingQuestionView({
-  question,
-  t,
-  categoryLabel,
-  speech,
-  selectedAnswer,
-  answered,
-  selectedLeft,
-  matchedPairs,
-  builtWords,
-  onSelectLeft,
-  onSelectRight,
-  onChooseAnswer,
-  onBuildWord,
-  onRemoveBuildWord,
-  onCheckBuiltSentence,
-}: {
-  question: TrainingQuestion;
-  t: Copy;
-  categoryLabel: string;
-  speech: (text: string) => void;
-  selectedAnswer: string | null;
-  answered: boolean;
-  selectedLeft: string | null;
-  matchedPairs: Record<string, string>;
-  builtWords: string[];
-  onSelectLeft: (word: string | null) => void;
-  onSelectRight: (translation: string) => void;
-  onChooseAnswer: (answer: string) => void;
-  onBuildWord: (word: string) => void;
-  onRemoveBuildWord: (index: number) => void;
-  onCheckBuiltSentence: () => void;
-}) {
-  if (question.type === "match") {
-    return (
-      <div className="training-question-stack" data-training-type="match">
-        <span className="eyebrow">{categoryLabel}</span>
-        <h2>{t.matchPairs}</h2>
-        <div className="match-grid">
-          <div className="match-column">
-            {question.words.map((word) => (
-              <button
-                key={word.word}
-                className={selectedLeft === word.word ? "match-button selected" : matchedPairs[word.word] ? "match-button matched" : "match-button"}
-                type="button"
-                disabled={Boolean(matchedPairs[word.word])}
-                onClick={() => onSelectLeft(word.word)}
-              >
-                {word.word}
-              </button>
-            ))}
-          </div>
-          <div className="match-column">
-            {question.translations.map((translation) => (
-              <button
-                key={translation}
-                className={Object.values(matchedPairs).includes(translation) ? "match-button matched" : "match-button"}
-                type="button"
-                disabled={Object.values(matchedPairs).includes(translation)}
-                onClick={() => onSelectRight(translation)}
-              >
-                {translation}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (question.type === "buildSentence" || question.type === "wordOrder") {
-    return (
-      <div className="training-question-stack" data-training-type="build">
-        <span className="eyebrow">{categoryLabel}</span>
-        <h2>{question.type === "buildSentence" ? t.buildSentence : t.wordOrder}</h2>
-        <p className="sentence-translation-prompt">{question.type === "buildSentence" ? question.prompt : t.wordOrder}</p>
-        <div className="sentence-build-zone">
-          {builtWords.length ? (
-            builtWords.map((word, index) => (
-              <button key={`${word}-${index}`} className="word-chip" type="button" disabled={answered} onClick={() => onRemoveBuildWord(index)}>
-                {word}
-              </button>
-            ))
-          ) : (
-            <span>{question.type === "buildSentence" ? t.buildSentence : t.wordOrder}</span>
-          )}
-        </div>
-        <div className="build-word-grid">
-          {question.options.map((word, index) => (
-            <button
-              key={`${word}-${index}`}
-              className="choice-button"
-              type="button"
-              disabled={answered || builtWords.filter((item) => item === word).length >= question.options.filter((item) => item === word).length}
-              onClick={() => onBuildWord(word)}
-            >
-              {word}
-            </button>
-          ))}
-        </div>
-        <button className="ghost-action" type="button" disabled={answered || builtWords.length !== question.options.length} onClick={onCheckBuiltSentence}>
-          {t.check}
-        </button>
-      </div>
-    );
-  }
-
-  const title = question.type === "translation"
-    ? t.chooseTranslation
-    : question.type === "english"
-      ? t.chooseEnglish
-      : question.type === "audioEnglish"
-        ? t.audioChooseWord
-        : question.type === "audioTranslation"
-          ? t.audioChooseTranslation
-          : t.audioChooseSentenceTranslation;
-  const isAudioQuestion = question.type === "audioEnglish" || question.type === "audioTranslation" || question.type === "audioSentenceTranslation";
-  const audioText = question.type === "audioSentenceTranslation" ? question.targetSentence ?? question.prompt : question.word.word;
-
-  return (
-    <div className="training-question-stack" data-training-type={question.type}>
-      <span className="eyebrow">{categoryLabel}</span>
-      <h2>{isAudioQuestion ? title : question.prompt}</h2>
-      {isAudioQuestion ? (
-        <button className="audio-prompt-button" type="button" onClick={() => speech(audioText)}>
-          <Volume2 size={26} aria-hidden="true" />
-        </button>
-      ) : null}
-      <div className="choice-list">
-        {question.options.map((option) => (
-          <button
-            key={option}
-            className={selectedAnswer === option ? "choice-button selected" : "choice-button"}
-            type="button"
-            disabled={answered}
-            onClick={() => onChooseAnswer(option)}
-          >
-            {option}
-          </button>
-        ))}
+    <div className={compact ? "logo compact" : "logo"}>
+      <span>SL</span>
+      <div>
+        <strong>StoryLingo</strong>
+        {!compact ? <small>English reading library</small> : null}
       </div>
     </div>
   );
 }
 
-function trainingCategoryPlainName(category: TrainingCategory["id"], t: Copy) {
-  if (category === "audio") return t.audioTrainingPlain;
-  if (category === "grammar") return t.grammarTrainingPlain;
-  return t.wordsTrainingPlain;
-}
-
-function mistakePromptText(question: TrainingQuestion) {
-  if (question.type === "match") return question.words.map((word) => word.word).join(", ");
-  if (question.type === "buildSentence" || question.type === "wordOrder") return question.targetSentence ?? question.answer;
-  if (question.type === "audioSentenceTranslation") return question.targetSentence ?? question.prompt;
-  if (question.type === "english" || question.type === "audioEnglish") return question.word.translation;
-  return question.word.word;
-}
-
-function mistakeAnswerText(question: TrainingQuestion) {
-  if (question.type === "match") return trainingAnswerText(question);
-  if (question.type === "buildSentence" || question.type === "wordOrder") return question.targetSentence ?? question.answer;
-  return question.answer;
-}
-
-function readUserEnglishLevel(): EnglishLevel | null {
-  try {
-    const saved = window.localStorage.getItem(USER_ENGLISH_LEVEL_KEY);
-    return isEnglishLevel(saved) ? saved : null;
-  } catch {
-    return null;
-  }
-}
-
-function saveUserEnglishLevel(level: EnglishLevel) {
-  try {
-    window.localStorage.setItem(USER_ENGLISH_LEVEL_KEY, level);
-  } catch {
-    // The app should keep working in browsers that restrict localStorage.
-  }
-}
-
-function isEnglishLevel(value: unknown): value is EnglishLevel {
-  return value === "A1" || value === "A2" || value === "B1" || value === "B2" || value === "C1";
-}
-
-function buildPlacementSession(): PlacementSessionQuestion[] {
-  for (let attempt = 0; attempt < 12; attempt += 1) {
-    const session = shuffleWithRepeats(selectPlacementQuestions()).map((question) => ({
-      ...question,
-      options: shuffleWithRepeats(question.options),
-    }));
-
-    if (!isPlacementOrderLinear(session)) return session;
-  }
-
-  return mixedPlacementFallback().map((question) => ({
-    ...question,
-    options: shuffleWithRepeats(question.options),
-  }));
-}
-
-function isPlacementOrderLinear(session: PlacementSessionQuestion[]) {
-  const rank: Record<EnglishLevel, number> = { A1: 1, A2: 2, B1: 3, B2: 4, C1: 5 };
-  return session.every((question, index) => index === 0 || rank[session[index - 1].level] <= rank[question.level]);
-}
-
-function mixedPlacementFallback() {
-  const byLevel = new Map<EnglishLevel, PlacementQuestion[]>();
-  placementQuestions.forEach((question) => {
-    byLevel.set(question.level, [...(byLevel.get(question.level) ?? []), question]);
-  });
-
-  byLevel.forEach((questions, level) => {
-    byLevel.set(level, shuffleWithRepeats(questions));
-  });
-
-  const levelPattern: EnglishLevel[] = ["A1", "B2", "A2", "C1", "B1", "A1", "C1", "A2", "B1", "B2"];
-  return levelPattern.map((level) => byLevel.get(level)?.shift()).filter((question): question is PlacementQuestion => Boolean(question));
-}
-
-function selectPlacementQuestions() {
-  const byLevel = new Map<EnglishLevel, PlacementQuestion[]>();
-  placementQuestions.forEach((question) => {
-    byLevel.set(question.level, [...(byLevel.get(question.level) ?? []), question]);
-  });
-
-  const levels: EnglishLevel[] = ["A1", "A2", "B1", "B2", "C1"];
-  return levels.flatMap((level) => shuffleWithRepeats(byLevel.get(level) ?? []).slice(0, 2));
-}
-
-function placementLevelFromScore(score: number): EnglishLevel {
-  if (score <= 2) return "A1";
-  if (score <= 5) return "A2";
-  if (score <= 7) return "B1";
-  if (score <= 9) return "B2";
-  return "C1";
-}
-
-function trainingLevelForUser(level: EnglishLevel | null): Level {
-  return level ?? "A1";
-}
-
-function levelResultDescription(level: EnglishLevel, t: Copy) {
-  if (level === "A1") return t.levelResultA1;
-  if (level === "A2") return t.levelResultA2;
-  if (level === "B1") return t.levelResultB1;
-  if (level === "B2") return t.levelResultB2;
-  return t.levelResultC1;
-}
-
-function uniqueVocabularyEntries(words: VocabularyEntry[]) {
-  return Array.from(new Map(words.map((word) => [word.word, word])).values());
-}
-
-function buildTrainingSession(
-  preferredWords: VocabularyEntry[],
-  allWords: VocabularyEntry[],
-  questionCount: number,
-  category: TrainingCategory["id"] = "words",
-  level?: Level,
-) {
-  const fullWordPool = uniqueVocabularyEntries([...allWords, ...curatedTrainingVocabulary]);
-  const effectiveLevel = trainingContentLevel(category, level);
-  const fallbackLevels = availableTrainingWordLevels(fullWordPool, category, effectiveLevel);
-  const preferredPool = uniqueVocabularyEntries(preferredWords.length ? [...preferredWords, ...curatedTrainingVocabulary] : fullWordPool);
-  const preferredLevelPool = fallbackLevels.length ? preferredPool.filter((word) => fallbackLevels.includes(word.level)) : preferredPool;
-  const allLevelWords = fallbackLevels.length ? fullWordPool.filter((word) => fallbackLevels.includes(word.level)) : fullWordPool;
-  const targetWords = uniqueVocabularyEntries([...preferredLevelPool, ...allLevelWords]);
-  const pool = shuffleArray(targetWords.length ? targetWords : preferredPool);
-  const optionWords = uniqueVocabularyEntries([...(allLevelWords.length ? allLevelWords : []), ...fullWordPool]);
-  if (!pool.length) return [];
-
-  const sessionWords = Array.from({ length: questionCount }, (_, index) => pool[index % pool.length]);
-  const baseTypes = trainingTypesForCategory(category);
-  if (!baseTypes.length) return [];
-
-  const types = shuffleWithRepeats(Array.from({ length: questionCount }, (_, index) => baseTypes[index % baseTypes.length]));
-
-  return sessionWords.map((word, index) => createTrainingQuestion(types[index], word, optionWords, index, effectiveLevel));
-}
-
-function trainingContentLevel(category: TrainingCategory["id"], level: Level = "A1") {
-  if (category === "audio" && (level === "B2" || level === "C1")) return "B1";
-  return level;
-}
-
-function trainingLevelFallbacks(category: TrainingCategory["id"], level?: Level): Level[] {
-  if (!level) return [];
-  if (category === "audio") return [level];
-  if (level === "C1") return ["C1", "B2", "B1"];
-  if (level === "B2") return ["B2", "B1"];
-  return [level];
-}
-
-function availableTrainingWordLevels(words: VocabularyEntry[], category: TrainingCategory["id"], level?: Level): Level[] {
-  const fallbackLevels = trainingLevelFallbacks(category, level);
-  const firstAvailableLevel = fallbackLevels.find((fallbackLevel) => words.some((word) => word.level === fallbackLevel));
-  return firstAvailableLevel ? [firstAvailableLevel] : fallbackLevels;
-}
-
-function trainingTypesForCategory(category: TrainingCategory["id"]): TrainingQuestion["type"][] {
-  if (category === "audio") {
-    return ["audioEnglish", "audioTranslation", "audioSentenceTranslation"];
-  }
-
-  if (category === "grammar") {
-    return ["buildSentence", "wordOrder"];
-  }
-
-  return ["translation", "english", "match"];
-}
-
-function createTrainingQuestion(type: TrainingQuestion["type"], word: VocabularyEntry, allWords: VocabularyEntry[], index: number, level?: Level): TrainingQuestion {
-  if (type === "match") {
-    const words = shuffleArray([word, ...shuffleArray(allWords.filter((item) => item.word !== word.word)).slice(0, 2)]);
-    return { id: `match-${index}`, type: "match", words, translations: derangedTranslations(words) };
-  }
-
-  if (type === "translation") {
-    return {
-      id: `translation-${index}`,
-      type,
-      word,
-      prompt: word.word,
-      answer: word.translation,
-      options: answerOptions(word.translation, allWords.filter((item) => item.word !== word.word).map((item) => item.translation)),
-    };
-  }
-
-  if (type === "english" || type === "audioEnglish") {
-    return {
-      id: `${type}-${index}`,
-      type,
-      word,
-      prompt: word.translation,
-      answer: word.word,
-      options: answerOptions(word.word, allWords.filter((item) => item.word !== word.word).map((item) => item.word)),
-    };
-  }
-
-  if (type === "audioTranslation") {
-    return {
-      id: `audio-translation-${index}`,
-      type,
-      word,
-      prompt: word.word,
-      answer: word.translation,
-      options: answerOptions(word.translation, allWords.filter((item) => item.word !== word.word).map((item) => item.translation)),
-    };
-  }
-
-  if (type === "audioSentenceTranslation") {
-    const sentence = grammarSentenceForIndex(index, level);
-    const sentenceOptions = answerOptions(
-      sentence.ru,
-      trainingGrammarSentences.filter((item) => item.en !== sentence.en).map((item) => item.ru),
-    );
-
-    return {
-      id: `audio-sentence-${index}`,
-      type,
-      word,
-      prompt: sentence.en,
-      answer: sentence.ru,
-      options: sentenceOptions,
-      targetSentence: sentence.en,
-    };
-  }
-
-  if (type === "buildSentence") {
-    const sentence = grammarSentenceForIndex(index, level);
-    const sentenceWords = wordsForSentenceBuild(sentence.en);
-
-    return {
-      id: `grammar-build-${index}`,
-      type,
-      word,
-      prompt: sentence.ru,
-      answer: sentenceWords.join(" "),
-      options: shuffleWithRepeats(sentenceWords),
-      targetSentence: sentence.en,
-    };
-  }
-
-  if (type === "wordOrder") {
-    const sentence = grammarSentenceForIndex(index, level);
-    const sentenceWords = wordsForSentenceBuild(sentence.en);
-
-    return {
-      id: `grammar-order-${index}`,
-      type,
-      word,
-      prompt: "Собери английское предложение в правильном порядке.",
-      answer: sentenceWords.join(" "),
-      options: shuffleWithRepeats(sentenceWords),
-      targetSentence: sentence.en,
-    };
-  }
-
-  throw new Error(`Unsupported training question type: ${type}`);
-}
-
-function grammarSentenceForIndex(index: number, level: Level = "A1") {
-  const levels = trainingLevelFallbacks("grammar", level);
-  const firstAvailableLevel = levels.find((fallbackLevel) => trainingGrammarSentences.some((sentence) => sentence.level === fallbackLevel));
-  const sentencesForLevel = trainingGrammarSentences.filter((sentence) => sentence.level === firstAvailableLevel);
-  const source = sentencesForLevel.length ? sentencesForLevel : trainingGrammarSentences;
-  return source[index % source.length];
-}
-
-function wordsForSentenceBuild(sentence: string) {
-  return sentence.replace(/[.!?]+$/g, "").split(/\s+/);
-}
-
-function trainingAnswerText(question: TrainingQuestion) {
-  if (question.type === "match") return question.words.map((word) => `${word.word} ↔ ${word.translation}`).join(", ");
-  if (question.type === "buildSentence" || question.type === "wordOrder") return question.targetSentence;
-  return question.answer;
-}
-
-function isCurrentTrainingAnswerCorrect(question: TrainingQuestion, selectedAnswer: string | null, matchedPairs: Record<string, string>) {
-  if (question.type === "match") return question.words.every((word) => matchedPairs[word.word] === word.translation);
-  return selectedAnswer === question.answer;
-}
-
-function StatisticsPage({
-  t,
+function HomePage({
+  onNavigate,
+  onOpenBook,
   progress,
-  currentLevel,
-  totalProgress,
 }: {
-  t: Copy;
-  progress: ReturnType<typeof useLearnerProgress>["progress"];
-  currentLevel: string;
-  totalProgress: number;
+  onNavigate: (page: Page) => void;
+  onOpenBook: (bookId: string) => void;
+  progress: Record<string, number>;
 }) {
   return (
-    <main className="page-stack">
-      <PageTitle label={t.stats} title={t.progress} text={t.welcomeText} />
-      <div className="dashboard-grid">
-        <MetricCard icon={<Sparkles />} label={t.totalXp} value={progress.xp.toString()} />
-        <MetricCard icon={<Flame />} label={t.streak} value={`${progress.streak}`} />
-        <MetricCard icon={<Trophy />} label={t.level} value={currentLevel} />
-        <MetricCard icon={<CheckCircle2 />} label={t.completedLessons} value={`${progress.completedLessons.length}/${stories.length}`} />
-      </div>
-      <section className="content-card">
-        <div className="section-header">
-          <div>
-            <span className="eyebrow">{t.progress}</span>
-            <h2>{totalProgress}%</h2>
+    <main className="book-home">
+      <section className="book-hero">
+        <div className="book-hero-copy">
+          <span className="eyebrow">StoryLingo Library</span>
+          <h1>Читайте книги<br />на английском<br />с удовольствием</h1>
+          <p>Истории, которые вы полюбите.<br />Английский, который вы понимаете.</p>
+          <div className="hero-actions">
+            <button className="primary-button" type="button" onClick={() => onNavigate("library")}>Книги</button>
+            <button className="secondary-button" type="button" onClick={() => onNavigate("library")}>Рассказы</button>
           </div>
         </div>
-        <ProgressBar value={totalProgress} />
+        <ReadingScene />
+      </section>
+
+      <BookSection title="Продолжить чтение" className="continue-grid">
+        {continueBooks.map((book) => (
+          <ContinueBookCard key={book.id} book={book} progressValue={progress[book.id] ?? book.progress} onOpen={onOpenBook} />
+        ))}
+      </BookSection>
+
+      <BookSection title="Популярные рассказы" className="story-grid">
+        {popularStories.map((story) => (
+          <StoryCard key={story.id} story={story} onOpen={onOpenBook} />
+        ))}
+      </BookSection>
+    </main>
+  );
+}
+
+function LibraryPage({ onOpenBook, progress }: { onOpenBook: (bookId: string) => void; progress: Record<string, number> }) {
+  return (
+    <main className="page-stack">
+      <PageTitle title="Библиотека" text="Демо-полка книг и рассказов. Реальная библиотека появится позже." />
+      <BookSection title="Книги" className="continue-grid">
+        {continueBooks.map((book) => (
+          <ContinueBookCard key={book.id} book={book} progressValue={progress[book.id] ?? book.progress} onOpen={onOpenBook} />
+        ))}
+      </BookSection>
+      <BookSection title="Рассказы" className="story-grid">
+        {popularStories.map((story) => (
+          <StoryCard key={story.id} story={story} onOpen={onOpenBook} />
+        ))}
+      </BookSection>
+    </main>
+  );
+}
+
+function DictionaryPage() {
+  const [query, setQuery] = useState("");
+  const [practiceOpen, setPracticeOpen] = useState(false);
+  const speech = useSpeech();
+  const words = useMemo(() => getAllVocabulary(), []);
+  const visibleWords = words
+    .filter((word) => {
+      const value = query.trim().toLowerCase();
+      if (!value) return true;
+      return word.word.toLowerCase().includes(value) || word.translation.toLowerCase().includes(value);
+    })
+    .slice(0, 36);
+
+  return (
+    <main className="page-stack">
+      <PageTitle title="Словарь" text="Слова из текущей базы StoryLingo с переводом, транскрипцией и аудио." />
+      <section className="dictionary-toolbar">
+        <label className="search-field">
+          <Search size={18} aria-hidden="true" />
+          <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Найти слово или перевод" />
+        </label>
+        <button className="primary-button" type="button" onClick={() => setPracticeOpen((current) => !current)}>
+          Тренировать слова
+        </button>
+      </section>
+      {practiceOpen ? (
+        <section className="practice-placeholder">
+          <strong>Тренировка слов скоро</strong>
+          <p>Кнопка уже находится внутри словаря. Отдельный раздел тренировки удалён.</p>
+        </section>
+      ) : null}
+      <section className="word-grid">
+        {visibleWords.map((word) => (
+          <WordRow key={word.id} word={word} onSpeak={speech.toggle} />
+        ))}
       </section>
     </main>
   );
 }
 
-function SettingsPage({
-  t,
-  selectedLanguage,
-  onSelectLanguage,
+function ProfilePage({
+  language,
   progress,
-  currentLevel,
-  totalProgress,
-  onNavigate,
+  onSelectLanguage,
 }: {
-  t: Copy;
-  selectedLanguage: NativeLanguage;
+  language: NativeLanguage;
+  progress: Record<string, number>;
   onSelectLanguage: (language: NativeLanguage) => void;
-  progress: ReturnType<typeof useLearnerProgress>["progress"];
-  currentLevel: string;
-  totalProgress: number;
-  onNavigate: (page: Page) => void;
 }) {
-  const [openSection, setOpenSection] = useState<"stats" | "vocabulary" | null>(null);
-  const vocabulary = useMemo(() => getVocabularyDatabase(), []);
-  const completedLessonsLabel = `${progress.completedLessons.length}/${stories.length}`;
-  const savedWordsLabel = progress.savedWords.length.toString();
+  const startedCount = Object.values(progress).filter((value) => value > 0).length;
+  const averageProgress = startedCount
+    ? Math.round(Object.values(progress).reduce((total, value) => total + value, 0) / startedCount)
+    : 0;
 
   return (
     <main className="page-stack profile-page">
-      <section className="content-card compact-settings profile-language-card">
+      <PageTitle title="Профиль" text="Настройки чтения и локальный прогресс на этом устройстве." />
+      <section className="profile-panel">
         <div>
-          <span className="eyebrow">{t.profile}</span>
-          <h1>{t.languageSettings}</h1>
-          <p>{t.changeLanguage}</p>
+          <span className="eyebrow">Язык интерфейса</span>
+          <h2>{language === "Russian" ? "Русский" : "English"}</h2>
         </div>
-        <div className="language-grid settings-grid">
-          {languages.map((language) => (
-            <button key={language} className={selectedLanguage === language ? "active" : ""} type="button" onClick={() => onSelectLanguage(language)}>
-              <Languages size={20} aria-hidden="true" />
-              {language}
-            </button>
-          ))}
+        <div className="language-actions">
+          <button className={language === "Russian" ? "active" : ""} type="button" onClick={() => onSelectLanguage("Russian")}>Русский</button>
+          <button className={language === "English" ? "active" : ""} type="button" onClick={() => onSelectLanguage("English")}>English</button>
         </div>
       </section>
-
-      <section className="content-card profile-panel">
-        <button
-          className="profile-panel-toggle"
-          type="button"
-          aria-expanded={openSection === "stats"}
-          onClick={() => setOpenSection(openSection === "stats" ? null : "stats")}
-        >
-          <span>
-            <BarChart3 size={20} aria-hidden="true" />
-            {t.stats}
-          </span>
-          <strong>{openSection === "stats" ? "-" : "+"}</strong>
-        </button>
-        {openSection === "stats" ? (
-          <div className="profile-panel-body">
-            <div className="profile-metric-grid">
-              <MetricCard icon={<Sparkles />} label={t.totalXp} value={progress.xp.toString()} />
-              <MetricCard icon={<Flame />} label={t.streak} value={`${progress.streak}`} />
-              <MetricCard icon={<Trophy />} label={t.level} value={currentLevel} />
-              <MetricCard icon={<CheckCircle2 />} label={t.completedLessons} value={completedLessonsLabel} />
-            </div>
-            <div className="profile-progress-summary">
-              <div className="section-header">
-                <div>
-                  <span className="eyebrow">{t.progress}</span>
-                  <h2>{totalProgress}%</h2>
-                </div>
-              </div>
-              <ProgressBar value={totalProgress} />
-            </div>
-            <button className="secondary-button profile-link-button" type="button" onClick={() => onNavigate("stats")}>
-              {t.stats}
-            </button>
-          </div>
-        ) : null}
-      </section>
-
-      <section className="content-card profile-panel">
-        <button
-          className="profile-panel-toggle"
-          type="button"
-          aria-expanded={openSection === "vocabulary"}
-          onClick={() => setOpenSection(openSection === "vocabulary" ? null : "vocabulary")}
-        >
-          <span>
-            <BookOpen size={20} aria-hidden="true" />
-            {t.wordsPage}
-          </span>
-          <strong>{openSection === "vocabulary" ? "-" : "+"}</strong>
-        </button>
-        {openSection === "vocabulary" ? (
-          <div className="profile-panel-body">
-            <div className="profile-metric-grid">
-              <MetricCard icon={<Star />} label={t.myWords} value={savedWordsLabel} />
-              <MetricCard icon={<BookOpen />} label={t.allWords} value={vocabulary.length.toString()} />
-              <MetricCard icon={<CheckCircle2 />} label={t.savedWordsCount} value={savedWordsLabel} />
-            </div>
-            <button className="secondary-button profile-link-button" type="button" onClick={() => onNavigate("words")}>
-              {t.wordsPage}
-            </button>
-          </div>
-        ) : null}
+      <section className="profile-stats">
+        <Metric label="Начато книг" value={startedCount.toString()} />
+        <Metric label="Средний прогресс" value={`${averageProgress}%`} />
       </section>
     </main>
   );
 }
 
-function LessonPathCard({
-  t,
-  story,
-  index,
+function ReaderPreview({
+  book,
   progressValue,
-  completed,
-  unlocked,
-  onStartLesson,
+  onBack,
+  onProgress,
 }: {
-  t: Copy;
-  story: Story;
-  index: number;
+  book: DemoBook;
   progressValue: number;
-  completed: boolean;
-  unlocked: boolean;
-  onStartLesson: (storyId: string) => void;
+  onBack: () => void;
+  onProgress: (value: number) => void;
+}) {
+  const speech = useSpeech();
+  const nextProgress = Math.min(100, Math.max(progressValue, 0) + 12);
+
+  return (
+    <main className="reader-preview">
+      <button className="text-button" type="button" onClick={onBack}>← Назад в библиотеку</button>
+      <article className="reader-card">
+        <div className={`book-cover ${book.tone}`}><span>{book.title.split(" ")[0]}</span></div>
+        <div className="reader-copy">
+          <span className="eyebrow">{book.chapter}</span>
+          <h1>{book.title}</h1>
+          <p>{book.author}</p>
+          <div className="reader-progress">
+            <div><span style={{ width: `${progressValue}%` }} /></div>
+            <small>{progressValue}% прочитано</small>
+          </div>
+          <blockquote>{book.excerpt}</blockquote>
+          <button className="audio-link" type="button" onClick={() => speech.toggle(book.excerpt)}>
+            <Volume2 size={18} aria-hidden="true" />
+            Прослушать фрагмент
+          </button>
+          <button className="primary-button" type="button" onClick={() => onProgress(nextProgress)}>
+            Сохранить прогресс чтения
+          </button>
+        </div>
+      </article>
+    </main>
+  );
+}
+
+function ReadingScene() {
+  return (
+    <div className="reading-scene" aria-label="Уютная книжная композиция">
+      <div className="scene-glow" />
+      <div className="scene-book scene-book-main">Alice</div>
+      <div className="scene-book scene-book-side">Garden</div>
+      <div className="scene-cup" />
+      <div className="scene-candle" />
+      <div className="scene-blanket" />
+    </div>
+  );
+}
+
+function BookSection({ title, className, children }: { title: string; className: string; children: ReactNode }) {
+  return (
+    <section className="book-section">
+      <h2>{title}</h2>
+      <div className={className}>{children}</div>
+    </section>
+  );
+}
+
+function ContinueBookCard({
+  book,
+  progressValue,
+  onOpen,
+}: {
+  book: DemoBook;
+  progressValue: number;
+  onOpen: (bookId: string) => void;
 }) {
   return (
-    <article className={unlocked ? "path-card" : "path-card locked"}>
-      <div className="illustration-card lesson-card-illustration" style={{ backgroundColor: story.color }}>
-        <span>{story.illustration ?? sceneForStory(story.id)}</span>
+    <article className="continue-card">
+      <div className={`book-cover ${book.tone}`}><span>{book.title.split(" ")[0]}</span></div>
+      <div className="book-card-body">
+        <h3>{book.title}</h3>
+        <p>{book.author}</p>
+        <span>{book.chapter}</span>
+        <Progress value={progressValue} />
+        <small>{progressValue}% прочитано</small>
+        <button className="text-button" type="button" onClick={() => onOpen(book.id)}>Открыть демо</button>
       </div>
-      <div className="path-card-body">
-        <div className="lesson-meta">
-          <span>{story.level}</span>
-          <span>{story.vocabulary.length} {t.words}</span>
-          <span>{story.readingTime}</span>
-        </div>
-        <h3>{index + 1}. {story.title}</h3>
-        <p>{story.description}</p>
-        <ProgressBar value={completed ? 100 : progressValue} />
-      </div>
-      <button className="primary-button" type="button" disabled={!unlocked} onClick={() => onStartLesson(story.id)}>
-        {!unlocked ? <><LockKeyhole size={17} />{t.locked}</> : completed ? t.review : progressValue > 0 ? t.continueLearning : t.start}
-      </button>
     </article>
   );
 }
 
-function MetricCard({ icon, label, value }: { icon: ReactNode; label: string; value: string }) {
+function StoryCard({ story, onOpen }: { story: DemoBook; onOpen: (bookId: string) => void }) {
   return (
-    <article className="metric-card">
-      <span>{icon}</span>
+    <article className="story-card">
+      <div className={`story-cover ${story.tone}`}><BookOpen size={26} aria-hidden="true" /></div>
       <div>
-        <small>{label}</small>
-        <strong>{value}</strong>
+        <h3>{story.title}</h3>
+        <p>{story.author}</p>
+        <span>{story.readingTime}</span>
+        <button className="text-button" type="button" onClick={() => onOpen(story.id)}>Читать демо</button>
       </div>
     </article>
   );
 }
 
-function PageTitle({ label, title, text }: { label: string; title: string; text: string }) {
+function WordRow({ word, onSpeak }: { word: VocabularyEntry; onSpeak: (text: string) => void }) {
+  return (
+    <article className="word-row">
+      <button className="audio-button" type="button" aria-label={`Прослушать ${word.word}`} onClick={() => onSpeak(word.word)}>
+        <Volume2 size={16} aria-hidden="true" />
+      </button>
+      <div>
+        <h3>{word.word}</h3>
+        <span>{word.ipa}</span>
+        <p>{word.translation}</p>
+      </div>
+    </article>
+  );
+}
+
+function PageTitle({ title, text }: { title: string; text: string }) {
   return (
     <section className="page-title">
-      <span className="eyebrow">{label}</span>
+      <span className="eyebrow">StoryLingo</span>
       <h1>{title}</h1>
       <p>{text}</p>
     </section>
   );
 }
 
-function navItems(t: Copy): Array<{ page: Page; label: string; short: string; icon: ReactNode }> {
-  return [
-    { page: "home", label: t.home, short: t.home, icon: <Home size={20} /> },
-    { page: "learn", label: t.learn, short: t.learn, icon: <GraduationCap size={20} /> },
-    { page: "words", label: t.wordsPage, short: t.wordsPage, icon: <BookOpen size={20} /> },
-    { page: "training", label: t.training, short: t.training, icon: <Target size={20} /> },
-    { page: "stats", label: t.stats, short: t.stats, icon: <BarChart3 size={20} /> },
-    { page: "settings", label: t.settings, short: t.settings, icon: <Settings size={20} /> },
-  ];
+function Metric({ label, value }: { label: string; value: string }) {
+  return (
+    <article className="metric">
+      <span>{label}</span>
+      <strong>{value}</strong>
+    </article>
+  );
 }
 
-function translateLevel(level: string, language: NativeLanguage) {
-  if (language === "English") return level;
-  if (level.includes("B1")) return "B1 Исследователь";
-  if (level.includes("A2")) return "A2 Ученик";
-  return "A1 Старт";
+function Progress({ value }: { value: number }) {
+  return (
+    <div className="progress-track" aria-label={`${value}%`}>
+      <span style={{ width: `${Math.min(100, Math.max(0, value))}%` }} />
+    </div>
+  );
 }
 
-function sceneForStory(storyId: string) {
-  const scenes: Record<string, string> = {
-    "morning-routine": "🛏️",
-    "beach-day": "🏖️",
-    "my-first-trip": "🚉",
-    "lost-phone": "📱",
-    "new-job": "🏢",
-    "surprise-gift": "🎁",
-  };
+function useSpeech() {
+  const [speakingText, setSpeakingText] = useState<string | null>(null);
 
-  return scenes[storyId] ?? "📚";
+  function toggle(text: string) {
+    if (!("speechSynthesis" in window)) return;
+    const normalizedText = text.trim();
+    if (!normalizedText) return;
+
+    if (speakingText === normalizedText && window.speechSynthesis.speaking) {
+      window.speechSynthesis.cancel();
+      setSpeakingText(null);
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(normalizedText);
+    utterance.lang = "en-US";
+    utterance.rate = 0.88;
+    utterance.onend = () => setSpeakingText(null);
+    utterance.onerror = () => setSpeakingText(null);
+    setSpeakingText(normalizedText);
+    window.speechSynthesis.speak(utterance);
+  }
+
+  return { toggle };
 }
+
+const navItems: Array<{ page: Page; label: string; icon: ReactNode }> = [
+  { page: "home", label: "Главная", icon: <Home size={20} /> },
+  { page: "library", label: "Библиотека", icon: <Library size={20} /> },
+  { page: "dictionary", label: "Словарь", icon: <Languages size={20} /> },
+  { page: "profile", label: "Профиль", icon: <User size={20} /> },
+];
 
 export default App;

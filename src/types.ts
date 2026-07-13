@@ -74,14 +74,7 @@ export type Story = {
 };
 
 export type LearnerProgress = {
-  xp: number;
-  streak: number;
-  completedLessons: string[];
-  unlockedLessons: string[];
-  savedWords: string[];
-  favoriteWords: string[];
   selectedLanguage: NativeLanguage | null;
-  testScores: Array<{ date: string; score: number; total: number; type: string }>;
-  lessonProgress: Record<string, number>;
+  readingProgress: Record<string, number>;
   lastVisitDate: string;
 };
