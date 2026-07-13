@@ -139,7 +139,7 @@ function App() {
           />
         ) : (
           <>
-            {page === "home" ? <HomePage onNavigate={navigate} onOpenBook={setActiveBookId} progress={progress.readingProgress} /> : null}
+            {page === "home" ? <HomePage onOpenBook={setActiveBookId} progress={progress.readingProgress} /> : null}
             {page === "library" ? <LibraryPage onOpenBook={setActiveBookId} progress={progress.readingProgress} /> : null}
             {page === "dictionary" ? <DictionaryPage /> : null}
             {page === "profile" ? <ProfilePage language={progress.selectedLanguage ?? "Russian"} onSelectLanguage={selectLanguage} progress={progress.readingProgress} /> : null}
@@ -212,32 +212,29 @@ function Logo({ compact = false }: { compact?: boolean }) {
 }
 
 function HomePage({
-  onNavigate,
   onOpenBook,
   progress,
 }: {
-  onNavigate: (page: Page) => void;
   onOpenBook: (bookId: string) => void;
   progress: Record<string, number>;
 }) {
   return (
     <main className="book-home">
-      <section className="book-hero">
-        <div className="book-hero-copy">
-          <span className="eyebrow">StoryLingo Library</span>
-          <h1>Читайте книги<br />на английском<br />с удовольствием</h1>
-          <p>Истории, которые вы полюбите.<br />Английский, который вы понимаете.</p>
-          <div className="hero-actions">
-            <button className="primary-button" type="button" onClick={() => onNavigate("library")}>Книги</button>
-            <button className="secondary-button" type="button" onClick={() => onNavigate("library")}>Рассказы</button>
-          </div>
-        </div>
-        <ReadingScene />
+      <section className="home-welcome">
+        <span className="eyebrow">StoryLingo Library</span>
+        <h1>Добрый вечер</h1>
+        <p>Что будем читать сегодня?</p>
       </section>
 
       <BookSection title="Продолжить чтение" className="continue-grid">
         {continueBooks.map((book) => (
           <ContinueBookCard key={book.id} book={book} progressValue={progress[book.id] ?? book.progress} onOpen={onOpenBook} />
+        ))}
+      </BookSection>
+
+      <BookSection title="Популярные книги" className="continue-grid popular-book-grid">
+        {continueBooks.map((book) => (
+          <ContinueBookCard key={`popular-${book.id}`} book={book} progressValue={book.progress} onOpen={onOpenBook} />
         ))}
       </BookSection>
 
@@ -381,19 +378,6 @@ function ReaderPreview({
         </div>
       </article>
     </main>
-  );
-}
-
-function ReadingScene() {
-  return (
-    <div className="reading-scene" aria-label="Уютная книжная композиция">
-      <div className="scene-glow" />
-      <div className="scene-book scene-book-main">Alice</div>
-      <div className="scene-book scene-book-side">Garden</div>
-      <div className="scene-cup" />
-      <div className="scene-candle" />
-      <div className="scene-blanket" />
-    </div>
   );
 }
 
