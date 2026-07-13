@@ -858,7 +858,7 @@ blockquote {
   .book-home,
   .page-stack,
   .reader-preview {
-    gap: 20px;
+    gap: 18px;
   }
 
   .mobile-topbar {
@@ -880,9 +880,9 @@ blockquote {
   }
 
   .book-hero {
-    gap: 18px;
-    margin-bottom: 24px;
-    padding: 14px;
+    gap: 14px;
+    margin-bottom: 224px;
+    padding: 12px;
     border-radius: 22px;
     background:
       radial-gradient(circle at 74% 8%, rgba(114, 86, 201, 0.16), transparent 28%),
@@ -890,14 +890,14 @@ blockquote {
   }
 
   .book-hero-copy {
-    gap: 14px;
+    gap: 12px;
     width: 100%;
   }
 
   .reading-scene {
     width: 100%;
     min-height: 0;
-    height: clamp(220px, 60vw, 260px);
+    height: clamp(210px, 56vw, 244px);
     border-radius: 20px;
   }
 
@@ -969,32 +969,35 @@ blockquote {
   .book-hero h1 {
     width: 100%;
     max-width: 100%;
-    font-size: clamp(2.6rem, 13vw, 3.25rem);
-    line-height: 1;
-    overflow-wrap: anywhere;
+    font-size: clamp(2.05rem, 9vw, 2.55rem);
+    line-height: 1.02;
+    overflow-wrap: normal;
+    word-break: normal;
+    hyphens: none;
   }
 
   .book-hero h1 br,
   .book-hero p br {
-    display: none;
+    display: initial;
   }
 
   .book-hero p {
-    max-width: 100%;
-    font-size: 0.98rem;
+    max-width: 19rem;
+    font-size: 0.94rem;
     line-height: 1.45;
   }
 
   .hero-actions {
     width: 100%;
+    flex-wrap: nowrap;
     gap: 10px;
   }
 
   .hero-actions .primary-button,
   .hero-actions .secondary-button {
-    flex: 1 1 124px;
+    flex: 1 1 0;
     min-height: 44px;
-    padding: 0 16px;
+    padding: 0 14px;
   }
 
   .continue-card {
