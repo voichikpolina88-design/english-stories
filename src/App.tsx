@@ -1,5 +1,6 @@
 import { BookOpen, Home, Languages, Library, Search, User, Volume2 } from "lucide-react";
-import { useMemo, useState, type ReactNode } from "react";
+import { useMemo, useState, type CSSProperties, type ReactNode } from "react";
+import { homeShelfBooks, homeShelves, type HomeShelfBook } from "./data/homeShelves";
 import { getAllVocabulary, type VocabularyEntry } from "./data/vocabulary";
 import { useLearnerProgress } from "./hooks/useLearnerProgress";
 import type { NativeLanguage } from "./types";
@@ -116,7 +117,7 @@ function App() {
   const [page, setPage] = useState<Page>("home");
   const [activeBookId, setActiveBookId] = useState<string | null>(null);
   const { progress, saveReadingProgress, selectLanguage } = useLearnerProgress();
-  const allItems = [...continueBooks, ...popularStories];
+  const allItems = [...continueBooks, ...popularStories, ...homeShelfBooks];
   const activeBook = allItems.find((book) => book.id === activeBookId) ?? null;
 
   function navigate(nextPage: Page) {
@@ -139,7 +140,7 @@ function App() {
           />
         ) : (
           <>
-            {page === "home" ? <HomePage onOpenBook={setActiveBookId} progress={progress.readingProgress} /> : null}
+            {page === "home" ? <HomePage onNavigate={navigate} onOpenBook={setActiveBookId} progress={progress.readingProgress} /> : null}
             {page === "library" ? <LibraryPage onOpenBook={setActiveBookId} progress={progress.readingProgress} /> : null}
             {page === "dictionary" ? <DictionaryPage /> : null}
             {page === "profile" ? <ProfilePage language={progress.selectedLanguage ?? "Russian"} onSelectLanguage={selectLanguage} progress={progress.readingProgress} /> : null}
@@ -212,38 +213,104 @@ function Logo({ compact = false }: { compact?: boolean }) {
 }
 
 function HomePage({
+  onNavigate,
   onOpenBook,
   progress,
 }: {
+  onNavigate: (page: Page) => void;
   onOpenBook: (bookId: string) => void;
   progress: Record<string, number>;
 }) {
   return (
     <main className="book-home">
       <section className="home-welcome">
-        <span className="eyebrow">StoryLingo Library</span>
-        <h1>Добрый вечер</h1>
-        <p>Что будем читать сегодня?</p>
+        <div>
+          <span className="eyebrow">Добрый вечер, Полина 🌙</span>
+          <h1>Что будем читать сегодня?</h1>
+        </div>
+        <div className="home-decor" aria-hidden="true">
+          <span className="decor-plant" />
+          <span className="decor-books" />
+          <span className="decor-candle" />
+        </div>
       </section>
 
-      <BookSection title="Продолжить чтение" className="continue-grid">
-        {continueBooks.map((book) => (
-          <ContinueBookCard key={book.id} book={book} progressValue={progress[book.id] ?? book.progress} onOpen={onOpenBook} />
-        ))}
-      </BookSection>
-
-      <BookSection title="Популярные книги" className="continue-grid popular-book-grid">
-        {continueBooks.map((book) => (
-          <ContinueBookCard key={`popular-${book.id}`} book={book} progressValue={book.progress} onOpen={onOpenBook} />
-        ))}
-      </BookSection>
-
-      <BookSection title="Популярные рассказы" className="story-grid">
-        {popularStories.map((story) => (
-          <StoryCard key={story.id} story={story} onOpen={onOpenBook} />
-        ))}
-      </BookSection>
+      {homeShelves.map((shelf) => (
+        <ShelfSection key={shelf.id} title={shelf.title} onViewAll={() => onNavigate("library")}>
+          <BookShelf>
+            {shelf.books.map((book) => (
+              <BookCover
+                key={book.id}
+                book={book}
+                progressValue={progress[book.id] ?? book.progress}
+                onOpen={onOpenBook}
+              />
+            ))}
+          </BookShelf>
+        </ShelfSection>
+      ))}
     </main>
+  );
+}
+
+function ShelfSection({ title, children, onViewAll }: { title: string; children: ReactNode; onViewAll: () => void }) {
+  return (
+    <section className="shelf-section">
+      <div className="shelf-heading">
+        <h2>{title}</h2>
+        <button className="shelf-link" type="button" onClick={onViewAll}>Все</button>
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function BookShelf({ children }: { children: ReactNode }) {
+  return (
+    <div className="book-shelf">
+      <div className="shelf-books">{children}</div>
+      <div className="wood-shelf" aria-hidden="true" />
+    </div>
+  );
+}
+
+function BookCover({
+  book,
+  progressValue,
+  onOpen,
+}: {
+  book: HomeShelfBook;
+  progressValue: number;
+  onOpen: (bookId: string) => void;
+}) {
+  const safeProgress = Math.min(100, Math.max(0, progressValue));
+
+  return (
+    <button
+      className="book-3d"
+      type="button"
+      onClick={() => onOpen(book.id)}
+      style={{ "--tilt": `${book.tilt}deg` } as CSSProperties}
+      aria-label={`Открыть ${book.title}`}
+    >
+      <span className="book-spine" aria-hidden="true" />
+      <span className={`book-face cover-${book.coverStyle}`}>
+        {book.original ? <span className="original-ribbon">StoryLingo Original</span> : null}
+        <span className="cover-frame">
+          <span className="cover-title">{book.title}</span>
+          <span className="cover-author">{book.author}</span>
+        </span>
+        {safeProgress > 0 ? (
+          <span className="cover-progress">
+            <span style={{ width: `${safeProgress}%` }} />
+            <small>{safeProgress}%</small>
+          </span>
+        ) : (
+          <span className="cover-meta">{book.readingTime}</span>
+        )}
+      </span>
+      <span className="book-pages" aria-hidden="true" />
+    </button>
   );
 }
 
