@@ -10,6 +10,9 @@ export type HomeShelfBook = {
   excerpt: string;
   coverStyle: "classic" | "botanical" | "gold" | "plum" | "gothic" | "rose" | "future" | "midnight" | "paper" | "emerald";
   tilt: number;
+  level?: string;
+  chapters?: string;
+  coverImage?: string;
   original?: boolean;
 };
 
@@ -34,6 +37,9 @@ export const homeShelves: HomeShelf[] = [
         progress: 42,
         tone: "violet",
         coverStyle: "classic",
+        coverImage: "/covers/alice.jpg",
+        level: "A2",
+        chapters: "12 глав",
         tilt: -3,
         excerpt: "Alice was beginning to get very tired of sitting by her sister on the bank.",
       },
@@ -47,6 +53,9 @@ export const homeShelves: HomeShelf[] = [
         progress: 28,
         tone: "rose",
         coverStyle: "botanical",
+        coverImage: "/covers/secret-garden.jpg",
+        level: "A2",
+        chapters: "15 глав",
         tilt: 2,
         excerpt: "When Mary Lennox was sent to Misselthwaite Manor she felt lonely and curious.",
       },
@@ -60,6 +69,9 @@ export const homeShelves: HomeShelf[] = [
         progress: 64,
         tone: "gold",
         coverStyle: "gold",
+        coverImage: "/covers/oz.jpg",
+        level: "A1",
+        chapters: "14 глав",
         tilt: -1,
         excerpt: "Dorothy lived in the midst of the great Kansas prairies with Uncle Henry.",
       },

@@ -416,19 +416,53 @@ function BookCover({
   featured?: boolean;
 }) {
   const safeProgress = Math.min(100, Math.max(0, progressValue));
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageFailed, setImageFailed] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const hasCoverImage = Boolean(book.coverImage && !imageFailed);
+  const level = book.level ?? (book.type === "book" ? "A2" : "A1");
+  const chapters = book.chapters ?? (book.type === "book" ? "10 глав" : "1 рассказ");
+  const description = book.excerpt.length > 124 ? `${book.excerpt.slice(0, 121)}...` : book.excerpt;
+
+  function handleCoverClick() {
+    if (window.matchMedia("(hover: none)").matches) {
+      setDetailsOpen((current) => !current);
+      return;
+    }
+
+    onOpen(book.id);
+  }
 
   return (
-    <button
-      className={[featured ? "book-3d featured" : "book-3d", compact ? "compact" : ""].filter(Boolean).join(" ")}
-      type="button"
-      onClick={() => onOpen(book.id)}
+    <div
+      className={[featured ? "book-3d featured" : "book-3d", compact ? "compact" : "", detailsOpen ? "details-open" : ""].filter(Boolean).join(" ")}
+      role="button"
+      tabIndex={0}
+      onClick={handleCoverClick}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          handleCoverClick();
+        }
+      }}
       style={{ "--tilt": `${book.tilt}deg` } as CSSProperties}
       aria-label={`Открыть ${book.title}`}
     >
       <span className="book-spine" aria-hidden="true" />
-      <span className={`book-face cover-${book.coverStyle}`}>
+      <span className={`book-face cover-${book.coverStyle} ${hasCoverImage ? "has-image" : ""}`}>
+        {hasCoverImage ? (
+          <img
+            className={imageLoaded ? "loaded" : ""}
+            src={book.coverImage}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            onLoad={() => setImageLoaded(true)}
+            onError={() => setImageFailed(true)}
+          />
+        ) : null}
         {book.original ? <span className="original-ribbon">StoryLingo Original</span> : null}
-        <span className="cover-frame">
+        <span className={hasCoverImage ? "cover-frame image-cover-copy" : "cover-frame"}>
           <span className="cover-title">{book.title}</span>
           <span className="cover-author">{book.author}</span>
         </span>
@@ -442,7 +476,20 @@ function BookCover({
         )}
       </span>
       <span className="book-pages" aria-hidden="true" />
-    </button>
+      <span className="book-details-card" onClick={(event) => event.stopPropagation()}>
+        <strong>{book.title}</strong>
+        <span>{book.author}</span>
+        <small>{level} · {chapters} · {book.readingTime}</small>
+        <p>{description}</p>
+        {safeProgress > 0 ? (
+          <span className="details-progress">
+            <span style={{ width: `${safeProgress}%` }} />
+            <small>{safeProgress}% прочитано</small>
+          </span>
+        ) : null}
+        <button className="book-info-button" type="button" onClick={() => onOpen(book.id)}>Читать</button>
+      </span>
+    </div>
   );
 }
 
