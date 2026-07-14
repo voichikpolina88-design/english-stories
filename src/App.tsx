@@ -113,6 +113,36 @@ const popularStories: DemoBook[] = [
   },
 ];
 
+const getShelfBooks = (shelfId: string) => homeShelves.find((shelf) => shelf.id === shelfId)?.books ?? [];
+const getShelfBook = (bookId: string) => homeShelfBooks.find((book) => book.id === bookId);
+const homeContinueBook = getShelfBook("alice") ?? homeShelfBooks[0];
+const recentBooks = ["secret-garden", "oz", "anne"]
+  .map((bookId) => getShelfBook(bookId))
+  .filter((book): book is HomeShelfBook => Boolean(book));
+const recommendationBook = getShelfBook("pride-prejudice") ?? homeShelfBooks[0];
+const weeklyNewBook = getShelfBook("seen-217") ?? homeShelfBooks[0];
+const classicBooks = [
+  "pride-prejudice",
+  "frankenstein",
+  "little-women",
+  "time-machine",
+  "jane-eyre",
+  "magi",
+  "last-leaf",
+  "happy-prince",
+  "tell-tale-heart",
+]
+  .map((bookId) => getShelfBook(bookId))
+  .filter((book): book is HomeShelfBook => Boolean(book));
+
+const libraryShelves = [
+  { id: "popular-books", title: "🔥 Популярные книги", books: getShelfBooks("popular-books") },
+  { id: "classics", title: "Классика", books: classicBooks },
+  { id: "originals", title: "✨ StoryLingo Originals", books: getShelfBooks("originals") },
+  { id: "short-stories", title: "📚 Короткие рассказы", books: getShelfBooks("short-stories") },
+  { id: "new", title: "Новинки", books: [weeklyNewBook, ...getShelfBooks("originals").filter((book) => book.id !== weeklyNewBook.id)] },
+];
+
 function App() {
   const [page, setPage] = useState<Page>("home");
   const [activeBookId, setActiveBookId] = useState<string | null>(null);
@@ -235,27 +265,125 @@ function HomePage({
         </div>
       </section>
 
-      {homeShelves.map((shelf) => (
-        <ShelfSection key={shelf.id} title={shelf.title} onViewAll={() => onNavigate("library")}>
-          <BookShelf>
-            {shelf.books.map((book) => (
-              <BookCover
-                key={book.id}
-                book={book}
-                progressValue={progress[book.id] ?? book.progress}
-                onOpen={onOpenBook}
-              />
-            ))}
-          </BookShelf>
-        </ShelfSection>
-      ))}
+      <HomeContinuePanel
+        book={homeContinueBook}
+        progressValue={progress[homeContinueBook.id] ?? homeContinueBook.progress}
+        onOpen={onOpenBook}
+      />
+
+      <ShelfSection title="Недавно открывали" onViewAll={() => onNavigate("library")} compact>
+        <BookShelf compact>
+          {recentBooks.map((book) => (
+            <BookCover
+              key={book.id}
+              book={book}
+              progressValue={progress[book.id] ?? book.progress}
+              onOpen={onOpenBook}
+              compact
+            />
+          ))}
+        </BookShelf>
+      </ShelfSection>
+
+      <section className="home-feature-grid">
+        <FeatureCard
+          title="Рекомендация для вас"
+          book={recommendationBook}
+          description="Спокойная классика с живыми диалогами и понятной бытовой лексикой."
+          badge="B1 · роман · 34 мин"
+          action="Открыть"
+          onOpen={onOpenBook}
+        />
+        <FeatureCard
+          title="Новинка недели"
+          book={weeklyNewBook}
+          description="Короткий атмосферный рассказ для вечернего чтения."
+          badge="StoryLingo Original · A2 · 12 мин"
+          action="Открыть"
+          onOpen={onOpenBook}
+          original
+        />
+      </section>
+
+      <section className="home-progress-panel">
+        <ProgressMetric label="Прочитано глав" value="12" />
+        <ProgressMetric label="Прочитано рассказов" value="7" />
+        <ProgressMetric label="Серия чтения" value="5 дней" />
+      </section>
     </main>
   );
 }
 
-function ShelfSection({ title, children, onViewAll }: { title: string; children: ReactNode; onViewAll: () => void }) {
+function HomeContinuePanel({
+  book,
+  progressValue,
+  onOpen,
+}: {
+  book: HomeShelfBook;
+  progressValue: number;
+  onOpen: (bookId: string) => void;
+}) {
   return (
-    <section className="shelf-section">
+    <section className="home-continue-panel">
+      <div className="home-continue-book">
+        <BookCover book={book} progressValue={progressValue} onOpen={onOpen} featured />
+      </div>
+      <div className="home-continue-copy">
+        <span className="eyebrow">Продолжить чтение</span>
+        <h2>{book.title}</h2>
+        <p>{book.author}</p>
+        <span>{book.chapter}</span>
+        <Progress value={progressValue} />
+        <small>{progressValue}% прочитано</small>
+        <button className="primary-button" type="button" onClick={() => onOpen(book.id)}>Продолжить чтение</button>
+      </div>
+    </section>
+  );
+}
+
+function FeatureCard({
+  title,
+  book,
+  description,
+  badge,
+  action,
+  original = false,
+  onOpen,
+}: {
+  title: string;
+  book: HomeShelfBook;
+  description: string;
+  badge: string;
+  action: string;
+  original?: boolean;
+  onOpen: (bookId: string) => void;
+}) {
+  return (
+    <article className="home-feature-card">
+      <div>
+        <span className="eyebrow">{title}</span>
+        <h3>{book.title}</h3>
+        <p>{description}</p>
+        <small>{badge}</small>
+        {original ? <strong>StoryLingo Original</strong> : null}
+      </div>
+      <button className="secondary-button" type="button" onClick={() => onOpen(book.id)}>{action}</button>
+    </article>
+  );
+}
+
+function ProgressMetric({ label, value }: { label: string; value: string }) {
+  return (
+    <article>
+      <span>{label}</span>
+      <strong>{value}</strong>
+    </article>
+  );
+}
+
+function ShelfSection({ title, children, onViewAll, compact = false }: { title: string; children: ReactNode; onViewAll: () => void; compact?: boolean }) {
+  return (
+    <section className={compact ? "shelf-section compact" : "shelf-section"}>
       <div className="shelf-heading">
         <h2>{title}</h2>
         <button className="shelf-link" type="button" onClick={onViewAll}>Все</button>
@@ -265,9 +393,9 @@ function ShelfSection({ title, children, onViewAll }: { title: string; children:
   );
 }
 
-function BookShelf({ children }: { children: ReactNode }) {
+function BookShelf({ children, compact = false }: { children: ReactNode; compact?: boolean }) {
   return (
-    <div className="book-shelf">
+    <div className={compact ? "book-shelf compact" : "book-shelf"}>
       <div className="shelf-books">{children}</div>
       <div className="wood-shelf" aria-hidden="true" />
     </div>
@@ -278,16 +406,20 @@ function BookCover({
   book,
   progressValue,
   onOpen,
+  compact = false,
+  featured = false,
 }: {
   book: HomeShelfBook;
   progressValue: number;
   onOpen: (bookId: string) => void;
+  compact?: boolean;
+  featured?: boolean;
 }) {
   const safeProgress = Math.min(100, Math.max(0, progressValue));
 
   return (
     <button
-      className="book-3d"
+      className={[featured ? "book-3d featured" : "book-3d", compact ? "compact" : ""].filter(Boolean).join(" ")}
       type="button"
       onClick={() => onOpen(book.id)}
       style={{ "--tilt": `${book.tilt}deg` } as CSSProperties}
@@ -315,19 +447,66 @@ function BookCover({
 }
 
 function LibraryPage({ onOpenBook, progress }: { onOpenBook: (bookId: string) => void; progress: Record<string, number> }) {
+  const [query, setQuery] = useState("");
+  const [contentType, setContentType] = useState<"all" | "books" | "stories" | "originals">("all");
+
+  const visibleShelves = libraryShelves
+    .map((shelf) => ({
+      ...shelf,
+      books: shelf.books.filter((book) => {
+        const matchesQuery = `${book.title} ${book.author}`.toLowerCase().includes(query.trim().toLowerCase());
+        const matchesType =
+          contentType === "all"
+            ? true
+            : contentType === "originals"
+            ? book.original
+            : contentType === "books"
+              ? book.type === "book"
+              : book.type === "story";
+        return matchesQuery && matchesType;
+      }),
+    }))
+    .filter((shelf) => shelf.books.length > 0);
+
   return (
-    <main className="page-stack">
-      <PageTitle title="Библиотека" text="Демо-полка книг и рассказов. Реальная библиотека появится позже." />
-      <BookSection title="Книги" className="continue-grid">
-        {continueBooks.map((book) => (
-          <ContinueBookCard key={book.id} book={book} progressValue={progress[book.id] ?? book.progress} onOpen={onOpenBook} />
-        ))}
-      </BookSection>
-      <BookSection title="Рассказы" className="story-grid">
-        {popularStories.map((story) => (
-          <StoryCard key={story.id} story={story} onOpen={onOpenBook} />
-        ))}
-      </BookSection>
+    <main className="page-stack library-page">
+      <section className="library-header">
+        <span className="eyebrow">StoryLingo</span>
+        <h1>Библиотека</h1>
+        <p>Полный демо-каталог книг и рассказов. Реальные подборки появятся позже.</p>
+      </section>
+
+      <section className="library-controls">
+        <label className="search-field">
+          <Search size={18} aria-hidden="true" />
+          <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Найти книгу или рассказ" />
+        </label>
+        <div className="library-tabs" aria-label="Тип контента">
+          <button className={contentType === "books" ? "active" : ""} type="button" onClick={() => setContentType(contentType === "books" ? "all" : "books")}>Книги</button>
+          <button className={contentType === "stories" ? "active" : ""} type="button" onClick={() => setContentType(contentType === "stories" ? "all" : "stories")}>Рассказы</button>
+          <button className={contentType === "originals" ? "active" : ""} type="button" onClick={() => setContentType(contentType === "originals" ? "all" : "originals")}>Originals</button>
+        </div>
+        <div className="library-filters" aria-label="Фильтры каталога">
+          <span>Уровень: A2-B1</span>
+          <span>Жанр: все</span>
+          <span>Сортировка: популярное</span>
+        </div>
+      </section>
+
+      {visibleShelves.map((shelf) => (
+        <ShelfSection key={shelf.id} title={shelf.title} onViewAll={() => setQuery("")}>
+          <BookShelf>
+            {shelf.books.map((book) => (
+              <BookCover
+                key={book.id}
+                book={book}
+                progressValue={progress[book.id] ?? book.progress}
+                onOpen={onOpenBook}
+              />
+            ))}
+          </BookShelf>
+        </ShelfSection>
+      ))}
     </main>
   );
 }
