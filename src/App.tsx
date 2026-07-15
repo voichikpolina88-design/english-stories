@@ -1,11 +1,26 @@
 import { BookOpen, Home, Languages, Library, Search, User, Volume2 } from "lucide-react";
-import { useMemo, useState, type CSSProperties, type ReactNode } from "react";
+import { useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { homeShelfBooks, homeShelves, type HomeShelfBook } from "./data/homeShelves";
 import { getAllVocabulary, type VocabularyEntry } from "./data/vocabulary";
 import { useLearnerProgress } from "./hooks/useLearnerProgress";
 import type { NativeLanguage } from "./types";
 
 type Page = "home" | "library" | "dictionary" | "profile";
+
+type BookRect = {
+  left: number;
+  top: number;
+  right: number;
+  bottom: number;
+  width: number;
+  height: number;
+};
+
+type BookInfoState = {
+  book: HomeShelfBook;
+  progressValue: number;
+  rect: BookRect;
+};
 
 type DemoBook = {
   id: string;
@@ -146,6 +161,9 @@ const libraryShelves = [
 function App() {
   const [page, setPage] = useState<Page>("home");
   const [activeBookId, setActiveBookId] = useState<string | null>(null);
+  const [bookInfo, setBookInfo] = useState<BookInfoState | null>(null);
+  const [sheetInfo, setSheetInfo] = useState<{ book: HomeShelfBook; progressValue: number } | null>(null);
+  const closeInfoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { progress, saveReadingProgress, selectLanguage } = useLearnerProgress();
   const allItems = [...continueBooks, ...popularStories, ...homeShelfBooks];
   const activeBook = allItems.find((book) => book.id === activeBookId) ?? null;
@@ -153,7 +171,32 @@ function App() {
   function navigate(nextPage: Page) {
     setPage(nextPage);
     setActiveBookId(null);
+    setBookInfo(null);
+    setSheetInfo(null);
     window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function clearCloseInfoTimer() {
+    if (closeInfoTimer.current) {
+      clearTimeout(closeInfoTimer.current);
+      closeInfoTimer.current = null;
+    }
+  }
+
+  function showBookInfo(book: HomeShelfBook, progressValue: number, rect: BookRect) {
+    clearCloseInfoTimer();
+    setBookInfo({ book, progressValue, rect });
+  }
+
+  function scheduleCloseBookInfo() {
+    clearCloseInfoTimer();
+    closeInfoTimer.current = setTimeout(() => setBookInfo(null), 140);
+  }
+
+  function openBook(bookId: string) {
+    setBookInfo(null);
+    setSheetInfo(null);
+    setActiveBookId(bookId);
   }
 
   return (
@@ -170,13 +213,48 @@ function App() {
           />
         ) : (
           <>
-            {page === "home" ? <HomePage onNavigate={navigate} onOpenBook={setActiveBookId} progress={progress.readingProgress} /> : null}
-            {page === "library" ? <LibraryPage onOpenBook={setActiveBookId} progress={progress.readingProgress} /> : null}
+            {page === "home" ? (
+              <HomePage
+                onNavigate={navigate}
+                onOpenBook={openBook}
+                onShowBookInfo={showBookInfo}
+                onHideBookInfo={scheduleCloseBookInfo}
+                onOpenBookSheet={setSheetInfo}
+                progress={progress.readingProgress}
+              />
+            ) : null}
+            {page === "library" ? (
+              <LibraryPage
+                onOpenBook={openBook}
+                onShowBookInfo={showBookInfo}
+                onHideBookInfo={scheduleCloseBookInfo}
+                onOpenBookSheet={setSheetInfo}
+                progress={progress.readingProgress}
+              />
+            ) : null}
             {page === "dictionary" ? <DictionaryPage /> : null}
             {page === "profile" ? <ProfilePage language={progress.selectedLanguage ?? "Russian"} onSelectLanguage={selectLanguage} progress={progress.readingProgress} /> : null}
           </>
         )}
       </div>
+      {bookInfo ? (
+        <BookInfoPopover
+          book={bookInfo.book}
+          progressValue={bookInfo.progressValue}
+          anchorRect={bookInfo.rect}
+          onOpen={openBook}
+          onKeepOpen={clearCloseInfoTimer}
+          onRequestClose={scheduleCloseBookInfo}
+        />
+      ) : null}
+      {sheetInfo ? (
+        <BookInfoSheet
+          book={sheetInfo.book}
+          progressValue={sheetInfo.progressValue}
+          onClose={() => setSheetInfo(null)}
+          onOpen={openBook}
+        />
+      ) : null}
       <MobileNav page={page} onNavigate={navigate} />
     </div>
   );
@@ -245,10 +323,16 @@ function Logo({ compact = false }: { compact?: boolean }) {
 function HomePage({
   onNavigate,
   onOpenBook,
+  onShowBookInfo,
+  onHideBookInfo,
+  onOpenBookSheet,
   progress,
 }: {
   onNavigate: (page: Page) => void;
   onOpenBook: (bookId: string) => void;
+  onShowBookInfo: (book: HomeShelfBook, progressValue: number, rect: BookRect) => void;
+  onHideBookInfo: () => void;
+  onOpenBookSheet: (info: { book: HomeShelfBook; progressValue: number }) => void;
   progress: Record<string, number>;
 }) {
   return (
@@ -279,6 +363,9 @@ function HomePage({
               book={book}
               progressValue={progress[book.id] ?? book.progress}
               onOpen={onOpenBook}
+              onShowInfo={onShowBookInfo}
+              onHideInfo={onHideBookInfo}
+              onOpenSheet={onOpenBookSheet}
               compact
             />
           ))}
@@ -406,47 +493,101 @@ function BookCover({
   book,
   progressValue,
   onOpen,
+  onShowInfo,
+  onHideInfo,
+  onOpenSheet,
   compact = false,
   featured = false,
 }: {
   book: HomeShelfBook;
   progressValue: number;
   onOpen: (bookId: string) => void;
+  onShowInfo?: (book: HomeShelfBook, progressValue: number, rect: BookRect) => void;
+  onHideInfo?: () => void;
+  onOpenSheet?: (info: { book: HomeShelfBook; progressValue: number }) => void;
   compact?: boolean;
   featured?: boolean;
 }) {
   const safeProgress = Math.min(100, Math.max(0, progressValue));
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageFailed, setImageFailed] = useState(false);
-  const [detailsOpen, setDetailsOpen] = useState(false);
+  const pointerStart = useRef<{ x: number; y: number } | null>(null);
+  const pointerMoved = useRef(false);
   const hasCoverImage = Boolean(book.coverImage && !imageFailed);
-  const level = book.level ?? (book.type === "book" ? "A2" : "A1");
-  const chapters = book.chapters ?? (book.type === "book" ? "10 глав" : "1 рассказ");
-  const description = book.excerpt.length > 124 ? `${book.excerpt.slice(0, 121)}...` : book.excerpt;
+  const canShowInfo = Boolean(onShowInfo && onHideInfo && onOpenSheet && !featured);
+  const isMinimalCover = featured;
 
-  function handleCoverClick() {
-    if (window.matchMedia("(hover: none)").matches) {
-      setDetailsOpen((current) => !current);
+  function isMobileInput() {
+    return window.innerWidth <= 768 || window.matchMedia("(hover: none), (pointer: coarse)").matches;
+  }
+
+  function getBookRect(element: HTMLElement): BookRect {
+    const rect = element.getBoundingClientRect();
+    return {
+      left: rect.left,
+      top: rect.top,
+      right: rect.right,
+      bottom: rect.bottom,
+      width: rect.width,
+      height: rect.height,
+    };
+  }
+
+  function showInfo(element: HTMLElement) {
+    if (!canShowInfo || isMobileInput()) return;
+    onShowInfo?.(book, safeProgress, getBookRect(element));
+  }
+
+  function handleCoverClick(event: React.MouseEvent<HTMLDivElement>) {
+    if (!canShowInfo) {
+      onOpen(book.id);
       return;
     }
 
-    onOpen(book.id);
+    if (isMobileInput()) {
+      if (!pointerMoved.current) {
+        onOpenSheet?.({ book, progressValue: safeProgress });
+      }
+      return;
+    }
+
+    showInfo(event.currentTarget);
   }
 
   return (
     <div
-      className={[featured ? "book-3d featured" : "book-3d", compact ? "compact" : "", detailsOpen ? "details-open" : ""].filter(Boolean).join(" ")}
+      className={[featured ? "book-3d featured" : "book-3d", compact ? "compact" : "", isMinimalCover ? "minimal-cover" : ""].filter(Boolean).join(" ")}
       role="button"
       tabIndex={0}
       onClick={handleCoverClick}
+      onMouseEnter={(event) => showInfo(event.currentTarget)}
+      onMouseLeave={() => onHideInfo?.()}
+      onFocus={(event) => showInfo(event.currentTarget)}
+      onBlur={() => onHideInfo?.()}
+      onPointerDown={(event) => {
+        pointerMoved.current = false;
+        pointerStart.current = { x: event.clientX, y: event.clientY };
+      }}
+      onPointerMove={(event) => {
+        if (!pointerStart.current) return;
+        const deltaX = Math.abs(event.clientX - pointerStart.current.x);
+        const deltaY = Math.abs(event.clientY - pointerStart.current.y);
+        if (deltaX > 10 || deltaY > 10) {
+          pointerMoved.current = true;
+        }
+      }}
       onKeyDown={(event) => {
         if (event.key === "Enter" || event.key === " ") {
           event.preventDefault();
-          handleCoverClick();
+          if (canShowInfo) {
+            showInfo(event.currentTarget);
+          } else {
+            onOpen(book.id);
+          }
         }
       }}
       style={{ "--tilt": `${book.tilt}deg` } as CSSProperties}
-      aria-label={`Открыть ${book.title}`}
+      aria-label={`Открыть информацию о ${book.title}`}
     >
       <span className="book-spine" aria-hidden="true" />
       <span className={`book-face cover-${book.coverStyle} ${hasCoverImage ? "has-image" : ""}`}>
@@ -462,38 +603,159 @@ function BookCover({
           />
         ) : null}
         {book.original ? <span className="original-ribbon">StoryLingo Original</span> : null}
-        <span className={hasCoverImage ? "cover-frame image-cover-copy" : "cover-frame"}>
+        <span className={hasCoverImage || isMinimalCover ? "cover-frame image-cover-copy" : "cover-frame"}>
           <span className="cover-title">{book.title}</span>
           <span className="cover-author">{book.author}</span>
         </span>
-        {safeProgress > 0 ? (
+        {!isMinimalCover && safeProgress > 0 ? (
           <span className="cover-progress">
             <span style={{ width: `${safeProgress}%` }} />
             <small>{safeProgress}%</small>
           </span>
-        ) : (
+        ) : !isMinimalCover ? (
           <span className="cover-meta">{book.readingTime}</span>
-        )}
+        ) : null}
       </span>
       <span className="book-pages" aria-hidden="true" />
-      <span className="book-details-card" onClick={(event) => event.stopPropagation()}>
-        <strong>{book.title}</strong>
-        <span>{book.author}</span>
-        <small>{level} · {chapters} · {book.readingTime}</small>
-        <p>{description}</p>
-        {safeProgress > 0 ? (
-          <span className="details-progress">
-            <span style={{ width: `${safeProgress}%` }} />
-            <small>{safeProgress}% прочитано</small>
-          </span>
-        ) : null}
-        <button className="book-info-button" type="button" onClick={() => onOpen(book.id)}>Читать</button>
-      </span>
     </div>
   );
 }
 
-function LibraryPage({ onOpenBook, progress }: { onOpenBook: (bookId: string) => void; progress: Record<string, number> }) {
+function BookInfoPopover({
+  book,
+  progressValue,
+  anchorRect,
+  onOpen,
+  onKeepOpen,
+  onRequestClose,
+}: {
+  book: HomeShelfBook;
+  progressValue: number;
+  anchorRect: BookRect;
+  onOpen: (bookId: string) => void;
+  onKeepOpen: () => void;
+  onRequestClose: () => void;
+}) {
+  const meta = getBookInfoMeta(book, progressValue);
+  const cardWidth = 310;
+  const gap = 18;
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+  const opensRight = anchorRect.right + gap + cardWidth <= viewportWidth - 16;
+  const rawLeft = opensRight ? anchorRect.right + gap : anchorRect.left - gap - cardWidth;
+  const left = Math.max(12, Math.min(rawLeft, viewportWidth - cardWidth - 12));
+  const top = Math.max(12, Math.min(anchorRect.top + 8, viewportHeight - 328));
+
+  return (
+    <aside
+      className={`book-info-popover ${opensRight ? "opens-right" : "opens-left"}`}
+      style={{ left, top, width: cardWidth } as CSSProperties}
+      onMouseEnter={onKeepOpen}
+      onMouseLeave={onRequestClose}
+      onFocus={onKeepOpen}
+      onBlur={onRequestClose}
+    >
+      <strong>{book.title}</strong>
+      <span>{book.author}</span>
+      <small>{meta.level} · {meta.chapters} · {book.readingTime}</small>
+      <p>{meta.description}</p>
+      {meta.safeProgress > 0 ? (
+        <span className="details-progress">
+          <span style={{ width: `${meta.safeProgress}%` }} />
+          <small>{meta.safeProgress}% прочитано</small>
+        </span>
+      ) : null}
+      <button className="book-info-button" type="button" onClick={() => onOpen(book.id)}>
+        {meta.safeProgress > 0 ? "Продолжить" : "Читать"}
+      </button>
+    </aside>
+  );
+}
+
+function BookInfoSheet({
+  book,
+  progressValue,
+  onClose,
+  onOpen,
+}: {
+  book: HomeShelfBook;
+  progressValue: number;
+  onClose: () => void;
+  onOpen: (bookId: string) => void;
+}) {
+  const meta = getBookInfoMeta(book, progressValue);
+  const [imageFailed, setImageFailed] = useState(false);
+  const dragStartY = useRef<number | null>(null);
+  const hasCoverImage = Boolean(book.coverImage && !imageFailed);
+
+  return (
+    <div className="book-sheet-layer" role="presentation" onClick={onClose}>
+      <article
+        className="book-info-sheet"
+        role="dialog"
+        aria-modal="true"
+        aria-label={book.title}
+        onClick={(event) => event.stopPropagation()}
+        onPointerDown={(event) => {
+          dragStartY.current = event.clientY;
+        }}
+        onPointerUp={(event) => {
+          if (dragStartY.current !== null && event.clientY - dragStartY.current > 70) {
+            onClose();
+          }
+          dragStartY.current = null;
+        }}
+      >
+        <button className="sheet-close" type="button" aria-label="Закрыть" onClick={onClose}>×</button>
+        <div className={`sheet-cover cover-${book.coverStyle}`}>
+          {hasCoverImage ? (
+            <img src={book.coverImage} alt="" loading="lazy" decoding="async" onError={() => setImageFailed(true)} />
+          ) : (
+            <span>{book.title}</span>
+          )}
+        </div>
+        <div className="sheet-copy">
+          <strong>{book.title}</strong>
+          <span>{book.author}</span>
+          <small>{meta.level} · {meta.chapters} · {book.readingTime}</small>
+          <p>{meta.description}</p>
+          {meta.safeProgress > 0 ? (
+            <span className="details-progress">
+              <span style={{ width: `${meta.safeProgress}%` }} />
+              <small>{meta.safeProgress}% прочитано</small>
+            </span>
+          ) : null}
+          <button className="book-info-button" type="button" onClick={() => onOpen(book.id)}>
+            {meta.safeProgress > 0 ? "Продолжить" : "Читать"}
+          </button>
+        </div>
+      </article>
+    </div>
+  );
+}
+
+function getBookInfoMeta(book: HomeShelfBook, progressValue: number) {
+  const safeProgress = Math.min(100, Math.max(0, progressValue));
+  const level = book.level ?? (book.type === "book" ? "A2" : "A1");
+  const chapters = book.chapters ?? (book.type === "book" ? "10 глав" : "1 рассказ");
+  const description = book.excerpt.length > 156 ? `${book.excerpt.slice(0, 153)}...` : book.excerpt;
+
+  return { safeProgress, level, chapters, description };
+}
+
+function LibraryPage({
+  onOpenBook,
+  onShowBookInfo,
+  onHideBookInfo,
+  onOpenBookSheet,
+  progress,
+}: {
+  onOpenBook: (bookId: string) => void;
+  onShowBookInfo: (book: HomeShelfBook, progressValue: number, rect: BookRect) => void;
+  onHideBookInfo: () => void;
+  onOpenBookSheet: (info: { book: HomeShelfBook; progressValue: number }) => void;
+  progress: Record<string, number>;
+}) {
   const [query, setQuery] = useState("");
   const [contentType, setContentType] = useState<"all" | "books" | "stories" | "originals">("all");
 
@@ -549,6 +811,9 @@ function LibraryPage({ onOpenBook, progress }: { onOpenBook: (bookId: string) =>
                 book={book}
                 progressValue={progress[book.id] ?? book.progress}
                 onOpen={onOpenBook}
+                onShowInfo={onShowBookInfo}
+                onHideInfo={onHideBookInfo}
+                onOpenSheet={onOpenBookSheet}
               />
             ))}
           </BookShelf>
