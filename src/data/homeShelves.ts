@@ -76,7 +76,7 @@ export const libraryCatalog: HomeShelfBook[] = [
     progress: 64,
     tone: "gold",
     coverStyle: "gold",
-    coverImage: "/covers/alice.jpg",
+    coverImage: "/covers/wonderful-wizard-of-oz.png",
     level: "A1",
     chapters: "14 глав",
     tilt: -1,
