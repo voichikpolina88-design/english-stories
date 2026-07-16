@@ -128,6 +128,7 @@ export const libraryCatalog: HomeShelfBook[] = [
     progress: 0,
     tone: "midnight",
     coverStyle: "gothic",
+    coverImage: "/covers/frankenstein.png",
     level: "B1",
     chapters: "Скоро",
     tilt: 2,
