@@ -1,5 +1,5 @@
 import { BookOpen, Clock, Home, Languages, Library, Pause, Play, Search, User, Volume2, X } from "lucide-react";
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from "react";
 import { homeShelfBooks, homeShelves, type HomeShelfBook } from "./data/homeShelves";
 import { getAllVocabulary, type VocabularyEntry } from "./data/vocabulary";
 import { useLearnerProgress } from "./hooks/useLearnerProgress";
@@ -988,14 +988,19 @@ function ReaderPreview({
 }) {
   const speech = useSpeech();
   const [timerOpen, setTimerOpen] = useState(false);
+  const timerButtonRef = useRef<HTMLButtonElement | null>(null);
   const nextProgress = Math.min(100, Math.max(progressValue, 0) + 12);
+  const closeTimer = () => {
+    setTimerOpen(false);
+    window.setTimeout(() => timerButtonRef.current?.focus(), 0);
+  };
 
   useEffect(() => {
     if (!timerOpen) return;
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        setTimerOpen(false);
+        closeTimer();
       }
     };
 
@@ -1037,6 +1042,8 @@ function ReaderPreview({
         bookTitle={book.title}
         chapterTitle={book.chapter}
         isOpen={timerOpen}
+        buttonRef={timerButtonRef}
+        onClose={closeTimer}
         onChangeGoal={onChangeGoal}
         onToggle={() => setTimerOpen((current) => !current)}
         readingTimer={readingTimer}
@@ -1127,39 +1134,49 @@ function ReadingGoalDialog({
 function ReadingTimerButton({
   bookTitle,
   chapterTitle,
+  buttonRef,
   isOpen,
+  onClose,
   onChangeGoal,
   onToggle,
   readingTimer,
 }: {
   bookTitle: string;
   chapterTitle: string;
+  buttonRef: RefObject<HTMLButtonElement | null>;
   isOpen: boolean;
+  onClose: () => void;
   onChangeGoal: () => void;
   onToggle: () => void;
   readingTimer: ReturnType<typeof useReadingTimer>;
 }) {
   return (
-    <div className="reading-timer-widget">
-      <button
-        className={readingTimer.timer.isRunning ? "reading-timer-toggle running" : "reading-timer-toggle paused"}
-        type="button"
-        aria-expanded={isOpen}
-        aria-label="Открыть таймер чтения"
-        onClick={onToggle}
-      >
-        <Clock size={18} aria-hidden="true" />
-        <span>{formatTimer(readingTimer.currentSessionSeconds)}</span>
-      </button>
+    <>
       {isOpen ? (
-        <ReadingTimerPanel
-          bookTitle={bookTitle}
-          chapterTitle={chapterTitle}
-          onChangeGoal={onChangeGoal}
-          readingTimer={readingTimer}
-        />
+        <div className="reading-timer-layer" role="presentation" onClick={onClose}>
+          <ReadingTimerPanel
+            bookTitle={bookTitle}
+            chapterTitle={chapterTitle}
+            onChangeGoal={onChangeGoal}
+            onClose={onClose}
+            readingTimer={readingTimer}
+          />
+        </div>
       ) : null}
-    </div>
+      <div className="reading-timer-widget">
+        <button
+          className={readingTimer.timer.isRunning ? "reading-timer-toggle running" : "reading-timer-toggle paused"}
+          type="button"
+          aria-expanded={isOpen}
+          aria-label="Открыть таймер чтения"
+          ref={buttonRef}
+          onClick={onToggle}
+        >
+          <Clock size={18} aria-hidden="true" />
+          <span>{formatTimer(readingTimer.currentSessionSeconds)}</span>
+        </button>
+      </div>
+    </>
   );
 }
 
@@ -1167,11 +1184,13 @@ function ReadingTimerPanel({
   bookTitle,
   chapterTitle,
   onChangeGoal,
+  onClose,
   readingTimer,
 }: {
   bookTitle: string;
   chapterTitle: string;
   onChangeGoal: () => void;
+  onClose: () => void;
   readingTimer: ReturnType<typeof useReadingTimer>;
 }) {
   const todayMinutes = Math.floor(readingTimer.stats.todaySeconds / 60);
@@ -1184,7 +1203,10 @@ function ReadingTimerPanel({
         : null;
 
   return (
-    <section className="reading-timer-panel" role="dialog" aria-label="Таймер чтения">
+    <section className="reading-timer-panel" role="dialog" aria-label="Таймер чтения" onClick={(event) => event.stopPropagation()}>
+      <button className="timer-close-button" type="button" aria-label="Закрыть таймер" onClick={onClose}>
+        <X size={16} aria-hidden="true" />
+      </button>
       <div className="timer-panel-heading">
         <span className="eyebrow">Таймер чтения</span>
         <strong>Сегодня: {todayMinutes} из {goalMinutes} минут</strong>

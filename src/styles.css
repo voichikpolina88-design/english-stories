@@ -1674,7 +1674,19 @@ blockquote {
   color: var(--purple);
 }
 
+.reading-timer-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 69;
+  display: grid;
+  align-items: end;
+  justify-items: end;
+  padding: 0 28px 82px 0;
+  background: transparent;
+}
+
 .reading-timer-panel {
+  position: relative;
   display: grid;
   gap: 12px;
   width: min(92vw, 338px);
@@ -1684,6 +1696,20 @@ blockquote {
   background: rgba(255, 255, 255, 0.97);
   box-shadow: 0 28px 70px rgba(30, 58, 138, 0.2);
   animation: timerPanelIn 180ms ease both;
+}
+
+.timer-close-button {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(30, 58, 138, 0.12);
+  border-radius: 999px;
+  background: var(--blue-quiet);
+  color: var(--purple);
 }
 
 @keyframes timerPanelIn {
@@ -2088,6 +2114,13 @@ blockquote {
   .reading-timer-widget {
     right: 14px;
     bottom: calc(94px + env(safe-area-inset-bottom));
+  }
+
+  .reading-timer-layer {
+    z-index: 69;
+    padding: 0;
+    background: rgba(37, 33, 45, 0.22);
+    backdrop-filter: blur(3px);
   }
 
   .reading-timer-toggle {
