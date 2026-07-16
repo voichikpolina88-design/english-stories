@@ -42,7 +42,7 @@ export const libraryCatalog: HomeShelfBook[] = [
     progress: 42,
     tone: "violet",
     coverStyle: "classic",
-    coverImage: "/covers/oz.jpg",
+    coverImage: "/covers/alice-in-wonderland.png",
     level: "A2",
     chapters: "12 глав",
     tilt: -3,
