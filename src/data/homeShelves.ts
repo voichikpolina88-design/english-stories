@@ -93,6 +93,7 @@ export const libraryCatalog: HomeShelfBook[] = [
     progress: 0,
     tone: "rose",
     coverStyle: "rose",
+    coverImage: "/covers/pride-prejudice.png",
     level: "B1",
     chapters: "Скоро",
     tilt: -2,
