@@ -182,6 +182,7 @@ export const libraryCatalog: HomeShelfBook[] = [
     progress: 0,
     tone: "gold",
     coverStyle: "gold",
+    coverImage: "/covers/happy-prince.png",
     level: "A2",
     chapters: "1 рассказ",
     tilt: -1,
