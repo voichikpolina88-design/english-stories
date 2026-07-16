@@ -59,7 +59,7 @@ export const libraryCatalog: HomeShelfBook[] = [
     progress: 28,
     tone: "rose",
     coverStyle: "botanical",
-    coverImage: "/covers/secret-garden.jpg",
+    coverImage: "/covers/secret-garden-new.png",
     level: "A2",
     chapters: "15 глав",
     tilt: 2,
