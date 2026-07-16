@@ -373,30 +373,22 @@ function HomePage({
       </ShelfSection>
 
       <section className="home-feature-grid">
-        <FeatureCard
-          title="Рекомендация для вас"
+        <RecommendationCard
           book={recommendationBook}
-          description="Спокойная классика с живыми диалогами и понятной бытовой лексикой."
-          badge="B1 · роман · 34 мин"
-          action="Открыть"
           onOpen={onOpenBook}
         />
-        <FeatureCard
-          title="Новинка недели"
+        <WeeklyNewCard
           book={weeklyNewBook}
-          description="Короткий атмосферный рассказ для вечернего чтения."
-          badge="StoryLingo Original · A2 · 12 мин"
-          action="Открыть"
           onOpen={onOpenBook}
-          original
         />
       </section>
 
-      <section className="home-progress-panel">
-        <ProgressMetric label="Прочитано глав" value="12" />
-        <ProgressMetric label="Прочитано рассказов" value="7" />
-        <ProgressMetric label="Серия чтения" value="5 дней" />
-      </section>
+      <ReadingGoalCard
+        dailyGoalMinutes={5}
+        todayReadingMinutes={0}
+        onChangeGoal={() => undefined}
+        onStartReading={() => onOpenBook(homeContinueBook.id)}
+      />
     </main>
   );
 }
@@ -428,43 +420,76 @@ function HomeContinuePanel({
   );
 }
 
-function FeatureCard({
-  title,
+function RecommendationCard({
   book,
-  description,
-  badge,
-  action,
-  original = false,
   onOpen,
 }: {
-  title: string;
   book: HomeShelfBook;
-  description: string;
-  badge: string;
-  action: string;
-  original?: boolean;
   onOpen: (bookId: string) => void;
 }) {
   return (
-    <article className="home-feature-card">
-      <div>
-        <span className="eyebrow">{title}</span>
-        <h3>{book.title}</h3>
-        <p>{description}</p>
-        <small>{badge}</small>
-        {original ? <strong>StoryLingo Original</strong> : null}
+    <article className="recommendation-card">
+      <div className={`recommendation-cover cover-${book.coverStyle}`} aria-hidden="true">
+        <span>{book.title}</span>
       </div>
-      <button className="secondary-button" type="button" onClick={() => onOpen(book.id)}>{action}</button>
+      <div className="recommendation-copy">
+        <span className="eyebrow">Рекомендация для вас</span>
+        <h3>{book.title}</h3>
+        <p>{book.author}</p>
+        <small>B1 · классика · роман · {book.readingTime}</small>
+        <p className="feature-description">Спокойная классика с живыми диалогами и понятной бытовой лексикой.</p>
+        <span className="recommendation-note">Подойдёт, если вам нравится спокойная классика и живые диалоги</span>
+        <button className="secondary-button" type="button" onClick={() => onOpen(book.id)}>Посмотреть книгу</button>
+      </div>
     </article>
   );
 }
 
-function ProgressMetric({ label, value }: { label: string; value: string }) {
+function WeeklyNewCard({ book, onOpen }: { book: HomeShelfBook; onOpen: (bookId: string) => void }) {
   return (
-    <article>
-      <span>{label}</span>
-      <strong>{value}</strong>
+    <article className="weekly-new-card">
+      <div className="weekly-new-overlay">
+        <span className="weekly-kicker">Новинка недели</span>
+        <span>StoryLingo Original</span>
+        <h3>{book.title}</h3>
+        <small>A2 · 12 минут</small>
+        <p>Одно сообщение. Один пропущенный звонок. И слишком позднее время.</p>
+        <button className="weekly-new-button" type="button" onClick={() => onOpen(book.id)}>Читать рассказ</button>
+      </div>
     </article>
+  );
+}
+
+function ReadingGoalCard({
+  dailyGoalMinutes,
+  todayReadingMinutes,
+  onChangeGoal,
+  onStartReading,
+}: {
+  dailyGoalMinutes: number;
+  todayReadingMinutes: number;
+  onChangeGoal: () => void;
+  onStartReading: () => void;
+}) {
+  const progressValue = dailyGoalMinutes > 0 ? Math.min(100, Math.round((todayReadingMinutes / dailyGoalMinutes) * 100)) : 0;
+
+  return (
+    <section className="reading-goal-card">
+      <div className="reading-goal-copy">
+        <span className="eyebrow">Цель по чтению</span>
+        <h2>Читайте понемногу каждый день</h2>
+        <p>Дневная цель: {dailyGoalMinutes} минут</p>
+        <button className="primary-button" type="button" onClick={onStartReading}>Начать читать</button>
+        <button className="goal-link" type="button" onClick={onChangeGoal}>Изменить цель</button>
+      </div>
+      <div className="reading-goal-meter" style={{ "--goal-progress": `${progressValue}%` } as CSSProperties}>
+        <div className="goal-ring" aria-label={`${todayReadingMinutes} из ${dailyGoalMinutes} минут`}>
+          <strong>{todayReadingMinutes}</strong>
+          <span>из {dailyGoalMinutes} минут</span>
+        </div>
+        <small>Сегодня</small>
+      </div>
+    </section>
   );
 }
 
