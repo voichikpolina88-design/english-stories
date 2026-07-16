@@ -773,6 +773,26 @@ p {
   scrollbar-color: rgba(37, 99, 235, 0.32) transparent;
 }
 
+.book-shelf.grid {
+  padding-bottom: 8px;
+}
+
+.book-shelf.grid .shelf-books {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(126px, 1fr));
+  align-items: end;
+  gap: clamp(18px, 2.4vw, 30px);
+  overflow: visible;
+}
+
+.book-shelf.grid .book-3d {
+  justify-self: center;
+}
+
+.book-shelf.grid .wood-shelf {
+  display: none;
+}
+
 .shelf-books::-webkit-scrollbar {
   height: 8px;
 }
@@ -836,6 +856,10 @@ p {
   flex-basis: 120px;
   width: 120px;
   height: 186px;
+}
+
+.book-3d:has(.soon-ribbon) {
+  cursor: default;
 }
 
 .book-3d:hover {
@@ -957,7 +981,8 @@ p {
 .cover-author,
 .cover-meta,
 .cover-progress,
-.original-ribbon {
+.original-ribbon,
+.soon-ribbon {
   position: relative;
   z-index: 4;
 }
@@ -1026,6 +1051,19 @@ p {
   text-align: center;
   text-transform: uppercase;
   transform: rotate(35deg);
+  box-shadow: 0 4px 10px rgba(37, 33, 45, 0.16);
+}
+
+.soon-ribbon {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(255, 247, 214, 0.96);
+  color: var(--purple-dark);
+  font-size: 0.62rem;
+  font-weight: 900;
   box-shadow: 0 4px 10px rgba(37, 33, 45, 0.16);
 }
 
@@ -1131,6 +1169,11 @@ p {
 
 .book-info-button:hover {
   background: var(--purple-dark);
+}
+
+.book-info-button:disabled {
+  cursor: default;
+  opacity: 0.68;
 }
 
 .book-info-popover .book-info-button {
@@ -1265,6 +1308,20 @@ p {
   display: grid;
   gap: 10px;
   padding: clamp(22px, 4vw, 34px);
+}
+
+.library-back-button {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.74);
+  color: var(--purple);
+  font-weight: 820;
 }
 
 .library-header h1 {
@@ -2177,6 +2234,19 @@ blockquote {
     gap: 16px;
     padding: 6px 18px 20px 8px;
     scroll-snap-type: x proximity;
+  }
+
+  .book-shelf.grid {
+    margin-right: 0;
+    margin-left: 0;
+    overflow: visible;
+  }
+
+  .book-shelf.grid .shelf-books {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px 12px;
+    padding: 6px 0 24px;
+    scroll-snap-type: none;
   }
 
   .book-3d {

@@ -1,6 +1,6 @@
-import { BookOpen, Clock, Home, Languages, Library, Pause, Play, Search, User, Volume2, X } from "lucide-react";
+import { ArrowLeft, BookOpen, Clock, Home, Languages, Library, Pause, Play, Search, User, Volume2, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from "react";
-import { homeShelfBooks, homeShelves, type HomeShelfBook } from "./data/homeShelves";
+import { getCatalogBook, getCategoryBooks, homeShelfBooks, type HomeShelfBook } from "./data/homeShelves";
 import { getAllVocabulary, type VocabularyEntry } from "./data/vocabulary";
 import { useLearnerProgress } from "./hooks/useLearnerProgress";
 import { useReadingTimer } from "./hooks/useReadingTimer";
@@ -23,114 +23,8 @@ type BookInfoState = {
   rect: BookRect;
 };
 
-type DemoBook = {
-  id: string;
-  title: string;
-  author: string;
-  type: "book" | "story";
-  chapter: string;
-  readingTime: string;
-  progress: number;
-  tone: string;
-  excerpt: string;
-};
-
-const continueBooks: DemoBook[] = [
-  {
-    id: "alice",
-    title: "Alice's Adventures in Wonderland",
-    author: "Lewis Carroll",
-    type: "book",
-    chapter: "Глава 3",
-    readingTime: "25 мин",
-    progress: 42,
-    tone: "violet",
-    excerpt: "Alice was beginning to get very tired of sitting by her sister on the bank.",
-  },
-  {
-    id: "secret-garden",
-    title: "The Secret Garden",
-    author: "Frances Hodgson Burnett",
-    type: "book",
-    chapter: "Глава 5",
-    readingTime: "30 мин",
-    progress: 28,
-    tone: "rose",
-    excerpt: "When Mary Lennox was sent to Misselthwaite Manor she felt lonely and curious.",
-  },
-  {
-    id: "oz",
-    title: "The Wonderful Wizard of Oz",
-    author: "L. Frank Baum",
-    type: "book",
-    chapter: "Глава 2",
-    readingTime: "22 мин",
-    progress: 64,
-    tone: "gold",
-    excerpt: "Dorothy lived in the midst of the great Kansas prairies with Uncle Henry.",
-  },
-  {
-    id: "anne",
-    title: "Anne of Green Gables",
-    author: "L. M. Montgomery",
-    type: "book",
-    chapter: "Глава 7",
-    readingTime: "28 мин",
-    progress: 53,
-    tone: "plum",
-    excerpt: "Anne looked at the world with bright eyes and a heart full of stories.",
-  },
-];
-
-const popularStories: DemoBook[] = [
-  {
-    id: "seen-217",
-    title: "Seen at 2:17 AM",
-    author: "StoryLingo Original",
-    type: "story",
-    chapter: "Короткий рассказ",
-    readingTime: "12 мин",
-    progress: 0,
-    tone: "midnight",
-    excerpt: "At 2:17 AM, the old reading lamp turned on by itself.",
-  },
-  {
-    id: "magi",
-    title: "The Gift of the Magi",
-    author: "O. Henry",
-    type: "story",
-    chapter: "Классика",
-    readingTime: "18 мин",
-    progress: 0,
-    tone: "candle",
-    excerpt: "One dollar and eighty-seven cents. That was all.",
-  },
-  {
-    id: "last-leaf",
-    title: "The Last Leaf",
-    author: "O. Henry",
-    type: "story",
-    chapter: "Классика",
-    readingTime: "16 мин",
-    progress: 0,
-    tone: "leaf",
-    excerpt: "In a little district west of Washington Square the streets have run crazy.",
-  },
-  {
-    id: "open-door",
-    title: "The Open Door",
-    author: "StoryLingo Original",
-    type: "story",
-    chapter: "Короткий рассказ",
-    readingTime: "10 мин",
-    progress: 0,
-    tone: "door",
-    excerpt: "The door at the end of the hall was always open, but nobody entered.",
-  },
-];
-
-const getShelfBooks = (shelfId: string) => homeShelves.find((shelf) => shelf.id === shelfId)?.books ?? [];
-const getShelfBook = (bookId: string) => homeShelfBooks.find((book) => book.id === bookId);
+const getShelfBooks = (shelfId: string) => getCategoryBooks(shelfId);
+const getShelfBook = (bookId: string) => getCatalogBook(bookId);
 const homeContinueBook = getShelfBook("alice") ?? homeShelfBooks[0];
 const recentBooks = ["secret-garden", "oz", "anne"]
   .map((bookId) => getShelfBook(bookId))
@@ -138,25 +32,22 @@ const recentBooks = ["secret-garden", "oz", "anne"]
 const recommendationBook = getShelfBook("pride-prejudice") ?? homeShelfBooks[0];
 const weeklyNewBook = getShelfBook("seen-217") ?? homeShelfBooks[0];
 const classicBooks = [
+  "alice",
+  "secret-garden",
+  "oz",
   "pride-prejudice",
   "frankenstein",
   "little-women",
-  "time-machine",
-  "jane-eyre",
-  "magi",
-  "last-leaf",
-  "happy-prince",
-  "tell-tale-heart",
 ]
   .map((bookId) => getShelfBook(bookId))
   .filter((book): book is HomeShelfBook => Boolean(book));
 
 const libraryShelves = [
-  { id: "popular-books", title: "🔥 Популярные книги", books: getShelfBooks("popular-books") },
-  { id: "classics", title: "Классика", books: classicBooks },
-  { id: "originals", title: "✨ StoryLingo Originals", books: getShelfBooks("originals") },
-  { id: "short-stories", title: "📚 Короткие рассказы", books: getShelfBooks("short-stories") },
-  { id: "new", title: "Новинки", books: [weeklyNewBook, ...getShelfBooks("originals").filter((book) => book.id !== weeklyNewBook.id)] },
+  { id: "popular-books", title: "Популярные книги", books: getShelfBooks("popular-books") },
+  { id: "classic-books", title: "Классические книги", books: classicBooks },
+  { id: "classic-stories", title: "Классические рассказы", books: getShelfBooks("classic-stories") },
+  { id: "originals", title: "StoryLingo Originals", books: getShelfBooks("originals") },
+  { id: "new", title: "Новинки", books: [weeklyNewBook, ...getShelfBooks("new").filter((book) => book.id !== weeklyNewBook.id)] },
 ];
 
 function App() {
@@ -167,7 +58,7 @@ function App() {
   const [goalDialogOpen, setGoalDialogOpen] = useState(false);
   const closeInfoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { progress, saveReadingProgress, selectLanguage } = useLearnerProgress();
-  const allItems = [...continueBooks, ...popularStories, ...homeShelfBooks];
+  const allItems = homeShelfBooks;
   const activeBook = allItems.find((book) => book.id === activeBookId) ?? null;
   const readingTimer = useReadingTimer(
     activeBook
@@ -205,6 +96,8 @@ function App() {
   }
 
   function openBook(bookId: string) {
+    const book = getShelfBook(bookId);
+    if (book?.comingSoon) return;
     setBookInfo(null);
     setSheetInfo(null);
     setActiveBookId(bookId);
@@ -539,21 +432,33 @@ function ReadingGoalCard({
   );
 }
 
-function ShelfSection({ title, children, onViewAll, compact = false }: { title: string; children: ReactNode; onViewAll: () => void; compact?: boolean }) {
+function ShelfSection({
+  title,
+  children,
+  onViewAll,
+  compact = false,
+  showViewAll = true,
+}: {
+  title: string;
+  children: ReactNode;
+  onViewAll: () => void;
+  compact?: boolean;
+  showViewAll?: boolean;
+}) {
   return (
     <section className={compact ? "shelf-section compact" : "shelf-section"}>
       <div className="shelf-heading">
         <h2>{title}</h2>
-        <button className="shelf-link" type="button" onClick={onViewAll}>Все</button>
+        {showViewAll ? <button className="shelf-link" type="button" onClick={onViewAll}>Все</button> : null}
       </div>
       {children}
     </section>
   );
 }
 
-function BookShelf({ children, compact = false }: { children: ReactNode; compact?: boolean }) {
+function BookShelf({ children, compact = false, grid = false }: { children: ReactNode; compact?: boolean; grid?: boolean }) {
   return (
-    <div className={compact ? "book-shelf compact" : "book-shelf"}>
+    <div className={[compact ? "book-shelf compact" : "book-shelf", grid ? "grid" : ""].filter(Boolean).join(" ")}>
       <div className="shelf-books">{children}</div>
       <div className="wood-shelf" aria-hidden="true" />
     </div>
@@ -610,6 +515,8 @@ function BookCover({
   }
 
   function handleCoverClick(event: React.MouseEvent<HTMLDivElement>) {
+    if (book.comingSoon && !canShowInfo) return;
+
     if (!canShowInfo) {
       onOpen(book.id);
       return;
@@ -674,6 +581,7 @@ function BookCover({
           />
         ) : null}
         {book.original ? <span className="original-ribbon">StoryLingo Original</span> : null}
+        {book.comingSoon ? <span className="soon-ribbon">Скоро</span> : null}
         <span className={hasCoverImage || isMinimalCover ? "cover-frame image-cover-copy" : "cover-frame"}>
           <span className="cover-title">{book.title}</span>
           <span className="cover-author">{book.author}</span>
@@ -738,8 +646,8 @@ function BookInfoPopover({
           <small>{meta.safeProgress}% прочитано</small>
         </span>
       ) : null}
-      <button className="book-info-button" type="button" onClick={() => onOpen(book.id)}>
-        {meta.safeProgress > 0 ? "Продолжить" : "Читать"}
+      <button className="book-info-button" type="button" disabled={book.comingSoon} onClick={() => onOpen(book.id)}>
+        {book.comingSoon ? "Скоро" : meta.safeProgress > 0 ? "Продолжить" : "Читать"}
       </button>
     </aside>
   );
@@ -798,8 +706,8 @@ function BookInfoSheet({
               <small>{meta.safeProgress}% прочитано</small>
             </span>
           ) : null}
-          <button className="book-info-button" type="button" onClick={() => onOpen(book.id)}>
-            {meta.safeProgress > 0 ? "Продолжить" : "Читать"}
+          <button className="book-info-button" type="button" disabled={book.comingSoon} onClick={() => onOpen(book.id)}>
+            {book.comingSoon ? "Скоро" : meta.safeProgress > 0 ? "Продолжить" : "Читать"}
           </button>
         </div>
       </article>
@@ -831,8 +739,11 @@ function LibraryPage({
 }) {
   const [query, setQuery] = useState("");
   const [contentType, setContentType] = useState<"all" | "books" | "stories" | "originals">("all");
+  const [libraryCategory, setLibraryCategory] = useState<string | null>(null);
+  const selectedCategory = libraryShelves.find((shelf) => shelf.id === libraryCategory) ?? null;
 
-  const visibleShelves = libraryShelves
+  const shelvesToShow = selectedCategory ? [selectedCategory] : libraryShelves;
+  const visibleShelves = shelvesToShow
     .map((shelf) => ({
       ...shelf,
       books: shelf.books.filter((book) => {
@@ -854,30 +765,47 @@ function LibraryPage({
     <main className="page-stack library-page">
       <section className="library-header">
         <span className="eyebrow">StoryLingo</span>
-        <h1>Библиотека</h1>
-        <p>Полный демо-каталог книг и рассказов. Реальные подборки появятся позже.</p>
+        {selectedCategory ? (
+          <button className="library-back-button" type="button" onClick={() => setLibraryCategory(null)}>
+            <ArrowLeft size={18} aria-hidden="true" />
+            Назад
+          </button>
+        ) : null}
+        <h1>{selectedCategory ? selectedCategory.title : "Библиотека"}</h1>
+        <p>{selectedCategory ? "Полный список выбранной категории." : "Каталог книг и рассказов StoryLingo."}</p>
       </section>
 
-      <section className="library-controls">
-        <label className="search-field">
-          <Search size={18} aria-hidden="true" />
-          <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Найти книгу или рассказ" />
-        </label>
-        <div className="library-tabs" aria-label="Тип контента">
-          <button className={contentType === "books" ? "active" : ""} type="button" onClick={() => setContentType(contentType === "books" ? "all" : "books")}>Книги</button>
-          <button className={contentType === "stories" ? "active" : ""} type="button" onClick={() => setContentType(contentType === "stories" ? "all" : "stories")}>Рассказы</button>
-          <button className={contentType === "originals" ? "active" : ""} type="button" onClick={() => setContentType(contentType === "originals" ? "all" : "originals")}>Originals</button>
-        </div>
-        <div className="library-filters" aria-label="Фильтры каталога">
-          <span>Уровень: A2-B1</span>
-          <span>Жанр: все</span>
-          <span>Сортировка: популярное</span>
-        </div>
-      </section>
+      {!selectedCategory ? (
+        <section className="library-controls">
+          <label className="search-field">
+            <Search size={18} aria-hidden="true" />
+            <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Найти книгу или рассказ" />
+          </label>
+          <div className="library-tabs" aria-label="Тип контента">
+            <button className={contentType === "books" ? "active" : ""} type="button" onClick={() => setContentType(contentType === "books" ? "all" : "books")}>Книги</button>
+            <button className={contentType === "stories" ? "active" : ""} type="button" onClick={() => setContentType(contentType === "stories" ? "all" : "stories")}>Рассказы</button>
+            <button className={contentType === "originals" ? "active" : ""} type="button" onClick={() => setContentType(contentType === "originals" ? "all" : "originals")}>Originals</button>
+          </div>
+          <div className="library-filters" aria-label="Фильтры каталога">
+            <span>Уровень: A2-B1</span>
+            <span>Жанр: все</span>
+            <span>Сортировка: популярное</span>
+          </div>
+        </section>
+      ) : null}
 
       {visibleShelves.map((shelf) => (
-        <ShelfSection key={shelf.id} title={shelf.title} onViewAll={() => setQuery("")}>
-          <BookShelf>
+        <ShelfSection
+          key={shelf.id}
+          title={shelf.title}
+          onViewAll={() => {
+            setQuery("");
+            setContentType("all");
+            setLibraryCategory(shelf.id);
+          }}
+          showViewAll={!selectedCategory}
+        >
+          <BookShelf grid={Boolean(selectedCategory)}>
             {shelf.books.map((book) => (
               <BookCover
                 key={book.id}
@@ -979,7 +907,7 @@ function ReaderPreview({
   readingTimer,
   onChangeGoal,
 }: {
-  book: DemoBook;
+  book: HomeShelfBook;
   progressValue: number;
   onBack: () => void;
   onProgress: (value: number) => void;
@@ -1260,7 +1188,7 @@ function ContinueBookCard({
   progressValue,
   onOpen,
 }: {
-  book: DemoBook;
+  book: HomeShelfBook;
   progressValue: number;
   onOpen: (bookId: string) => void;
 }) {
@@ -1279,7 +1207,7 @@ function ContinueBookCard({
   );
 }
 
-function StoryCard({ story, onOpen }: { story: DemoBook; onOpen: (bookId: string) => void }) {
+function StoryCard({ story, onOpen }: { story: HomeShelfBook; onOpen: (bookId: string) => void }) {
   return (
     <article className="story-card">
       <div className={`story-cover ${story.tone}`}><BookOpen size={26} aria-hidden="true" /></div>
