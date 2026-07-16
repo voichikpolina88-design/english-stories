@@ -25,26 +25,15 @@ type BookInfoState = {
 
 const getShelfBooks = (shelfId: string) => getCategoryBooks(shelfId);
 const getShelfBook = (bookId: string) => getCatalogBook(bookId);
-const homeContinueBook = getShelfBook("alice") ?? homeShelfBooks[0];
-const recentBooks = ["secret-garden", "oz", "anne"]
+const homeContinueBook = getShelfBook("alice-in-wonderland") ?? homeShelfBooks[0];
+const recentBooks = ["secret-garden", "wonderful-wizard-of-oz", "anne"]
   .map((bookId) => getShelfBook(bookId))
   .filter((book): book is HomeShelfBook => Boolean(book));
 const recommendationBook = getShelfBook("pride-prejudice") ?? homeShelfBooks[0];
 const weeklyNewBook = getShelfBook("seen-217") ?? homeShelfBooks[0];
-const classicBooks = [
-  "alice",
-  "secret-garden",
-  "oz",
-  "pride-prejudice",
-  "frankenstein",
-  "little-women",
-]
-  .map((bookId) => getShelfBook(bookId))
-  .filter((book): book is HomeShelfBook => Boolean(book));
 
 const libraryShelves = [
-  { id: "popular-books", title: "Популярные книги", books: getShelfBooks("popular-books") },
-  { id: "classic-books", title: "Классические книги", books: classicBooks },
+  { id: "classic-books", title: "Классические книги", books: getShelfBooks("classic-books") },
   { id: "classic-stories", title: "Классические рассказы", books: getShelfBooks("classic-stories") },
   { id: "originals", title: "StoryLingo Originals", books: getShelfBooks("originals") },
   { id: "new", title: "Новинки", books: [weeklyNewBook, ...getShelfBooks("new").filter((book) => book.id !== weeklyNewBook.id)] },

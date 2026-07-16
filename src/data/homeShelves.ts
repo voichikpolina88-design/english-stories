@@ -32,7 +32,7 @@ export type LibraryCategory = {
 
 export const libraryCatalog: HomeShelfBook[] = [
   {
-    id: "alice",
+    id: "alice-in-wonderland",
     title: "Alice's Adventures in Wonderland",
     author: "Lewis Carroll",
     type: "book",
@@ -42,7 +42,7 @@ export const libraryCatalog: HomeShelfBook[] = [
     progress: 42,
     tone: "violet",
     coverStyle: "classic",
-    coverImage: "/covers/alice.jpg",
+    coverImage: "/covers/oz.jpg",
     level: "A2",
     chapters: "12 глав",
     tilt: -3,
@@ -66,7 +66,7 @@ export const libraryCatalog: HomeShelfBook[] = [
     excerpt: "When Mary Lennox was sent to Misselthwaite Manor she felt lonely and curious.",
   },
   {
-    id: "oz",
+    id: "wonderful-wizard-of-oz",
     title: "The Wonderful Wizard of Oz",
     author: "L. Frank Baum",
     type: "book",
@@ -76,7 +76,7 @@ export const libraryCatalog: HomeShelfBook[] = [
     progress: 64,
     tone: "gold",
     coverStyle: "gold",
-    coverImage: "/covers/oz.jpg",
+    coverImage: "/covers/alice.jpg",
     level: "A1",
     chapters: "14 глав",
     tilt: -1,
@@ -312,14 +312,9 @@ export const libraryCatalog: HomeShelfBook[] = [
 
 export const libraryCategories: LibraryCategory[] = [
   {
-    id: "popular-books",
-    title: "Популярные книги",
-    bookIds: ["alice", "secret-garden", "oz", "pride-prejudice", "frankenstein", "little-women"],
-  },
-  {
     id: "classic-books",
     title: "Классические книги",
-    bookIds: ["alice", "secret-garden", "oz", "pride-prejudice", "frankenstein", "little-women"],
+    bookIds: ["alice-in-wonderland", "secret-garden", "wonderful-wizard-of-oz", "pride-prejudice", "frankenstein", "little-women"],
   },
   {
     id: "classic-stories",
@@ -349,7 +344,7 @@ const homeShelfConfig: LibraryCategory[] = [
   {
     id: "continue",
     title: "📖 Продолжить чтение",
-    bookIds: ["alice", "secret-garden", "oz"],
+    bookIds: ["alice-in-wonderland", "secret-garden", "wonderful-wizard-of-oz"],
   },
   ...libraryCategories,
 ];
