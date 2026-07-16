@@ -164,6 +164,7 @@ export const libraryCatalog: HomeShelfBook[] = [
     progress: 0,
     tone: "leaf",
     coverStyle: "emerald",
+    coverImage: "/covers/last-leaf.png",
     level: "A2",
     chapters: "1 рассказ",
     tilt: 2,
