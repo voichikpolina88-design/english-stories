@@ -146,6 +146,7 @@ export const libraryCatalog: HomeShelfBook[] = [
     progress: 0,
     tone: "plum",
     coverStyle: "paper",
+    coverImage: "/covers/little-women.png",
     level: "B1",
     chapters: "Скоро",
     tilt: -1,
