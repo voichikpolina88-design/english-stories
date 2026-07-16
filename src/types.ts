@@ -78,3 +78,39 @@ export type LearnerProgress = {
   readingProgress: Record<string, number>;
   lastVisitDate: string;
 };
+
+export type ReadingGoal = {
+  dailyGoalMinutes: number;
+  updatedAt: string;
+};
+
+export type ReadingSession = {
+  id: string;
+  contentType: "book" | "story";
+  contentId: string;
+  chapterId?: string;
+  startedAt: string;
+  endedAt: string;
+  durationSeconds: number;
+  dateKey: string;
+  completed: boolean;
+};
+
+export type ReadingTimerState = {
+  isRunning: boolean;
+  startedAt: number | null;
+  accumulatedSeconds: number;
+  contentId: string | null;
+  chapterId?: string | null;
+};
+
+export type ReadingStats = {
+  todaySeconds: number;
+  last7DaysSeconds: number;
+  last30DaysSeconds: number;
+  sessionCount: number;
+  averageSessionSeconds: number;
+  completedGoalDays: number;
+  currentReadingStreak: number;
+  bestReadingStreak: number;
+};

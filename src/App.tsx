@@ -1,8 +1,9 @@
-import { BookOpen, Home, Languages, Library, Search, User, Volume2 } from "lucide-react";
-import { useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { BookOpen, Clock, Home, Languages, Library, Pause, Play, Search, User, Volume2, X } from "lucide-react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { homeShelfBooks, homeShelves, type HomeShelfBook } from "./data/homeShelves";
 import { getAllVocabulary, type VocabularyEntry } from "./data/vocabulary";
 import { useLearnerProgress } from "./hooks/useLearnerProgress";
+import { useReadingTimer } from "./hooks/useReadingTimer";
 import type { NativeLanguage } from "./types";
 
 type Page = "home" | "library" | "dictionary" | "profile";
@@ -163,10 +164,20 @@ function App() {
   const [activeBookId, setActiveBookId] = useState<string | null>(null);
   const [bookInfo, setBookInfo] = useState<BookInfoState | null>(null);
   const [sheetInfo, setSheetInfo] = useState<{ book: HomeShelfBook; progressValue: number } | null>(null);
+  const [goalDialogOpen, setGoalDialogOpen] = useState(false);
   const closeInfoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { progress, saveReadingProgress, selectLanguage } = useLearnerProgress();
   const allItems = [...continueBooks, ...popularStories, ...homeShelfBooks];
   const activeBook = allItems.find((book) => book.id === activeBookId) ?? null;
+  const readingTimer = useReadingTimer(
+    activeBook
+      ? {
+          contentType: activeBook.type,
+          contentId: activeBook.id,
+          chapterId: activeBook.chapter,
+        }
+      : null,
+  );
 
   function navigate(nextPage: Page) {
     setPage(nextPage);
@@ -199,6 +210,15 @@ function App() {
     setActiveBookId(bookId);
   }
 
+  function startReadingFromGoal() {
+    if (readingTimer.lastContentId && allItems.some((item) => item.id === readingTimer.lastContentId)) {
+      openBook(readingTimer.lastContentId);
+      return;
+    }
+
+    navigate("library");
+  }
+
   return (
     <div className="app-shell">
       <Sidebar page={page} onNavigate={navigate} />
@@ -210,6 +230,8 @@ function App() {
             progressValue={progress.readingProgress[activeBook.id] ?? activeBook.progress}
             onBack={() => setActiveBookId(null)}
             onProgress={(value) => saveReadingProgress(activeBook.id, value)}
+            readingTimer={readingTimer}
+            onChangeGoal={() => setGoalDialogOpen(true)}
           />
         ) : (
           <>
@@ -221,6 +243,9 @@ function App() {
                 onHideBookInfo={scheduleCloseBookInfo}
                 onOpenBookSheet={setSheetInfo}
                 progress={progress.readingProgress}
+                readingTimer={readingTimer}
+                onStartReading={startReadingFromGoal}
+                onChangeGoal={() => setGoalDialogOpen(true)}
               />
             ) : null}
             {page === "library" ? (
@@ -253,6 +278,16 @@ function App() {
           progressValue={sheetInfo.progressValue}
           onClose={() => setSheetInfo(null)}
           onOpen={openBook}
+        />
+      ) : null}
+      {goalDialogOpen ? (
+        <ReadingGoalDialog
+          currentGoal={readingTimer.goal.dailyGoalMinutes}
+          onClose={() => setGoalDialogOpen(false)}
+          onSave={(minutes) => {
+            readingTimer.setDailyGoal(minutes);
+            setGoalDialogOpen(false);
+          }}
         />
       ) : null}
       <MobileNav page={page} onNavigate={navigate} />
@@ -327,6 +362,9 @@ function HomePage({
   onHideBookInfo,
   onOpenBookSheet,
   progress,
+  readingTimer,
+  onStartReading,
+  onChangeGoal,
 }: {
   onNavigate: (page: Page) => void;
   onOpenBook: (bookId: string) => void;
@@ -334,6 +372,9 @@ function HomePage({
   onHideBookInfo: () => void;
   onOpenBookSheet: (info: { book: HomeShelfBook; progressValue: number }) => void;
   progress: Record<string, number>;
+  readingTimer: ReturnType<typeof useReadingTimer>;
+  onStartReading: () => void;
+  onChangeGoal: () => void;
 }) {
   return (
     <main className="book-home">
@@ -384,10 +425,11 @@ function HomePage({
       </section>
 
       <ReadingGoalCard
-        dailyGoalMinutes={5}
-        todayReadingMinutes={0}
-        onChangeGoal={() => undefined}
-        onStartReading={() => onOpenBook(homeContinueBook.id)}
+        dailyGoalMinutes={readingTimer.goal.dailyGoalMinutes}
+        todayReadingSeconds={readingTimer.stats.todaySeconds}
+        isComplete={readingTimer.isGoalCompleteToday}
+        onChangeGoal={onChangeGoal}
+        onStartReading={onStartReading}
       />
     </main>
   );
@@ -462,16 +504,19 @@ function WeeklyNewCard({ book, onOpen }: { book: HomeShelfBook; onOpen: (bookId:
 
 function ReadingGoalCard({
   dailyGoalMinutes,
-  todayReadingMinutes,
+  todayReadingSeconds,
+  isComplete,
   onChangeGoal,
   onStartReading,
 }: {
   dailyGoalMinutes: number;
-  todayReadingMinutes: number;
+  todayReadingSeconds: number;
+  isComplete: boolean;
   onChangeGoal: () => void;
   onStartReading: () => void;
 }) {
-  const progressValue = dailyGoalMinutes > 0 ? Math.min(100, Math.round((todayReadingMinutes / dailyGoalMinutes) * 100)) : 0;
+  const todayReadingMinutes = Math.floor(todayReadingSeconds / 60);
+  const progressValue = dailyGoalMinutes > 0 ? Math.min(100, Math.round((todayReadingSeconds / (dailyGoalMinutes * 60)) * 100)) : 0;
 
   return (
     <section className="reading-goal-card">
@@ -479,6 +524,7 @@ function ReadingGoalCard({
         <span className="eyebrow">Цель по чтению</span>
         <h2>Читайте понемногу каждый день</h2>
         <p>Дневная цель: {dailyGoalMinutes} минут</p>
+        <strong className="goal-status">{isComplete ? "Цель на сегодня выполнена" : `${todayReadingMinutes} из ${dailyGoalMinutes} минут`}</strong>
         <button className="primary-button" type="button" onClick={onStartReading}>Начать читать</button>
         <button className="goal-link" type="button" onClick={onChangeGoal}>Изменить цель</button>
       </div>
@@ -930,17 +976,42 @@ function ReaderPreview({
   progressValue,
   onBack,
   onProgress,
+  readingTimer,
+  onChangeGoal,
 }: {
   book: DemoBook;
   progressValue: number;
   onBack: () => void;
   onProgress: (value: number) => void;
+  readingTimer: ReturnType<typeof useReadingTimer>;
+  onChangeGoal: () => void;
 }) {
   const speech = useSpeech();
+  const [timerOpen, setTimerOpen] = useState(false);
   const nextProgress = Math.min(100, Math.max(progressValue, 0) + 12);
 
+  useEffect(() => {
+    if (!timerOpen) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setTimerOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [timerOpen]);
+
   return (
-    <main className="reader-preview">
+    <main
+      className="reader-preview"
+      onClick={readingTimer.recordActivity}
+      onKeyDown={readingTimer.recordActivity}
+      onPointerMove={readingTimer.recordActivity}
+      onScroll={readingTimer.recordActivity}
+      onTouchStart={readingTimer.recordActivity}
+    >
       <button className="text-button" type="button" onClick={onBack}>← Назад в библиотеку</button>
       <article className="reader-card">
         <div className={`book-cover ${book.tone}`}><span>{book.title.split(" ")[0]}</span></div>
@@ -962,8 +1033,195 @@ function ReaderPreview({
           </button>
         </div>
       </article>
+      <ReadingTimerButton
+        bookTitle={book.title}
+        chapterTitle={book.chapter}
+        isOpen={timerOpen}
+        onChangeGoal={onChangeGoal}
+        onToggle={() => setTimerOpen((current) => !current)}
+        readingTimer={readingTimer}
+      />
     </main>
   );
+}
+
+function ReadingGoalDialog({
+  currentGoal,
+  onClose,
+  onSave,
+}: {
+  currentGoal: number;
+  onClose: () => void;
+  onSave: (minutes: number) => void;
+}) {
+  const goalOptions = [5, 10, 15, 20, 30];
+  const [selectedGoal, setSelectedGoal] = useState<number | "custom">(goalOptions.includes(currentGoal) ? currentGoal : "custom");
+  const [customGoal, setCustomGoal] = useState(goalOptions.includes(currentGoal) ? "" : currentGoal.toString());
+  const selectedMinutes = selectedGoal === "custom" ? Number(customGoal) : selectedGoal;
+  const isValidGoal = Number.isInteger(selectedMinutes) && selectedMinutes >= 1 && selectedMinutes <= 240;
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        onClose();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
+
+  return (
+    <div className="goal-dialog-layer" role="presentation" onClick={onClose}>
+      <section className="goal-dialog" role="dialog" aria-modal="true" aria-labelledby="goal-dialog-title" onClick={(event) => event.stopPropagation()}>
+        <button className="dialog-close" type="button" aria-label="Закрыть окно цели" onClick={onClose}>
+          <X size={18} aria-hidden="true" />
+        </button>
+        <span className="eyebrow">Цель по чтению</span>
+        <h2 id="goal-dialog-title">Изменить дневную цель</h2>
+        <p>Выберите спокойный темп на день. Уже прочитанное сегодня время сохранится.</p>
+        <div className="goal-options" role="group" aria-label="Варианты дневной цели">
+          {goalOptions.map((minutes) => (
+            <button
+              className={selectedGoal === minutes ? "goal-option active" : "goal-option"}
+              key={minutes}
+              type="button"
+              onClick={() => setSelectedGoal(minutes)}
+            >
+              {minutes} минут
+            </button>
+          ))}
+          <button
+            className={selectedGoal === "custom" ? "goal-option active" : "goal-option"}
+            type="button"
+            onClick={() => setSelectedGoal("custom")}
+          >
+            Своё
+          </button>
+        </div>
+        {selectedGoal === "custom" ? (
+          <label className="custom-goal-field">
+            <span>Своё значение, минут</span>
+            <input
+              inputMode="numeric"
+              min={1}
+              max={240}
+              step={1}
+              type="number"
+              value={customGoal}
+              onChange={(event) => setCustomGoal(event.target.value)}
+            />
+          </label>
+        ) : null}
+        <div className="goal-dialog-actions">
+          <button className="secondary-button" type="button" onClick={onClose}>Отмена</button>
+          <button className="primary-button" type="button" disabled={!isValidGoal} onClick={() => onSave(selectedMinutes)}>
+            Сохранить
+          </button>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function ReadingTimerButton({
+  bookTitle,
+  chapterTitle,
+  isOpen,
+  onChangeGoal,
+  onToggle,
+  readingTimer,
+}: {
+  bookTitle: string;
+  chapterTitle: string;
+  isOpen: boolean;
+  onChangeGoal: () => void;
+  onToggle: () => void;
+  readingTimer: ReturnType<typeof useReadingTimer>;
+}) {
+  return (
+    <div className="reading-timer-widget">
+      <button
+        className={readingTimer.timer.isRunning ? "reading-timer-toggle running" : "reading-timer-toggle paused"}
+        type="button"
+        aria-expanded={isOpen}
+        aria-label="Открыть таймер чтения"
+        onClick={onToggle}
+      >
+        <Clock size={18} aria-hidden="true" />
+        <span>{formatTimer(readingTimer.currentSessionSeconds)}</span>
+      </button>
+      {isOpen ? (
+        <ReadingTimerPanel
+          bookTitle={bookTitle}
+          chapterTitle={chapterTitle}
+          onChangeGoal={onChangeGoal}
+          readingTimer={readingTimer}
+        />
+      ) : null}
+    </div>
+  );
+}
+
+function ReadingTimerPanel({
+  bookTitle,
+  chapterTitle,
+  onChangeGoal,
+  readingTimer,
+}: {
+  bookTitle: string;
+  chapterTitle: string;
+  onChangeGoal: () => void;
+  readingTimer: ReturnType<typeof useReadingTimer>;
+}) {
+  const todayMinutes = Math.floor(readingTimer.stats.todaySeconds / 60);
+  const goalMinutes = readingTimer.goal.dailyGoalMinutes;
+  const pauseMessage =
+    readingTimer.pauseReason === "idle"
+      ? "Таймер приостановлен из-за бездействия"
+      : readingTimer.pauseReason === "manual"
+        ? "Таймер на паузе"
+        : null;
+
+  return (
+    <section className="reading-timer-panel" role="dialog" aria-label="Таймер чтения">
+      <div className="timer-panel-heading">
+        <span className="eyebrow">Таймер чтения</span>
+        <strong>Сегодня: {todayMinutes} из {goalMinutes} минут</strong>
+        {readingTimer.isGoalCompleteToday ? <small className="timer-complete">Цель на сегодня выполнена</small> : null}
+      </div>
+      <div className="timer-session-time" aria-live="polite">
+        {formatTimer(readingTimer.currentSessionSeconds)}
+      </div>
+      <p className="timer-current-book">{bookTitle} · {chapterTitle}</p>
+      {pauseMessage ? <p className="timer-message">{pauseMessage}</p> : null}
+      <div className="timer-actions">
+        <button
+          className="primary-button"
+          type="button"
+          onClick={readingTimer.timer.isRunning ? readingTimer.pauseTimer : readingTimer.resumeTimer}
+        >
+          {readingTimer.timer.isRunning ? <Pause size={16} aria-hidden="true" /> : <Play size={16} aria-hidden="true" />}
+          {readingTimer.timer.isRunning ? "Пауза" : "Продолжить"}
+        </button>
+        <button className="secondary-button" type="button" onClick={readingTimer.finishSession}>Завершить сеанс</button>
+      </div>
+      <button className="timer-text-button" type="button" onClick={onChangeGoal}>Изменить цель</button>
+    </section>
+  );
+}
+
+function formatTimer(seconds: number) {
+  const safeSeconds = Math.max(0, Math.floor(seconds));
+  const hours = Math.floor(safeSeconds / 3600);
+  const minutes = Math.floor((safeSeconds % 3600) / 60);
+  const rest = safeSeconds % 60;
+
+  if (hours > 0) {
+    return `${hours}:${minutes.toString().padStart(2, "0")}:${rest.toString().padStart(2, "0")}`;
+  }
+
+  return `${minutes.toString().padStart(2, "0")}:${rest.toString().padStart(2, "0")}`;
 }
 
 function BookSection({ title, className, children }: { title: string; className: string; children: ReactNode }) {
