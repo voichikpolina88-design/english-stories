@@ -637,14 +637,16 @@ function BookInfoPopover({
   onRequestClose: () => void;
 }) {
   const meta = getBookInfoMeta(book, progressValue);
-  const cardWidth = 310;
+  const cardWidth = 292;
   const gap = 18;
   const viewportWidth = window.innerWidth;
   const viewportHeight = window.innerHeight;
-  const opensRight = anchorRect.right + gap + cardWidth <= viewportWidth - 16;
+  const rightSpace = viewportWidth - anchorRect.right - gap - 16;
+  const leftSpace = anchorRect.left - gap - 16;
+  const opensRight = rightSpace >= cardWidth || rightSpace >= leftSpace;
   const rawLeft = opensRight ? anchorRect.right + gap : anchorRect.left - gap - cardWidth;
   const left = Math.max(12, Math.min(rawLeft, viewportWidth - cardWidth - 12));
-  const top = Math.max(12, Math.min(anchorRect.top + 8, viewportHeight - 328));
+  const top = Math.max(12, Math.min(anchorRect.top + 6, viewportHeight - 300));
 
   return (
     <aside
