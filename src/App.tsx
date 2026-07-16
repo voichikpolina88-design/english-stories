@@ -1,6 +1,6 @@
 import { ArrowLeft, BookOpen, Clock, Home, Languages, Library, Pause, Play, Search, User, Volume2, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from "react";
-import { getCatalogBook, getCategoryBooks, homeShelfBooks, type HomeShelfBook } from "./data/homeShelves";
+import { getCatalogBook, getCategoryBooks, homeShelfBooks, libraryCategories, type HomeShelfBook } from "./data/homeShelves";
 import { getAllVocabulary, type VocabularyEntry } from "./data/vocabulary";
 import { useLearnerProgress } from "./hooks/useLearnerProgress";
 import { useReadingTimer } from "./hooks/useReadingTimer";
@@ -25,6 +25,7 @@ type BookInfoState = {
 
 const getShelfBooks = (shelfId: string) => getCategoryBooks(shelfId);
 const getShelfBook = (bookId: string) => getCatalogBook(bookId);
+const getBooksByIds = (bookIds: string[]) => bookIds.map((bookId) => getShelfBook(bookId)).filter((book): book is HomeShelfBook => Boolean(book));
 const homeContinueBook = getShelfBook("alice-in-wonderland") ?? homeShelfBooks[0];
 const recentBooks = ["secret-garden", "wonderful-wizard-of-oz", "anne"]
   .map((bookId) => getShelfBook(bookId))
@@ -32,12 +33,10 @@ const recentBooks = ["secret-garden", "wonderful-wizard-of-oz", "anne"]
 const recommendationBook = getShelfBook("pride-prejudice") ?? homeShelfBooks[0];
 const weeklyNewBook = getShelfBook("seen-217") ?? homeShelfBooks[0];
 
-const libraryShelves = [
-  { id: "classic-books", title: "Классические книги", books: getShelfBooks("classic-books") },
-  { id: "classic-stories", title: "Классические рассказы", books: getShelfBooks("classic-stories") },
-  { id: "originals", title: "StoryLingo Originals", books: getShelfBooks("originals") },
-  { id: "new", title: "Новинки", books: [weeklyNewBook, ...getShelfBooks("new").filter((book) => book.id !== weeklyNewBook.id)] },
-];
+const libraryShelves = libraryCategories.map((category) => ({
+  ...category,
+  books: getShelfBooks(category.id),
+}));
 
 function App() {
   const [page, setPage] = useState<Page>("home");
@@ -454,6 +453,67 @@ function BookShelf({ children, compact = false, grid = false }: { children: Reac
   );
 }
 
+function FullCategoryBooks({
+  books,
+  onHideBookInfo,
+  onOpenBook,
+  onOpenBookSheet,
+  onShowBookInfo,
+  progress,
+}: {
+  books: HomeShelfBook[];
+  onHideBookInfo: () => void;
+  onOpenBook: (bookId: string) => void;
+  onOpenBookSheet: (info: { book: HomeShelfBook; progressValue: number }) => void;
+  onShowBookInfo: (book: HomeShelfBook, progressValue: number, rect: BookRect) => void;
+  progress: Record<string, number>;
+}) {
+  const renderBooks = (items: HomeShelfBook[]) =>
+    items.map((book) => (
+      <BookCover
+        key={book.id}
+        book={book}
+        progressValue={progress[book.id] ?? book.progress}
+        onOpen={onOpenBook}
+        onShowInfo={onShowBookInfo}
+        onHideInfo={onHideBookInfo}
+        onOpenSheet={onOpenBookSheet}
+      />
+    ));
+
+  return (
+    <div className="category-full-list">
+      <div className="category-full-desktop category-full-desktop-4">
+        {chunkBooks(books, 4).map((row, index) => (
+          <BookShelf key={`row-4-${index}`}>
+            {renderBooks(row)}
+          </BookShelf>
+        ))}
+      </div>
+      <div className="category-full-desktop category-full-desktop-3">
+        {chunkBooks(books, 3).map((row, index) => (
+          <BookShelf key={`row-3-${index}`}>
+            {renderBooks(row)}
+          </BookShelf>
+        ))}
+      </div>
+      <div className="category-full-mobile">
+        <BookShelf grid>
+          {renderBooks(books)}
+        </BookShelf>
+      </div>
+    </div>
+  );
+}
+
+function chunkBooks(books: HomeShelfBook[], size: number) {
+  const rows: HomeShelfBook[][] = [];
+  for (let index = 0; index < books.length; index += size) {
+    rows.push(books.slice(index, index + size));
+  }
+  return rows;
+}
+
 function BookCover({
   book,
   progressValue,
@@ -731,7 +791,16 @@ function LibraryPage({
   const [libraryCategory, setLibraryCategory] = useState<string | null>(null);
   const selectedCategory = libraryShelves.find((shelf) => shelf.id === libraryCategory) ?? null;
 
-  const shelvesToShow = selectedCategory ? [selectedCategory] : libraryShelves;
+  const shelvesToShow = selectedCategory
+    ? [selectedCategory]
+    : libraryShelves.map((shelf) => {
+        const previewBookIds = shelf.bookIds.slice(0, 3);
+        return {
+          ...shelf,
+          bookIds: previewBookIds,
+          books: getBooksByIds(previewBookIds),
+        };
+      });
   const visibleShelves = shelvesToShow
     .map((shelf) => ({
       ...shelf,
@@ -794,19 +863,30 @@ function LibraryPage({
           }}
           showViewAll={!selectedCategory}
         >
-          <BookShelf grid={Boolean(selectedCategory)}>
-            {shelf.books.map((book) => (
-              <BookCover
-                key={book.id}
-                book={book}
-                progressValue={progress[book.id] ?? book.progress}
-                onOpen={onOpenBook}
-                onShowInfo={onShowBookInfo}
-                onHideInfo={onHideBookInfo}
-                onOpenSheet={onOpenBookSheet}
-              />
-            ))}
-          </BookShelf>
+          {selectedCategory ? (
+            <FullCategoryBooks
+              books={shelf.books}
+              onHideBookInfo={onHideBookInfo}
+              onOpenBook={onOpenBook}
+              onOpenBookSheet={onOpenBookSheet}
+              onShowBookInfo={onShowBookInfo}
+              progress={progress}
+            />
+          ) : (
+            <BookShelf>
+              {shelf.books.map((book) => (
+                <BookCover
+                  key={book.id}
+                  book={book}
+                  progressValue={progress[book.id] ?? book.progress}
+                  onOpen={onOpenBook}
+                  onShowInfo={onShowBookInfo}
+                  onHideInfo={onHideBookInfo}
+                  onOpenSheet={onOpenBookSheet}
+                />
+              ))}
+            </BookShelf>
+          )}
         </ShelfSection>
       ))}
     </main>
