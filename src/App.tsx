@@ -35,7 +35,7 @@ const getShelfBook = (bookId: string) => getCatalogBook(bookId);
 const recentBooks = ["secret-garden", "wonderful-wizard-of-oz"]
   .map((bookId) => getShelfBook(bookId))
   .filter((book): book is HomeShelfBook => Boolean(book));
-const recommendationBook = getShelfBook("pride-prejudice") ?? homeShelfBooks[0];
+const recommendationBook = getShelfBook("pride-and-prejudice") ?? homeShelfBooks[0];
 const weeklyNewBook = getShelfBook("seen-217") ?? homeShelfBooks[0];
 
 const libraryShelves = libraryCategories.map((category) => ({
@@ -489,6 +489,9 @@ function RecommendationCard({
   book: HomeShelfBook;
   onOpen: (bookId: string) => void;
 }) {
+  const [imageFailed, setImageFailed] = useState(false);
+  const hasCoverImage = Boolean(book.coverImage && !imageFailed);
+
   function handleKeyDown(event: ReactKeyboardEvent<HTMLElement>) {
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
@@ -506,7 +509,12 @@ function RecommendationCard({
       aria-label={`Открыть ${book.title}`}
     >
       <div className={`recommendation-cover cover-${book.coverStyle}`} aria-hidden="true">
-        <span>{book.title}</span>
+        {hasCoverImage ? (
+          <img src={book.coverImage} alt="" loading="lazy" decoding="async" onError={() => setImageFailed(true)} />
+        ) : (
+          <span>{book.title}</span>
+        )}
+        {book.comingSoon ? <small>Скоро</small> : null}
       </div>
       <div className="recommendation-copy">
         <span className="eyebrow">Рекомендация для вас</span>

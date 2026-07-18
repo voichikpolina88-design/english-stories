@@ -83,7 +83,7 @@ export const libraryCatalog: HomeShelfBook[] = [
     excerpt: "Dorothy lived in the midst of the great Kansas prairies with Uncle Henry.",
   },
   {
-    id: "pride-prejudice",
+    id: "pride-and-prejudice",
     title: "Pride and Prejudice",
     author: "Jane Austen",
     type: "book",
@@ -304,7 +304,7 @@ export const libraryCategories: LibraryCategory[] = [
   {
     id: "classic-books",
     title: "Классические книги",
-    bookIds: ["alice-in-wonderland", "secret-garden", "wonderful-wizard-of-oz", "pride-prejudice", "frankenstein", "little-women"],
+    bookIds: ["alice-in-wonderland", "secret-garden", "wonderful-wizard-of-oz", "pride-and-prejudice", "frankenstein", "little-women"],
   },
   {
     id: "classic-stories",
