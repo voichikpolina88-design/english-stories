@@ -125,3 +125,50 @@ export type ReadingStats = {
   currentReadingStreak: number;
   bestReadingStreak: number;
 };
+
+export type ReaderWord = {
+  id: string;
+  text: string;
+  lemma?: string;
+  translation?: string;
+  audioSrc?: string;
+};
+
+export type ReaderSentence = {
+  id: string;
+  words: ReaderWord[];
+  translation?: string;
+  audioSrc?: string;
+};
+
+export type ReaderParagraph = {
+  id: string;
+  sentences: ReaderSentence[];
+};
+
+export type ReaderChapter = {
+  id: string;
+  number: number;
+  title: string;
+  paragraphs: ReaderParagraph[];
+};
+
+export type ReaderBook = {
+  id: string;
+  title: string;
+  author: string;
+  chapters: ReaderChapter[];
+};
+
+export type ReadingTheme = "light" | "cream" | "sepia" | "dark";
+export type ReadingFont = "Literata" | "Merriweather" | "Georgia" | "Inter";
+
+export type ReadingSettings = {
+  theme: ReadingTheme;
+  textSize: number;
+  lineHeight: number;
+  fontFamily: ReadingFont;
+  textWidth: number;
+  showSentenceTranslation: boolean;
+  showWordTranslation: boolean;
+};

@@ -1,10 +1,11 @@
-import { ArrowLeft, BookOpen, Clock, Home, Languages, Library, Pause, Play, Search, User, Volume2, X } from "lucide-react";
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent, type ReactNode, type RefObject } from "react";
+import { ArrowLeft, BookOpen, Bookmark, Clock, Home, Languages, Library, Pause, Play, Search, User, Volume2, X } from "lucide-react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type Dispatch, type KeyboardEvent as ReactKeyboardEvent, type ReactNode, type RefObject, type SetStateAction } from "react";
 import { getCatalogBook, getCategoryBooks, homeShelfBooks, libraryCategories, type HomeShelfBook } from "./data/homeShelves";
+import { getReaderChapter } from "./data/aliceReader";
 import { getAllVocabulary, type VocabularyEntry } from "./data/vocabulary";
 import { useLearnerProgress } from "./hooks/useLearnerProgress";
 import { useReadingTimer } from "./hooks/useReadingTimer";
-import type { LastOpenedContent, NativeLanguage } from "./types";
+import type { LastOpenedContent, NativeLanguage, ReaderChapter, ReaderParagraph, ReaderSentence, ReaderWord, ReadingSettings } from "./types";
 
 type Page = "home" | "library" | "dictionary" | "profile";
 
@@ -30,6 +31,27 @@ type OpenContentOptions = {
   restorePosition?: boolean;
 };
 
+const READING_SETTINGS_KEY = "storylingo-reading-settings";
+
+const defaultReadingSettings: ReadingSettings = {
+  theme: "cream",
+  textSize: 21,
+  lineHeight: 1.7,
+  fontFamily: "Literata",
+  textWidth: 720,
+  showSentenceTranslation: false,
+  showWordTranslation: false,
+};
+
+const readingThemes: Array<{ id: ReadingSettings["theme"]; label: string }> = [
+  { id: "light", label: "Light" },
+  { id: "cream", label: "Cream" },
+  { id: "sepia", label: "Sepia" },
+  { id: "dark", label: "Dark" },
+];
+
+const readingFonts: ReadingSettings["fontFamily"][] = ["Literata", "Merriweather", "Georgia", "Inter"];
+
 const getShelfBooks = (shelfId: string) => getCategoryBooks(shelfId);
 const getShelfBook = (bookId: string) => getCatalogBook(bookId);
 const recentBooks = ["secret-garden", "wonderful-wizard-of-oz"]
@@ -42,6 +64,27 @@ const libraryShelves = libraryCategories.map((category) => ({
   ...category,
   books: getShelfBooks(category.id),
 }));
+
+function useReadingSettings() {
+  const [settings, setSettings] = useState<ReadingSettings>(() => {
+    try {
+      const saved = window.localStorage.getItem(READING_SETTINGS_KEY);
+      return saved ? { ...defaultReadingSettings, ...JSON.parse(saved) } : defaultReadingSettings;
+    } catch {
+      return defaultReadingSettings;
+    }
+  });
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(READING_SETTINGS_KEY, JSON.stringify(settings));
+    } catch {
+      // Reading should remain available when localStorage is blocked.
+    }
+  }, [settings]);
+
+  return { settings, setSettings };
+}
 
 function App() {
   const [page, setPage] = useState<Page>("home");
@@ -1309,31 +1352,98 @@ function ReaderPreview({
   onChangeGoal: () => void;
 }) {
   const speech = useSpeech();
+  const { settings, setSettings } = useReadingSettings();
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [bookmarked, setBookmarked] = useState(false);
   const [timerOpen, setTimerOpen] = useState(false);
   const timerButtonRef = useRef<HTMLButtonElement | null>(null);
-  const nextProgress = Math.min(100, Math.max(progressValue, 0) + 12);
+  const settingsButtonRef = useRef<HTMLButtonElement | null>(null);
+  const settingsPanelRef = useRef<HTMLDivElement | null>(null);
+  const readerContentRef = useRef<HTMLDivElement | null>(null);
+  const onProgressRef = useRef(onProgress);
+  const onSessionUpdateRef = useRef(onSessionUpdate);
+  const chapter = getReaderChapter(book.id, "alice-chapter-1") ?? createFallbackChapter(book);
+  const chapterCount = book.id === "alice-in-wonderland" ? 12 : 1;
+  const bookPercent = Math.min(100, Math.max(progressValue, 0));
   const closeTimer = () => {
     setTimerOpen(false);
     window.setTimeout(() => timerButtonRef.current?.focus(), 0);
   };
 
   useEffect(() => {
+    onProgressRef.current = onProgress;
+    onSessionUpdateRef.current = onSessionUpdate;
+  }, [onProgress, onSessionUpdate]);
+
+  useEffect(() => {
     if (restoreScrollPosition !== null) {
       window.setTimeout(() => window.scrollTo({ top: restoreScrollPosition, behavior: "auto" }), 0);
     }
 
-    onSessionUpdate(window.scrollY);
+    onSessionUpdateRef.current(window.scrollY);
 
     const handleBeforeUnload = () => {
-      onSessionUpdate(window.scrollY);
+      onSessionUpdateRef.current(window.scrollY);
     };
 
     window.addEventListener("beforeunload", handleBeforeUnload);
     return () => {
-      onSessionUpdate(window.scrollY);
+      onSessionUpdateRef.current(window.scrollY);
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
   }, [book.id]);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (!settingsOpen) return;
+      const target = event.target as Node;
+      if (settingsPanelRef.current?.contains(target) || settingsButtonRef.current?.contains(target)) return;
+      setSettingsOpen(false);
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setSettingsOpen(false);
+        settingsButtonRef.current?.focus();
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [settingsOpen]);
+
+  useEffect(() => {
+    let frameId = 0;
+
+    function updateReadingProgress() {
+      window.cancelAnimationFrame(frameId);
+      frameId = window.requestAnimationFrame(() => {
+        const content = readerContentRef.current;
+        if (!content) return;
+
+        const rect = content.getBoundingClientRect();
+        const readableHeight = Math.max(1, content.scrollHeight - window.innerHeight * 0.65);
+        const scrolled = Math.max(0, -rect.top);
+        const chapterProgress = Math.min(100, Math.round((scrolled / readableHeight) * 100));
+        const totalProgress = Math.min(100, Math.max(bookPercent, Math.round(((chapter.number - 1) / chapterCount) * 100 + chapterProgress / chapterCount)));
+        if (totalProgress > bookPercent) {
+          onProgressRef.current(totalProgress);
+        }
+        onSessionUpdateRef.current(window.scrollY);
+      });
+    }
+
+    updateReadingProgress();
+    window.addEventListener("scroll", updateReadingProgress, { passive: true });
+    return () => {
+      window.cancelAnimationFrame(frameId);
+      window.removeEventListener("scroll", updateReadingProgress);
+    };
+  }, [book.id, chapter.id, bookPercent, chapter.number, chapterCount]);
 
   useEffect(() => {
     if (!timerOpen) return;
@@ -1350,37 +1460,86 @@ function ReaderPreview({
 
   return (
     <main
-      className="reader-preview"
+      className={`reader-preview reading-theme-${settings.theme}`}
       onClick={readingTimer.recordActivity}
       onKeyDown={readingTimer.recordActivity}
       onPointerMove={readingTimer.recordActivity}
       onScroll={readingTimer.recordActivity}
       onTouchStart={readingTimer.recordActivity}
+      style={{
+        "--reader-font-size": `${settings.textSize}px`,
+        "--reader-line-height": settings.lineHeight,
+        "--reader-font-family": readerFontStack(settings.fontFamily),
+        "--reader-width": `${settings.textWidth}px`,
+      } as CSSProperties}
     >
-      <button className="text-button" type="button" onClick={onBack}>← Назад в библиотеку</button>
-      <article className="reader-card">
-        <div className={`book-cover ${book.tone}`}><span>{book.title.split(" ")[0]}</span></div>
-        <div className="reader-copy">
-          <span className="eyebrow">{book.chapter}</span>
-          <h1>{book.title}</h1>
-          <p>{book.author}</p>
-          <div className="reader-progress">
-            <div><span style={{ width: `${progressValue}%` }} /></div>
-            <small>{progressValue}% прочитано</small>
-          </div>
-          <blockquote>{book.excerpt}</blockquote>
-          <button className="audio-link" type="button" onClick={() => speech.toggle(book.excerpt)}>
-            <Volume2 size={18} aria-hidden="true" />
-            Прослушать фрагмент
+      <header className="reading-topbar">
+        <button className="reader-icon-button reader-back-button" type="button" aria-label="Назад" onClick={onBack}>
+          <ArrowLeft size={20} aria-hidden="true" />
+        </button>
+        <div className="reading-title">
+          <strong>{book.title}</strong>
+          <span>{book.author}</span>
+        </div>
+        <div className="reading-actions">
+          <button
+            className={settingsOpen ? "reader-icon-button active" : "reader-icon-button"}
+            type="button"
+            aria-label="Настройки чтения"
+            aria-expanded={settingsOpen}
+            ref={settingsButtonRef}
+            onClick={() => setSettingsOpen((current) => !current)}
+          >
+            Aa
           </button>
-          <button className="primary-button" type="button" onClick={() => onProgress(nextProgress)}>
-            Сохранить прогресс чтения
+          <button
+            className={bookmarked ? "reader-icon-button active" : "reader-icon-button"}
+            type="button"
+            aria-label={bookmarked ? "Убрать закладку" : "Добавить закладку"}
+            onClick={() => setBookmarked((current) => !current)}
+          >
+            <Bookmark size={18} aria-hidden="true" />
+          </button>
+          <button className="reader-icon-button" type="button" aria-label="Поиск по главе">
+            <Search size={18} aria-hidden="true" />
           </button>
         </div>
+        {settingsOpen ? (
+          <ReadingSettingsPanel
+            panelRef={settingsPanelRef}
+            settings={settings}
+            onChange={setSettings}
+          />
+        ) : null}
+      </header>
+
+      <article className="reading-page" ref={readerContentRef}>
+        <div className="reading-chapter-heading">
+          <span>Chapter {chapter.number}</span>
+          <h1>{chapter.title}</h1>
+        </div>
+        <div className="structured-text">
+          {chapter.paragraphs.map((paragraph) => (
+            <ReaderParagraphView
+              key={paragraph.id}
+              paragraph={paragraph}
+              settings={settings}
+              onSpeak={(sentence) => speech.toggle(sentence.words.map((word) => word.text).join(" "))}
+            />
+          ))}
+        </div>
       </article>
+
+      <footer className="reading-bottombar">
+        <span>Chapter {chapter.number} of {chapterCount}</span>
+        <div className="reading-book-progress" aria-label={`${bookPercent}% книги`}>
+          <span style={{ width: `${bookPercent}%` }} />
+        </div>
+        <span>{bookPercent}% книги</span>
+      </footer>
       <ReadingTimerButton
         bookTitle={book.title}
-        chapterTitle={book.chapter}
+        chapterTitle={`Chapter ${chapter.number}: ${chapter.title}`}
         isOpen={timerOpen}
         buttonRef={timerButtonRef}
         onClose={closeTimer}
@@ -1390,6 +1549,181 @@ function ReaderPreview({
       />
     </main>
   );
+}
+
+function ReadingSettingsPanel({
+  panelRef,
+  settings,
+  onChange,
+}: {
+  panelRef: RefObject<HTMLDivElement | null>;
+  settings: ReadingSettings;
+  onChange: Dispatch<SetStateAction<ReadingSettings>>;
+}) {
+  return (
+    <div className="reading-settings-panel" ref={panelRef} role="dialog" aria-label="Настройки чтения">
+      <div className="settings-group">
+        <span>Тема</span>
+        <div className="segmented-control">
+          {readingThemes.map((theme) => (
+            <button
+              className={settings.theme === theme.id ? "active" : ""}
+              key={theme.id}
+              type="button"
+              onClick={() => onChange((current) => ({ ...current, theme: theme.id }))}
+            >
+              {theme.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <label className="settings-range">
+        <span>Размер текста</span>
+        <input
+          type="range"
+          min={16}
+          max={30}
+          value={settings.textSize}
+          onChange={(event) => onChange((current) => ({ ...current, textSize: Number(event.target.value) }))}
+        />
+      </label>
+
+      <label className="settings-range">
+        <span>Межстрочный интервал</span>
+        <input
+          type="range"
+          min={1.35}
+          max={2.1}
+          step={0.05}
+          value={settings.lineHeight}
+          onChange={(event) => onChange((current) => ({ ...current, lineHeight: Number(event.target.value) }))}
+        />
+      </label>
+
+      <label className="settings-select">
+        <span>Шрифт</span>
+        <select
+          value={settings.fontFamily}
+          onChange={(event) => onChange((current) => ({ ...current, fontFamily: event.target.value as ReadingSettings["fontFamily"] }))}
+        >
+          {readingFonts.map((font) => (
+            <option key={font} value={font}>{font}</option>
+          ))}
+        </select>
+      </label>
+
+      <label className="settings-range desktop-only-setting">
+        <span>Ширина текста</span>
+        <input
+          type="range"
+          min={560}
+          max={920}
+          step={20}
+          value={settings.textWidth}
+          onChange={(event) => onChange((current) => ({ ...current, textWidth: Number(event.target.value) }))}
+        />
+      </label>
+
+      <label className="settings-toggle">
+        <span>Показывать перевод предложения</span>
+        <input
+          type="checkbox"
+          checked={settings.showSentenceTranslation}
+          onChange={(event) => onChange((current) => ({ ...current, showSentenceTranslation: event.target.checked }))}
+        />
+      </label>
+
+      <label className="settings-toggle">
+        <span>Показывать перевод слова</span>
+        <input
+          type="checkbox"
+          checked={settings.showWordTranslation}
+          onChange={(event) => onChange((current) => ({ ...current, showWordTranslation: event.target.checked }))}
+        />
+      </label>
+    </div>
+  );
+}
+
+function ReaderParagraphView({
+  paragraph,
+  settings,
+  onSpeak,
+}: {
+  paragraph: ReaderParagraph;
+  settings: ReadingSettings;
+  onSpeak: (sentence: ReaderSentence) => void;
+}) {
+  return (
+    <p className="reader-paragraph">
+      {paragraph.sentences.map((sentence) => (
+        <ReaderSentenceView key={sentence.id} sentence={sentence} settings={settings} onSpeak={onSpeak} />
+      ))}
+    </p>
+  );
+}
+
+function ReaderSentenceView({
+  sentence,
+  settings,
+  onSpeak,
+}: {
+  sentence: ReaderSentence;
+  settings: ReadingSettings;
+  onSpeak: (sentence: ReaderSentence) => void;
+}) {
+  return (
+    <span className="reader-sentence">
+      <span className="reader-sentence-words">
+        {sentence.words.map((word) => (
+          <ReaderWordView key={word.id} word={word} showTranslation={settings.showWordTranslation} />
+        ))}
+      </span>
+      <button className="sentence-audio-button" type="button" aria-label="Прослушать предложение" onClick={() => onSpeak(sentence)}>
+        <Volume2 size={15} aria-hidden="true" />
+      </button>
+      {settings.showSentenceTranslation && sentence.translation ? <span className="sentence-translation">{sentence.translation}</span> : null}
+    </span>
+  );
+}
+
+function ReaderWordView({ word, showTranslation }: { word: ReaderWord; showTranslation: boolean }) {
+  return (
+    <span className="reader-word" data-word-id={word.id}>
+      <span>{word.text}</span>
+      {showTranslation && word.translation ? <small>{word.translation}</small> : null}
+    </span>
+  );
+}
+
+function createFallbackChapter(book: HomeShelfBook): ReaderChapter {
+  return {
+    id: `${book.id}-chapter-1`,
+    number: 1,
+    title: book.chapter || "Reading",
+    paragraphs: [
+      {
+        id: `${book.id}-p1`,
+        sentences: [
+          {
+            id: `${book.id}-s1`,
+            words: book.excerpt.split(" ").map((word, index) => ({
+              id: `${book.id}-w${index + 1}`,
+              text: word,
+            })),
+          },
+        ],
+      },
+    ],
+  };
+}
+
+function readerFontStack(font: ReadingSettings["fontFamily"]) {
+  if (font === "Inter") return "Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif";
+  if (font === "Georgia") return 'Georgia, "Times New Roman", serif';
+  if (font === "Merriweather") return 'Merriweather, Georgia, "Times New Roman", serif';
+  return 'Literata, Georgia, "Times New Roman", serif';
 }
 
 function ReadingGoalDialog({

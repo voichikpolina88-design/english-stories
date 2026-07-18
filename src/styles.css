@@ -1884,6 +1884,322 @@ p {
   font-size: 2rem;
 }
 
+.reader-preview {
+  min-height: 100vh;
+  gap: 22px;
+  padding-bottom: 108px;
+  color: var(--reader-ink, var(--ink));
+  background: var(--reader-bg, transparent);
+}
+
+.reading-theme-light {
+  --reader-bg: #fff;
+  --reader-paper: #fff;
+  --reader-ink: #1f2937;
+  --reader-muted: #6b7280;
+  --reader-line: rgba(30, 58, 138, 0.12);
+}
+
+.reading-theme-cream {
+  --reader-bg: #fbf7f1;
+  --reader-paper: #fffdf8;
+  --reader-ink: #25212d;
+  --reader-muted: #77717f;
+  --reader-line: rgba(30, 58, 138, 0.12);
+}
+
+.reading-theme-sepia {
+  --reader-bg: #f4ead8;
+  --reader-paper: #fbf1df;
+  --reader-ink: #3a2b1f;
+  --reader-muted: #7a6754;
+  --reader-line: rgba(99, 67, 35, 0.18);
+}
+
+.reading-theme-dark {
+  --reader-bg: #121826;
+  --reader-paper: #182033;
+  --reader-ink: #f8fafc;
+  --reader-muted: #cbd5e1;
+  --reader-line: rgba(191, 219, 254, 0.18);
+}
+
+.reading-topbar {
+  position: sticky;
+  top: 16px;
+  z-index: 55;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  width: min(100%, calc(var(--reader-width) + 180px));
+  margin: 0 auto;
+  padding: 10px;
+  border: 1px solid var(--reader-line);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--reader-paper) 92%, transparent);
+  box-shadow: 0 16px 38px rgba(30, 58, 138, 0.1);
+  backdrop-filter: blur(16px);
+}
+
+.reading-title {
+  display: grid;
+  min-width: 0;
+}
+
+.reading-title strong {
+  overflow: hidden;
+  color: var(--reader-ink);
+  font-size: 0.95rem;
+  font-weight: 840;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reading-title span {
+  overflow: hidden;
+  color: var(--reader-muted);
+  font-size: 0.76rem;
+  font-weight: 680;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reading-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.reader-icon-button {
+  display: inline-grid;
+  min-width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--reader-ink);
+  font-weight: 860;
+}
+
+.reader-icon-button:hover,
+.reader-icon-button.active {
+  background: var(--purple-soft);
+  color: var(--purple);
+}
+
+.reading-settings-panel {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 10px;
+  display: grid;
+  gap: 14px;
+  width: min(360px, calc(100vw - 32px));
+  padding: 16px;
+  border: 1px solid var(--reader-line);
+  border-radius: 20px;
+  background: var(--reader-paper);
+  color: var(--reader-ink);
+  box-shadow: 0 22px 54px rgba(30, 58, 138, 0.18);
+}
+
+.settings-group,
+.settings-range,
+.settings-select,
+.settings-toggle {
+  display: grid;
+  gap: 8px;
+}
+
+.settings-group > span,
+.settings-range > span,
+.settings-select > span,
+.settings-toggle > span {
+  color: var(--reader-muted);
+  font-size: 0.78rem;
+  font-weight: 820;
+}
+
+.segmented-control {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--purple-soft);
+}
+
+.segmented-control button {
+  min-height: 32px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--purple);
+  font-size: 0.76rem;
+  font-weight: 820;
+}
+
+.segmented-control button.active {
+  background: var(--purple);
+  color: #fff;
+}
+
+.settings-range input,
+.settings-select select {
+  width: 100%;
+}
+
+.settings-select select {
+  min-height: 38px;
+  padding: 0 10px;
+  border: 1px solid var(--reader-line);
+  border-radius: 12px;
+  background: var(--reader-paper);
+  color: var(--reader-ink);
+  font: inherit;
+}
+
+.settings-toggle {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.settings-toggle input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--purple);
+}
+
+.reading-page {
+  width: min(100%, var(--reader-width));
+  margin: 0 auto;
+  padding: clamp(24px, 5vw, 54px);
+  border: 1px solid var(--reader-line);
+  border-radius: 22px;
+  background: var(--reader-paper);
+  box-shadow: 0 18px 52px rgba(30, 58, 138, 0.08);
+}
+
+.reading-chapter-heading {
+  display: grid;
+  gap: 8px;
+  margin-bottom: clamp(24px, 4vw, 44px);
+  text-align: center;
+}
+
+.reading-chapter-heading span {
+  color: var(--purple);
+  font-size: 0.76rem;
+  font-weight: 860;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.reading-chapter-heading h1 {
+  color: var(--reader-ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2.15rem, 4vw, 4rem);
+  line-height: 1.04;
+}
+
+.structured-text {
+  color: var(--reader-ink);
+  font-family: var(--reader-font-family);
+  font-size: var(--reader-font-size);
+  line-height: var(--reader-line-height);
+}
+
+.reader-paragraph {
+  margin: 0 0 1.35em;
+}
+
+.reader-sentence {
+  display: inline;
+}
+
+.reader-sentence-words {
+  display: inline;
+}
+
+.reader-word {
+  display: inline-grid;
+  grid-auto-flow: row;
+  margin-right: 0.24em;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.reader-word:hover {
+  background: rgba(37, 99, 235, 0.09);
+}
+
+.reader-word small {
+  color: var(--purple);
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 0.62em;
+  font-weight: 760;
+  line-height: 1.1;
+}
+
+.sentence-audio-button {
+  display: inline-grid;
+  width: 24px;
+  height: 24px;
+  margin: 0 0.24em;
+  place-items: center;
+  vertical-align: text-bottom;
+  border: 0;
+  border-radius: 999px;
+  background: var(--purple-soft);
+  color: var(--purple);
+}
+
+.sentence-translation {
+  display: block;
+  margin: 0.35em 0 0.65em;
+  color: var(--reader-muted);
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 0.78em;
+  line-height: 1.45;
+}
+
+.reading-bottombar {
+  position: fixed;
+  left: calc(var(--sidebar-width) + 24px);
+  right: 24px;
+  bottom: 20px;
+  z-index: 50;
+  display: grid;
+  grid-template-columns: auto minmax(90px, 220px) auto;
+  gap: 12px;
+  align-items: center;
+  width: min(100% - var(--sidebar-width) - 48px, 560px);
+  margin: 0 auto;
+  padding: 10px 14px;
+  border: 1px solid var(--reader-line);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--reader-paper) 94%, transparent);
+  color: var(--reader-muted);
+  box-shadow: 0 16px 42px rgba(30, 58, 138, 0.12);
+  backdrop-filter: blur(14px);
+  font-size: 0.82rem;
+  font-weight: 780;
+}
+
+.reading-book-progress {
+  height: 7px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--purple-soft);
+}
+
+.reading-book-progress span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--accent-link), var(--purple));
+}
+
 .reader-card {
   display: grid;
   grid-template-columns: 280px minmax(0, 1fr);
@@ -2172,6 +2488,39 @@ blockquote {
     grid-template-columns: 1fr;
   }
 
+  .reading-topbar {
+    top: 10px;
+    grid-template-columns: 38px minmax(0, 1fr) auto;
+    width: 100%;
+    border-radius: 20px;
+  }
+
+  .reading-actions {
+    gap: 3px;
+  }
+
+  .reader-icon-button {
+    min-width: 34px;
+    height: 34px;
+  }
+
+  .reading-page {
+    width: 100%;
+    padding: 24px 18px;
+    border-radius: 18px;
+  }
+
+  .desktop-only-setting {
+    display: none;
+  }
+
+  .reading-bottombar {
+    left: 10px;
+    right: 10px;
+    bottom: calc(96px + env(safe-area-inset-bottom));
+    width: auto;
+  }
+
   .home-continue-panel {
     grid-template-columns: 170px minmax(0, 1fr);
   }
@@ -2235,6 +2584,10 @@ blockquote {
     gap: 18px;
   }
 
+  .reader-preview {
+    padding-bottom: calc(168px + env(safe-area-inset-bottom));
+  }
+
   .mobile-topbar {
     margin-bottom: 10px;
     padding: 8px;
@@ -2262,6 +2615,38 @@ blockquote {
   .home-welcome h1 {
     font-size: clamp(2rem, 11vw, 2.75rem);
     line-height: 1.02;
+  }
+
+  .reading-topbar {
+    padding: 8px;
+  }
+
+  .reading-title strong {
+    font-size: 0.82rem;
+  }
+
+  .reading-title span {
+    display: none;
+  }
+
+  .reading-settings-panel {
+    right: 0;
+    width: calc(100vw - 20px);
+  }
+
+  .reading-chapter-heading h1 {
+    font-size: clamp(2rem, 12vw, 3rem);
+  }
+
+  .structured-text {
+    font-size: min(var(--reader-font-size), 22px);
+  }
+
+  .reading-bottombar {
+    grid-template-columns: auto minmax(72px, 1fr) auto;
+    gap: 8px;
+    padding: 9px 10px;
+    font-size: 0.72rem;
   }
 
   .home-decor {
