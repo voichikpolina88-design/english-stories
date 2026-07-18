@@ -901,7 +901,8 @@ p {
   z-index: 1;
   flex: 0 0 clamp(126px, 12vw, 158px);
   width: clamp(126px, 12vw, 158px);
-  height: clamp(194px, 18vw, 238px);
+  aspect-ratio: 3 / 4;
+  height: auto;
   margin-left: 7px;
   padding: 0;
   border: 0;
@@ -922,13 +923,13 @@ p {
 .book-3d.featured {
   flex-basis: 178px;
   width: 178px;
-  height: 270px;
+  height: auto;
 }
 
 .book-3d.compact {
   flex-basis: 120px;
   width: 120px;
-  height: 186px;
+  height: auto;
 }
 
 .book-3d:has(.soon-ribbon) {
@@ -991,7 +992,7 @@ p {
 }
 
 .book-face.has-image {
-  background: #dbeafe;
+  background: #fffaf3;
 }
 
 .book-face.has-image img {
@@ -1002,15 +1003,13 @@ p {
   width: 100%;
   height: 100%;
   border-radius: inherit;
-  object-fit: cover;
-  opacity: 0;
-  transform: scale(1.025);
-  transition: opacity 360ms ease, transform 520ms ease;
+  object-fit: contain;
+  object-position: center;
+  opacity: 1;
 }
 
 .book-face.has-image img.loaded {
   opacity: 1;
-  transform: scale(1);
 }
 
 .book-face::before {
@@ -1034,6 +1033,14 @@ p {
 .book-face.has-image::before,
 .book-face.has-image::after {
   z-index: 2;
+}
+
+.book-face.has-image::before {
+  border-color: rgba(30, 58, 138, 0.08);
+}
+
+.book-face.has-image::after {
+  display: none;
 }
 
 .cover-frame {
@@ -2317,7 +2324,7 @@ blockquote {
 
   .book-shelf.grid .shelf-books {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 18px 12px;
+    gap: 18px 10px;
     padding: 6px 0 24px;
     scroll-snap-type: none;
   }
@@ -2325,20 +2332,25 @@ blockquote {
   .book-3d {
     flex-basis: 118px;
     width: 118px;
-    height: 182px;
+    height: auto;
     scroll-snap-align: start;
+  }
+
+  .book-shelf.grid .book-3d {
+    flex-basis: 132px;
+    width: 132px;
   }
 
   .book-3d.featured {
     flex-basis: 96px;
     width: 96px;
-    height: 148px;
+    height: auto;
   }
 
   .book-3d.compact {
     flex-basis: 112px;
     width: 112px;
-    height: 172px;
+    height: auto;
   }
 
   .book-3d:hover {
