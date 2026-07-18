@@ -76,7 +76,18 @@ export type Story = {
 export type LearnerProgress = {
   selectedLanguage: NativeLanguage | null;
   readingProgress: Record<string, number>;
+  lastOpenedContent?: LastOpenedContent | null;
   lastVisitDate: string;
+};
+
+export type LastOpenedContent = {
+  contentId: string;
+  contentType: "book" | "story";
+  chapterId?: string;
+  openedAt: string;
+  readingProgress: number;
+  scrollPosition?: number;
+  lastPosition?: number;
 };
 
 export type ReadingGoal = {

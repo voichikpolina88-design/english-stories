@@ -1,10 +1,10 @@
 import { ArrowLeft, BookOpen, Clock, Home, Languages, Library, Pause, Play, Search, User, Volume2, X } from "lucide-react";
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent, type ReactNode, type RefObject } from "react";
 import { getCatalogBook, getCategoryBooks, homeShelfBooks, libraryCategories, type HomeShelfBook } from "./data/homeShelves";
 import { getAllVocabulary, type VocabularyEntry } from "./data/vocabulary";
 import { useLearnerProgress } from "./hooks/useLearnerProgress";
 import { useReadingTimer } from "./hooks/useReadingTimer";
-import type { NativeLanguage } from "./types";
+import type { LastOpenedContent, NativeLanguage } from "./types";
 
 type Page = "home" | "library" | "dictionary" | "profile";
 
@@ -23,9 +23,15 @@ type BookInfoState = {
   rect: BookRect;
 };
 
+type OpenContentOptions = {
+  chapterId?: string;
+  readingProgress?: number;
+  scrollPosition?: number;
+  restorePosition?: boolean;
+};
+
 const getShelfBooks = (shelfId: string) => getCategoryBooks(shelfId);
 const getShelfBook = (bookId: string) => getCatalogBook(bookId);
-const homeContinueBook = getShelfBook("alice-in-wonderland") ?? homeShelfBooks[0];
 const recentBooks = ["secret-garden", "wonderful-wizard-of-oz"]
   .map((bookId) => getShelfBook(bookId))
   .filter((book): book is HomeShelfBook => Boolean(book));
@@ -40,13 +46,17 @@ const libraryShelves = libraryCategories.map((category) => ({
 function App() {
   const [page, setPage] = useState<Page>("home");
   const [activeBookId, setActiveBookId] = useState<string | null>(null);
+  const [activeDetailId, setActiveDetailId] = useState<string | null>(null);
   const [bookInfo, setBookInfo] = useState<BookInfoState | null>(null);
   const [sheetInfo, setSheetInfo] = useState<{ book: HomeShelfBook; progressValue: number } | null>(null);
   const [goalDialogOpen, setGoalDialogOpen] = useState(false);
   const closeInfoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const { progress, saveReadingProgress, selectLanguage } = useLearnerProgress();
+  const pendingScrollPosition = useRef<number | null>(null);
+  const { progress, saveLastOpenedContent, saveReadingProgress, selectLanguage } = useLearnerProgress();
   const allItems = homeShelfBooks;
   const activeBook = allItems.find((book) => book.id === activeBookId) ?? null;
+  const activeDetailBook = allItems.find((book) => book.id === activeDetailId) ?? null;
+  const lastOpenedBook = progress.lastOpenedContent ? getShelfBook(progress.lastOpenedContent.contentId) : null;
   const readingTimer = useReadingTimer(
     activeBook
       ? {
@@ -60,6 +70,7 @@ function App() {
   function navigate(nextPage: Page) {
     setPage(nextPage);
     setActiveBookId(null);
+    setActiveDetailId(null);
     setBookInfo(null);
     setSheetInfo(null);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -82,17 +93,94 @@ function App() {
     closeInfoTimer.current = setTimeout(() => setBookInfo(null), 140);
   }
 
-  function openBook(bookId: string) {
-    const book = getShelfBook(bookId);
-    if (book?.comingSoon) return;
+  function saveOpenedContent(book: HomeShelfBook, options: OpenContentOptions = {}) {
+    const fallbackProgress = progress.readingProgress[book.id] ?? book.progress;
+    saveLastOpenedContent({
+      contentId: book.id,
+      contentType: book.type,
+      chapterId: options.chapterId ?? book.chapter,
+      readingProgress: options.readingProgress ?? fallbackProgress,
+      scrollPosition: options.scrollPosition ?? 0,
+      lastPosition: options.scrollPosition ?? 0,
+    });
+  }
+
+  function openContent(contentId: string, options: OpenContentOptions = {}) {
+    const book = getShelfBook(contentId);
+    if (!book) return;
+
+    const restorePosition = options.restorePosition ?? true;
+    pendingScrollPosition.current = restorePosition ? options.scrollPosition ?? progress.lastOpenedContent?.scrollPosition ?? null : null;
+    saveOpenedContent(book, options);
     setBookInfo(null);
     setSheetInfo(null);
-    setActiveBookId(bookId);
+    setPage("home");
+
+    if (book.comingSoon) {
+      setActiveBookId(null);
+      setActiveDetailId(book.id);
+      return;
+    }
+
+    setActiveDetailId(null);
+    setActiveBookId(book.id);
+  }
+
+  function openBook(bookId: string, options?: OpenContentOptions) {
+    openContent(bookId, options);
+  }
+
+  function closeActiveContent() {
+    if (activeBook) {
+      saveOpenedContent(activeBook, {
+        readingProgress: progress.readingProgress[activeBook.id] ?? activeBook.progress,
+        scrollPosition: window.scrollY,
+      });
+    }
+
+    setActiveBookId(null);
+    setActiveDetailId(null);
+  }
+
+  function continueLastOpened() {
+    if (!progress.lastOpenedContent) return;
+    openContent(progress.lastOpenedContent.contentId, {
+      chapterId: progress.lastOpenedContent.chapterId,
+      readingProgress: progress.lastOpenedContent.readingProgress,
+      scrollPosition: progress.lastOpenedContent.scrollPosition,
+      restorePosition: true,
+    });
+  }
+
+  function handleReadingProgress(book: HomeShelfBook, value: number) {
+    saveReadingProgress(book.id, value);
+    saveOpenedContent(book, {
+      readingProgress: value,
+      scrollPosition: window.scrollY,
+    });
+  }
+
+  function openBookPage(bookId: string) {
+    const book = getShelfBook(bookId);
+    if (!book) return;
+    saveOpenedContent(book, {
+      readingProgress: progress.readingProgress[book.id] ?? book.progress,
+      scrollPosition: 0,
+    });
+    setBookInfo(null);
+    setSheetInfo(null);
+    setActiveBookId(null);
+    setActiveDetailId(book.id);
   }
 
   function startReadingFromGoal() {
+    if (progress.lastOpenedContent && allItems.some((item) => item.id === progress.lastOpenedContent?.contentId)) {
+      continueLastOpened();
+      return;
+    }
+
     if (readingTimer.lastContentId && allItems.some((item) => item.id === readingTimer.lastContentId)) {
-      openBook(readingTimer.lastContentId);
+      openContent(readingTimer.lastContentId);
       return;
     }
 
@@ -108,21 +196,39 @@ function App() {
           <ReaderPreview
             book={activeBook}
             progressValue={progress.readingProgress[activeBook.id] ?? activeBook.progress}
-            onBack={() => setActiveBookId(null)}
-            onProgress={(value) => saveReadingProgress(activeBook.id, value)}
+            onBack={closeActiveContent}
+            onProgress={(value) => handleReadingProgress(activeBook, value)}
+            onSessionUpdate={(scrollPosition) =>
+              saveOpenedContent(activeBook, {
+                readingProgress: progress.readingProgress[activeBook.id] ?? activeBook.progress,
+                scrollPosition,
+              })
+            }
+            restoreScrollPosition={pendingScrollPosition.current}
             readingTimer={readingTimer}
             onChangeGoal={() => setGoalDialogOpen(true)}
+          />
+        ) : activeDetailBook ? (
+          <ContentDetailPage
+            book={activeDetailBook}
+            progressValue={progress.readingProgress[activeDetailBook.id] ?? activeDetailBook.progress}
+            onBack={() => setActiveDetailId(null)}
+            onOpen={openContent}
           />
         ) : (
           <>
             {page === "home" ? (
               <HomePage
                 onNavigate={navigate}
-                onOpenBook={openBook}
+                onOpenBook={openContent}
+                onOpenBookPage={openBookPage}
+                onContinueLast={continueLastOpened}
                 onShowBookInfo={showBookInfo}
                 onHideBookInfo={scheduleCloseBookInfo}
                 onOpenBookSheet={setSheetInfo}
                 progress={progress.readingProgress}
+                lastOpened={progress.lastOpenedContent ?? null}
+                lastOpenedBook={lastOpenedBook ?? null}
                 readingTimer={readingTimer}
                 onStartReading={startReadingFromGoal}
                 onChangeGoal={() => setGoalDialogOpen(true)}
@@ -130,7 +236,7 @@ function App() {
             ) : null}
             {page === "library" ? (
               <LibraryPage
-                onOpenBook={openBook}
+                onOpenBook={openContent}
                 onShowBookInfo={showBookInfo}
                 onHideBookInfo={scheduleCloseBookInfo}
                 onOpenBookSheet={setSheetInfo}
@@ -147,7 +253,7 @@ function App() {
           book={bookInfo.book}
           progressValue={bookInfo.progressValue}
           anchorRect={bookInfo.rect}
-          onOpen={openBook}
+          onOpen={openContent}
           onKeepOpen={clearCloseInfoTimer}
           onRequestClose={scheduleCloseBookInfo}
         />
@@ -157,7 +263,7 @@ function App() {
           book={sheetInfo.book}
           progressValue={sheetInfo.progressValue}
           onClose={() => setSheetInfo(null)}
-          onOpen={openBook}
+          onOpen={openContent}
         />
       ) : null}
       {goalDialogOpen ? (
@@ -238,20 +344,28 @@ function Logo({ compact = false }: { compact?: boolean }) {
 function HomePage({
   onNavigate,
   onOpenBook,
+  onOpenBookPage,
+  onContinueLast,
   onShowBookInfo,
   onHideBookInfo,
   onOpenBookSheet,
   progress,
+  lastOpened,
+  lastOpenedBook,
   readingTimer,
   onStartReading,
   onChangeGoal,
 }: {
   onNavigate: (page: Page) => void;
-  onOpenBook: (bookId: string) => void;
+  onOpenBook: (bookId: string, options?: OpenContentOptions) => void;
+  onOpenBookPage: (bookId: string) => void;
+  onContinueLast: () => void;
   onShowBookInfo: (book: HomeShelfBook, progressValue: number, rect: BookRect) => void;
   onHideBookInfo: () => void;
   onOpenBookSheet: (info: { book: HomeShelfBook; progressValue: number }) => void;
   progress: Record<string, number>;
+  lastOpened: LastOpenedContent | null;
+  lastOpenedBook: HomeShelfBook | null;
   readingTimer: ReturnType<typeof useReadingTimer>;
   onStartReading: () => void;
   onChangeGoal: () => void;
@@ -271,9 +385,11 @@ function HomePage({
       </section>
 
       <HomeContinuePanel
-        book={homeContinueBook}
-        progressValue={progress[homeContinueBook.id] ?? homeContinueBook.progress}
-        onOpen={onOpenBook}
+        book={lastOpenedBook}
+        lastOpened={lastOpened}
+        progressValue={lastOpenedBook ? progress[lastOpenedBook.id] ?? lastOpened?.readingProgress ?? lastOpenedBook.progress : 0}
+        onContinue={onContinueLast}
+        onChooseFirstBook={() => onNavigate("library")}
       />
 
       <ShelfSection title="Недавно открывали" onViewAll={() => onNavigate("library")} compact>
@@ -296,7 +412,7 @@ function HomePage({
       <section className="home-feature-grid">
         <RecommendationCard
           book={recommendationBook}
-          onOpen={onOpenBook}
+          onOpen={onOpenBookPage}
         />
         <WeeklyNewCard
           book={weeklyNewBook}
@@ -317,26 +433,50 @@ function HomePage({
 
 function HomeContinuePanel({
   book,
+  lastOpened,
   progressValue,
-  onOpen,
+  onContinue,
+  onChooseFirstBook,
 }: {
-  book: HomeShelfBook;
+  book: HomeShelfBook | null;
+  lastOpened: LastOpenedContent | null;
   progressValue: number;
-  onOpen: (bookId: string) => void;
+  onContinue: () => void;
+  onChooseFirstBook: () => void;
 }) {
+  if (!book || !lastOpened) {
+    return (
+      <section className="home-continue-panel empty">
+        <div className="home-empty-cover" aria-hidden="true">
+          <BookOpen size={42} />
+        </div>
+        <div className="home-continue-copy">
+          <span className="eyebrow">Продолжить чтение</span>
+          <h2>Выберите первую книгу</h2>
+          <p>Откройте библиотеку и выберите книгу или рассказ для уютного чтения.</p>
+          <button className="primary-button" type="button" onClick={onChooseFirstBook}>В библиотеку</button>
+        </div>
+      </section>
+    );
+  }
+
+  const isStory = book.type === "story";
+  const progressLabel = progressValue > 0 ? `${progressValue}% прочитано` : "Позиция сохранена";
+  const actionLabel = isStory ? "Продолжить рассказ" : "Продолжить чтение";
+
   return (
     <section className="home-continue-panel">
       <div className="home-continue-book">
-        <BookCover book={book} progressValue={progressValue} onOpen={onOpen} featured />
+        <BookCover book={book} progressValue={progressValue} onOpen={onContinue} featured />
       </div>
       <div className="home-continue-copy">
         <span className="eyebrow">Продолжить чтение</span>
         <h2>{book.title}</h2>
         <p>{book.author}</p>
-        <span>{book.chapter}</span>
+        <span>{isStory ? "Рассказ" : lastOpened.chapterId ?? book.chapter}</span>
         <Progress value={progressValue} />
-        <small>{progressValue}% прочитано</small>
-        <button className="primary-button" type="button" onClick={() => onOpen(book.id)}>Продолжить чтение</button>
+        <small>{progressLabel}</small>
+        <button className="primary-button" type="button" onClick={onContinue}>{actionLabel}</button>
       </div>
     </section>
   );
@@ -349,8 +489,22 @@ function RecommendationCard({
   book: HomeShelfBook;
   onOpen: (bookId: string) => void;
 }) {
+  function handleKeyDown(event: ReactKeyboardEvent<HTMLElement>) {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      onOpen(book.id);
+    }
+  }
+
   return (
-    <article className="recommendation-card">
+    <article
+      className="recommendation-card clickable"
+      role="button"
+      tabIndex={0}
+      onClick={() => onOpen(book.id)}
+      onKeyDown={handleKeyDown}
+      aria-label={`Открыть ${book.title}`}
+    >
       <div className={`recommendation-cover cover-${book.coverStyle}`} aria-hidden="true">
         <span>{book.title}</span>
       </div>
@@ -361,22 +515,54 @@ function RecommendationCard({
         <small>B1 · классика · роман · {book.readingTime}</small>
         <p className="feature-description">Спокойная классика с живыми диалогами и понятной бытовой лексикой.</p>
         <span className="recommendation-note">Подойдёт, если вам нравится спокойная классика и живые диалоги</span>
-        <button className="secondary-button" type="button" onClick={() => onOpen(book.id)}>Посмотреть книгу</button>
+        <button
+          className="secondary-button"
+          type="button"
+          onClick={(event) => {
+            event.stopPropagation();
+            onOpen(book.id);
+          }}
+        >
+          Посмотреть книгу
+        </button>
       </div>
     </article>
   );
 }
 
 function WeeklyNewCard({ book, onOpen }: { book: HomeShelfBook; onOpen: (bookId: string) => void }) {
+  function handleKeyDown(event: ReactKeyboardEvent<HTMLElement>) {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      onOpen(book.id);
+    }
+  }
+
   return (
-    <article className="weekly-new-card">
+    <article
+      className="weekly-new-card clickable"
+      role="button"
+      tabIndex={0}
+      onClick={() => onOpen(book.id)}
+      onKeyDown={handleKeyDown}
+      aria-label={`Открыть ${book.title}`}
+    >
       <div className="weekly-new-overlay">
         <span className="weekly-kicker">Новинка недели</span>
         <span>StoryLingo Original</span>
         <h3>{book.title}</h3>
         <small>A2 · 12 минут</small>
         <p>Одно сообщение. Один пропущенный звонок. И слишком позднее время.</p>
-        <button className="weekly-new-button" type="button" onClick={() => onOpen(book.id)}>Читать рассказ</button>
+        <button
+          className="weekly-new-button"
+          type="button"
+          onClick={(event) => {
+            event.stopPropagation();
+            onOpen(book.id);
+          }}
+        >
+          Читать рассказ
+        </button>
       </div>
     </article>
   );
@@ -790,7 +976,7 @@ function BookInfoPopover({
           <small>{meta.safeProgress}% прочитано</small>
         </span>
       ) : null}
-      <button className="book-info-button" type="button" disabled={book.comingSoon} onClick={() => onOpen(book.id)}>
+      <button className="book-info-button" type="button" onClick={() => onOpen(book.id)}>
         {book.comingSoon ? "Скоро" : meta.safeProgress > 0 ? "Продолжить" : "Читать"}
       </button>
     </aside>
@@ -850,7 +1036,7 @@ function BookInfoSheet({
               <small>{meta.safeProgress}% прочитано</small>
             </span>
           ) : null}
-          <button className="book-info-button" type="button" disabled={book.comingSoon} onClick={() => onOpen(book.id)}>
+          <button className="book-info-button" type="button" onClick={() => onOpen(book.id)}>
             {book.comingSoon ? "Скоро" : meta.safeProgress > 0 ? "Продолжить" : "Читать"}
           </button>
         </div>
@@ -1014,6 +1200,52 @@ function DictionaryPage() {
   );
 }
 
+function ContentDetailPage({
+  book,
+  progressValue,
+  onBack,
+  onOpen,
+}: {
+  book: HomeShelfBook;
+  progressValue: number;
+  onBack: () => void;
+  onOpen: (bookId: string) => void;
+}) {
+  const meta = getBookInfoMeta(book, progressValue);
+
+  return (
+    <main className="page-stack content-detail-page">
+      <button className="text-button" type="button" onClick={onBack}>← Назад</button>
+      <section className="content-detail-card">
+        <div className="content-detail-cover">
+          <BookCover book={book} progressValue={progressValue} onOpen={onOpen} featured />
+        </div>
+        <div className="content-detail-copy">
+          <span className="eyebrow">{book.type === "story" ? "Рассказ" : "Книга"}</span>
+          <h1>{book.title}</h1>
+          <p>{book.author}</p>
+          <div className="content-detail-meta">
+            <span>{meta.level}</span>
+            <span>{meta.chapters}</span>
+            <span>{book.readingTime}</span>
+          </div>
+          {book.comingSoon ? <strong className="soon-status">Скоро</strong> : null}
+          <p className="content-detail-description">{meta.description}</p>
+          {progressValue > 0 ? (
+            <div className="content-detail-progress">
+              <Progress value={progressValue} />
+              <small>{progressValue}% прочитано</small>
+            </div>
+          ) : null}
+          <button className="primary-button" type="button" disabled={book.comingSoon} onClick={() => onOpen(book.id)}>
+            {book.comingSoon ? "Скоро будет доступно" : book.type === "story" ? "Читать рассказ" : "Читать"}
+          </button>
+        </div>
+      </section>
+    </main>
+  );
+}
+
 function ProfilePage({
   language,
   progress,
@@ -1054,6 +1286,8 @@ function ReaderPreview({
   progressValue,
   onBack,
   onProgress,
+  onSessionUpdate,
+  restoreScrollPosition,
   readingTimer,
   onChangeGoal,
 }: {
@@ -1061,6 +1295,8 @@ function ReaderPreview({
   progressValue: number;
   onBack: () => void;
   onProgress: (value: number) => void;
+  onSessionUpdate: (scrollPosition: number) => void;
+  restoreScrollPosition: number | null;
   readingTimer: ReturnType<typeof useReadingTimer>;
   onChangeGoal: () => void;
 }) {
@@ -1072,6 +1308,24 @@ function ReaderPreview({
     setTimerOpen(false);
     window.setTimeout(() => timerButtonRef.current?.focus(), 0);
   };
+
+  useEffect(() => {
+    if (restoreScrollPosition !== null) {
+      window.setTimeout(() => window.scrollTo({ top: restoreScrollPosition, behavior: "auto" }), 0);
+    }
+
+    onSessionUpdate(window.scrollY);
+
+    const handleBeforeUnload = () => {
+      onSessionUpdate(window.scrollY);
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      onSessionUpdate(window.scrollY);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [book.id]);
 
   useEffect(() => {
     if (!timerOpen) return;

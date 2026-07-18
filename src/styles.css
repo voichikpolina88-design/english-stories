@@ -294,6 +294,20 @@ p {
     rgba(255, 255, 255, 0.86);
 }
 
+.home-continue-panel.empty {
+  grid-template-columns: 132px minmax(0, 1fr);
+}
+
+.home-empty-cover {
+  display: grid;
+  min-height: 170px;
+  place-items: center;
+  border: 1px dashed rgba(30, 58, 138, 0.28);
+  border-radius: 18px;
+  background: linear-gradient(145deg, rgba(239, 246, 255, 0.92), rgba(255, 255, 255, 0.84));
+  color: var(--purple);
+}
+
 .home-continue-book {
   display: grid;
   justify-items: center;
@@ -357,6 +371,17 @@ p {
   gap: 18px;
   align-items: center;
   padding: 16px;
+}
+
+.recommendation-card.clickable,
+.weekly-new-card.clickable {
+  cursor: pointer;
+}
+
+.recommendation-card.clickable:focus-visible,
+.weekly-new-card.clickable:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.32);
+  outline-offset: 4px;
 }
 
 .recommendation-cover {
@@ -483,6 +508,84 @@ p {
   background: #fff;
   color: var(--purple);
   font-weight: 860;
+}
+
+.content-detail-page {
+  padding-bottom: 72px;
+}
+
+.content-detail-card {
+  display: grid;
+  grid-template-columns: minmax(190px, 260px) minmax(0, 1fr);
+  gap: clamp(20px, 4vw, 42px);
+  align-items: center;
+  padding: clamp(18px, 4vw, 34px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background:
+    radial-gradient(circle at 90% 12%, rgba(37, 99, 235, 0.11), transparent 28%),
+    rgba(255, 255, 255, 0.88);
+  box-shadow: var(--soft-shadow);
+}
+
+.content-detail-cover {
+  display: grid;
+  justify-items: center;
+  padding-bottom: 14px;
+}
+
+.content-detail-copy {
+  display: grid;
+  gap: 12px;
+  justify-items: start;
+  min-width: 0;
+}
+
+.content-detail-copy h1 {
+  color: var(--ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2.2rem, 4vw, 4rem);
+  line-height: 1.02;
+}
+
+.content-detail-copy > p {
+  color: var(--muted);
+  font-weight: 680;
+}
+
+.content-detail-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.content-detail-meta span,
+.soon-status {
+  width: fit-content;
+  padding: 7px 11px;
+  border-radius: 999px;
+  background: var(--purple-soft);
+  color: var(--purple);
+  font-size: 0.8rem;
+  font-weight: 860;
+}
+
+.soon-status {
+  background: rgba(30, 58, 138, 0.1);
+  text-transform: uppercase;
+}
+
+.content-detail-description {
+  max-width: 620px;
+  color: var(--muted);
+  line-height: 1.62;
+}
+
+.content-detail-progress {
+  display: grid;
+  gap: 6px;
+  width: min(100%, 360px);
+  color: var(--muted);
 }
 
 .reading-goal-card {
@@ -2041,12 +2144,29 @@ blockquote {
   .dictionary-toolbar,
   .library-controls,
   .reader-card,
+  .content-detail-card,
   .profile-panel {
     grid-template-columns: 1fr;
   }
 
   .home-continue-panel {
     grid-template-columns: 170px minmax(0, 1fr);
+  }
+
+  .home-continue-panel.empty {
+    grid-template-columns: 112px minmax(0, 1fr);
+  }
+
+  .home-empty-cover {
+    min-height: 144px;
+  }
+
+  .content-detail-card {
+    justify-items: center;
+  }
+
+  .content-detail-copy {
+    justify-items: stretch;
   }
 
   .home-feature-grid {

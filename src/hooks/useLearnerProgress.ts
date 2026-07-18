@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { LearnerProgress, NativeLanguage } from "../types";
+import type { LastOpenedContent, LearnerProgress, NativeLanguage } from "../types";
 
 const STORAGE_KEY = "english-stories-progress";
 
@@ -22,6 +22,7 @@ export function useLearnerProgress() {
         ...migrateLessonProgress(saved),
         ...(saved?.readingProgress ?? {}),
       },
+      lastOpenedContent: saved?.lastOpenedContent ?? null,
       lastVisitDate: saved?.lastVisitDate ?? today(),
     };
   });
@@ -39,7 +40,31 @@ export function useLearnerProgress() {
         ...current.readingProgress,
         [itemId]: Math.max(current.readingProgress[itemId] ?? 0, normalizedValue),
       },
+      lastOpenedContent:
+        current.lastOpenedContent?.contentId === itemId
+          ? {
+              ...current.lastOpenedContent,
+              readingProgress: Math.max(current.lastOpenedContent.readingProgress, normalizedValue),
+              openedAt: new Date().toISOString(),
+            }
+          : current.lastOpenedContent,
     }));
+  }
+
+  function saveLastOpenedContent(nextContent: Omit<LastOpenedContent, "openedAt"> & { openedAt?: string }) {
+    setProgress((current) => {
+      const normalizedProgress = Math.min(100, Math.max(0, Math.round(nextContent.readingProgress)));
+
+      return {
+        ...current,
+        lastVisitDate: today(),
+        lastOpenedContent: {
+          ...nextContent,
+          openedAt: nextContent.openedAt ?? new Date().toISOString(),
+          readingProgress: normalizedProgress,
+        },
+      };
+    });
   }
 
   function selectLanguage(language: NativeLanguage) {
@@ -49,6 +74,7 @@ export function useLearnerProgress() {
   return {
     progress,
     saveReadingProgress,
+    saveLastOpenedContent,
     selectLanguage,
   };
 }
