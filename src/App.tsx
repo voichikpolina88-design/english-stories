@@ -25,9 +25,8 @@ type BookInfoState = {
 
 const getShelfBooks = (shelfId: string) => getCategoryBooks(shelfId);
 const getShelfBook = (bookId: string) => getCatalogBook(bookId);
-const getBooksByIds = (bookIds: string[]) => bookIds.map((bookId) => getShelfBook(bookId)).filter((book): book is HomeShelfBook => Boolean(book));
 const homeContinueBook = getShelfBook("alice-in-wonderland") ?? homeShelfBooks[0];
-const recentBooks = ["secret-garden", "wonderful-wizard-of-oz", "anne"]
+const recentBooks = ["secret-garden", "wonderful-wizard-of-oz"]
   .map((bookId) => getShelfBook(bookId))
   .filter((book): book is HomeShelfBook => Boolean(book));
 const recommendationBook = getShelfBook("pride-prejudice") ?? homeShelfBooks[0];
@@ -444,11 +443,107 @@ function ShelfSection({
   );
 }
 
-function BookShelf({ children, compact = false, grid = false }: { children: ReactNode; compact?: boolean; grid?: boolean }) {
+function BookShelf({
+  children,
+  compact = false,
+  grid = false,
+  scrollRef,
+}: {
+  children: ReactNode;
+  compact?: boolean;
+  grid?: boolean;
+  scrollRef?: RefObject<HTMLDivElement | null>;
+}) {
   return (
     <div className={[compact ? "book-shelf compact" : "book-shelf", grid ? "grid" : ""].filter(Boolean).join(" ")}>
-      <div className="shelf-books">{children}</div>
+      <div className="shelf-books" ref={scrollRef}>{children}</div>
       <div className="wood-shelf" aria-hidden="true" />
+    </div>
+  );
+}
+
+function LibraryShelfScroller({
+  books,
+  onHideBookInfo,
+  onOpenBook,
+  onOpenBookSheet,
+  onShowBookInfo,
+  progress,
+}: {
+  books: HomeShelfBook[];
+  onHideBookInfo: () => void;
+  onOpenBook: (bookId: string) => void;
+  onOpenBookSheet: (info: { book: HomeShelfBook; progressValue: number }) => void;
+  onShowBookInfo: (book: HomeShelfBook, progressValue: number, rect: BookRect) => void;
+  progress: Record<string, number>;
+}) {
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  function updateScrollState() {
+    const element = scrollRef.current;
+    if (!element) return;
+    setCanScrollLeft(element.scrollLeft > 4);
+    setCanScrollRight(element.scrollLeft + element.clientWidth < element.scrollWidth - 4);
+  }
+
+  function scrollShelf(direction: "left" | "right") {
+    const element = scrollRef.current;
+    if (!element) return;
+    element.scrollBy({
+      left: direction === "left" ? -Math.round(element.clientWidth * 0.72) : Math.round(element.clientWidth * 0.72),
+      behavior: "smooth",
+    });
+  }
+
+  useEffect(() => {
+    const element = scrollRef.current;
+    if (!element) return;
+
+    updateScrollState();
+    element.addEventListener("scroll", updateScrollState, { passive: true });
+    window.addEventListener("resize", updateScrollState);
+
+    return () => {
+      element.removeEventListener("scroll", updateScrollState);
+      window.removeEventListener("resize", updateScrollState);
+    };
+  }, [books.length]);
+
+  return (
+    <div className="library-shelf-frame">
+      <button
+        className="shelf-scroll-button left"
+        type="button"
+        aria-label="Прокрутить полку влево"
+        disabled={!canScrollLeft}
+        onClick={() => scrollShelf("left")}
+      >
+        ‹
+      </button>
+      <BookShelf scrollRef={scrollRef}>
+        {books.map((book) => (
+          <BookCover
+            key={book.id}
+            book={book}
+            progressValue={progress[book.id] ?? book.progress}
+            onOpen={onOpenBook}
+            onShowInfo={onShowBookInfo}
+            onHideInfo={onHideBookInfo}
+            onOpenSheet={onOpenBookSheet}
+          />
+        ))}
+      </BookShelf>
+      <button
+        className="shelf-scroll-button right"
+        type="button"
+        aria-label="Прокрутить полку вправо"
+        disabled={!canScrollRight}
+        onClick={() => scrollShelf("right")}
+      >
+        ›
+      </button>
     </div>
   );
 }
@@ -791,16 +886,7 @@ function LibraryPage({
   const [libraryCategory, setLibraryCategory] = useState<string | null>(null);
   const selectedCategory = libraryShelves.find((shelf) => shelf.id === libraryCategory) ?? null;
 
-  const shelvesToShow = selectedCategory
-    ? [selectedCategory]
-    : libraryShelves.map((shelf) => {
-        const previewBookIds = shelf.bookIds.slice(0, 3);
-        return {
-          ...shelf,
-          bookIds: previewBookIds,
-          books: getBooksByIds(previewBookIds),
-        };
-      });
+  const shelvesToShow = selectedCategory ? [selectedCategory] : libraryShelves;
   const visibleShelves = shelvesToShow
     .map((shelf) => ({
       ...shelf,
@@ -873,19 +959,14 @@ function LibraryPage({
               progress={progress}
             />
           ) : (
-            <BookShelf>
-              {shelf.books.map((book) => (
-                <BookCover
-                  key={book.id}
-                  book={book}
-                  progressValue={progress[book.id] ?? book.progress}
-                  onOpen={onOpenBook}
-                  onShowInfo={onShowBookInfo}
-                  onHideInfo={onHideBookInfo}
-                  onOpenSheet={onOpenBookSheet}
-                />
-              ))}
-            </BookShelf>
+            <LibraryShelfScroller
+              books={shelf.books}
+              onHideBookInfo={onHideBookInfo}
+              onOpenBook={onOpenBook}
+              onOpenBookSheet={onOpenBookSheet}
+              onShowBookInfo={onShowBookInfo}
+              progress={progress}
+            />
           )}
         </ShelfSection>
       ))}

@@ -793,6 +793,33 @@ p {
   display: none;
 }
 
+.library-shelf-frame {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.shelf-scroll-button {
+  display: none;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--purple);
+  box-shadow: var(--soft-shadow);
+  font-size: 1.55rem;
+  font-weight: 760;
+  line-height: 1;
+}
+
+.shelf-scroll-button:disabled {
+  cursor: default;
+  opacity: 0;
+  pointer-events: none;
+}
+
 .category-full-list {
   display: grid;
   gap: 18px;
@@ -811,12 +838,9 @@ p {
 }
 
 @media (min-width: 1181px) {
-  .library-page .book-shelf .shelf-books {
+  .library-shelf-frame .shelf-scroll-button {
     display: grid;
-    grid-template-columns: repeat(4, minmax(126px, 170px));
-    align-items: end;
-    justify-content: start;
-    overflow: visible;
+    place-items: center;
   }
 
   .category-full-desktop-4 {
@@ -839,12 +863,9 @@ p {
 }
 
 @media (min-width: 921px) and (max-width: 1180px) {
-  .library-page .book-shelf .shelf-books {
+  .library-shelf-frame .shelf-scroll-button {
     display: grid;
-    grid-template-columns: repeat(3, minmax(126px, 160px));
-    align-items: end;
-    justify-content: start;
-    overflow: visible;
+    place-items: center;
   }
 
   .category-full-desktop-3 {
