@@ -131,6 +131,7 @@ export type ReaderWord = {
   text: string;
   lemma?: string;
   translation?: string;
+  transcription?: string;
   audioSrc?: string;
 };
 
@@ -171,4 +172,13 @@ export type ReadingSettings = {
   textWidth: number;
   showSentenceTranslation: boolean;
   showWordTranslation: boolean;
+};
+
+export type ReaderPosition = {
+  chapterId: string;
+  sentenceId: string;
+  wordId: string;
+  wordIndex: number;
+  progressRatio: number;
+  updatedAt: string;
 };

@@ -1,11 +1,12 @@
 import { ArrowLeft, BookOpen, Bookmark, Clock, Home, Languages, Library, Pause, Play, Search, User, Volume2, X } from "lucide-react";
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type Dispatch, type KeyboardEvent as ReactKeyboardEvent, type ReactNode, type RefObject, type SetStateAction } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type Dispatch, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode, type RefObject, type SetStateAction } from "react";
 import { getCatalogBook, getCategoryBooks, homeShelfBooks, libraryCategories, type HomeShelfBook } from "./data/homeShelves";
 import { getReaderChapter } from "./data/aliceReader";
 import { getAllVocabulary, type VocabularyEntry } from "./data/vocabulary";
 import { useLearnerProgress } from "./hooks/useLearnerProgress";
+import { emptyPaginationSize, type ReaderPage, type ReaderPageWord, useReaderPagination } from "./hooks/useReaderPagination";
 import { useReadingTimer } from "./hooks/useReadingTimer";
-import type { LastOpenedContent, NativeLanguage, ReaderChapter, ReaderParagraph, ReaderSentence, ReaderWord, ReadingSettings } from "./types";
+import type { LastOpenedContent, NativeLanguage, ReaderChapter, ReaderPosition, ReaderSentence, ReaderWord, ReadingSettings } from "./types";
 
 type Page = "home" | "library" | "dictionary" | "profile";
 
@@ -32,6 +33,7 @@ type OpenContentOptions = {
 };
 
 const READING_SETTINGS_KEY = "storylingo-reading-settings";
+const READER_POSITION_KEY = "storylingo-reader-positions";
 
 const defaultReadingSettings: ReadingSettings = {
   theme: "cream",
@@ -84,6 +86,26 @@ function useReadingSettings() {
   }, [settings]);
 
   return { settings, setSettings };
+}
+
+function readReaderPosition(contentId: string): ReaderPosition | null {
+  try {
+    const saved = window.localStorage.getItem(READER_POSITION_KEY);
+    const positions = saved ? JSON.parse(saved) as Record<string, ReaderPosition> : {};
+    return positions[contentId] ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function writeReaderPosition(contentId: string, position: ReaderPosition) {
+  try {
+    const saved = window.localStorage.getItem(READER_POSITION_KEY);
+    const positions = saved ? JSON.parse(saved) as Record<string, ReaderPosition> : {};
+    window.localStorage.setItem(READER_POSITION_KEY, JSON.stringify({ ...positions, [contentId]: position }));
+  } catch {
+    // Reading still works if storage is unavailable.
+  }
 }
 
 function App() {
@@ -1356,15 +1378,34 @@ function ReaderPreview({
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
   const [timerOpen, setTimerOpen] = useState(false);
+  const [currentPageIndex, setCurrentPageIndex] = useState(0);
+  const [pageSize, setPageSize] = useState(emptyPaginationSize);
+  const [pageDirection, setPageDirection] = useState<"next" | "prev" | null>(null);
+  const [restrictionOpen, setRestrictionOpen] = useState(false);
+  const [selectedWord, setSelectedWord] = useState<ReaderPageWord | null>(null);
+  const [selectedSentence, setSelectedSentence] = useState<ReaderPageWord | null>(null);
   const timerButtonRef = useRef<HTMLButtonElement | null>(null);
   const settingsButtonRef = useRef<HTMLButtonElement | null>(null);
   const settingsPanelRef = useRef<HTMLDivElement | null>(null);
-  const readerContentRef = useRef<HTMLDivElement | null>(null);
+  const readingPageRef = useRef<HTMLElement | null>(null);
+  const readingTextFrameRef = useRef<HTMLDivElement | null>(null);
   const onProgressRef = useRef(onProgress);
   const onSessionUpdateRef = useRef(onSessionUpdate);
-  const chapter = getReaderChapter(book.id, "alice-chapter-1") ?? createFallbackChapter(book);
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+  const visibleWordIdBeforeRepaginate = useRef<string | null>(null);
+  const chapter = useMemo(() => getReaderChapter(book.id, "alice-chapter-1") ?? createFallbackChapter(book), [book]);
   const chapterCount = book.id === "alice-in-wonderland" ? 12 : 1;
+  const readerFont = readerFontStack(settings.fontFamily);
+  const { flatWords, isPaginating, pages } = useReaderPagination({
+    chapter,
+    fontFamily: readerFont,
+    settings,
+    size: pageSize,
+  });
+  const activePage = pages[currentPageIndex] ?? pages[0] ?? null;
   const bookPercent = Math.min(100, Math.max(progressValue, 0));
+  const pageProgressRatio = pages.length > 0 ? (currentPageIndex + 1) / pages.length : 0;
+  const visibleBookPercent = Math.min(100, Math.max(bookPercent, Math.round(((chapter.number - 1 + pageProgressRatio) / chapterCount) * 100)));
   const closeTimer = () => {
     setTimerOpen(false);
     window.setTimeout(() => timerButtonRef.current?.focus(), 0);
@@ -1376,22 +1417,43 @@ function ReaderPreview({
   }, [onProgress, onSessionUpdate]);
 
   useEffect(() => {
-    if (restoreScrollPosition !== null) {
-      window.setTimeout(() => window.scrollTo({ top: restoreScrollPosition, behavior: "auto" }), 0);
-    }
-
-    onSessionUpdateRef.current(window.scrollY);
+    window.scrollTo({ top: 0, behavior: "auto" });
+    onSessionUpdateRef.current(0);
 
     const handleBeforeUnload = () => {
-      onSessionUpdateRef.current(window.scrollY);
+      onSessionUpdateRef.current(0);
     };
 
     window.addEventListener("beforeunload", handleBeforeUnload);
     return () => {
-      onSessionUpdateRef.current(window.scrollY);
+      onSessionUpdateRef.current(0);
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
-  }, [book.id]);
+  }, [book.id, restoreScrollPosition]);
+
+  useEffect(() => {
+    function measurePage() {
+      const page = readingPageRef.current;
+      const textFrame = readingTextFrameRef.current;
+      if (!page || !textFrame) return;
+      const frameRect = textFrame.getBoundingClientRect();
+      setPageSize({
+        width: Math.max(1, Math.floor(frameRect.width)),
+        height: Math.max(1, Math.floor(frameRect.height)),
+      });
+    }
+
+    const observer = new ResizeObserver(measurePage);
+    if (readingPageRef.current) observer.observe(readingPageRef.current);
+    if (readingTextFrameRef.current) observer.observe(readingTextFrameRef.current);
+    measurePage();
+    window.addEventListener("resize", measurePage);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", measurePage);
+    };
+  }, []);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -1417,33 +1479,46 @@ function ReaderPreview({
   }, [settingsOpen]);
 
   useEffect(() => {
-    let frameId = 0;
+    if (pages.length === 0) return;
+    const saved = readReaderPosition(book.id);
+    const targetWordId = visibleWordIdBeforeRepaginate.current ?? saved?.wordId;
+    let nextIndex = targetWordId ? pages.findIndex((page) => page.words.some((word) => word.id === targetWordId)) : -1;
 
-    function updateReadingProgress() {
-      window.cancelAnimationFrame(frameId);
-      frameId = window.requestAnimationFrame(() => {
-        const content = readerContentRef.current;
-        if (!content) return;
-
-        const rect = content.getBoundingClientRect();
-        const readableHeight = Math.max(1, content.scrollHeight - window.innerHeight * 0.65);
-        const scrolled = Math.max(0, -rect.top);
-        const chapterProgress = Math.min(100, Math.round((scrolled / readableHeight) * 100));
-        const totalProgress = Math.min(100, Math.max(bookPercent, Math.round(((chapter.number - 1) / chapterCount) * 100 + chapterProgress / chapterCount)));
-        if (totalProgress > bookPercent) {
-          onProgressRef.current(totalProgress);
-        }
-        onSessionUpdateRef.current(window.scrollY);
-      });
+    if (nextIndex < 0 && saved?.sentenceId) {
+      nextIndex = pages.findIndex((page) => page.words.some((word) => word.sentenceId === saved.sentenceId));
     }
 
-    updateReadingProgress();
-    window.addEventListener("scroll", updateReadingProgress, { passive: true });
-    return () => {
-      window.cancelAnimationFrame(frameId);
-      window.removeEventListener("scroll", updateReadingProgress);
-    };
-  }, [book.id, chapter.id, bookPercent, chapter.number, chapterCount]);
+    if (nextIndex < 0 && saved?.progressRatio !== undefined) {
+      nextIndex = Math.min(pages.length - 1, Math.max(0, Math.floor(saved.progressRatio * pages.length)));
+    }
+
+    setCurrentPageIndex((current) => {
+      if (nextIndex >= 0) return nextIndex;
+      return Math.min(current, pages.length - 1);
+    });
+    visibleWordIdBeforeRepaginate.current = null;
+  }, [book.id, chapter.id, pages]);
+
+  useEffect(() => {
+    if (!activePage || flatWords.length === 0 || pages.length === 0) return;
+    const firstWord = activePage.words[0];
+    const progressRatio = Math.min(1, Math.max(0, firstWord.absoluteIndex / Math.max(1, flatWords.length - 1)));
+
+    writeReaderPosition(book.id, {
+      chapterId: chapter.id,
+      sentenceId: firstWord.sentenceId,
+      wordId: firstWord.id,
+      wordIndex: firstWord.absoluteIndex,
+      progressRatio,
+      updatedAt: new Date().toISOString(),
+    });
+
+    onSessionUpdateRef.current(0);
+
+    if (visibleBookPercent > bookPercent) {
+      onProgressRef.current(visibleBookPercent);
+    }
+  }, [activePage, book.id, bookPercent, chapter.id, flatWords.length, pages.length, visibleBookPercent]);
 
   useEffect(() => {
     if (!timerOpen) return;
@@ -1457,6 +1532,81 @@ function ReaderPreview({
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [timerOpen]);
+
+  function rememberCurrentWord() {
+    visibleWordIdBeforeRepaginate.current = activePage?.firstWordId ?? null;
+  }
+
+  function updateReadingSettings(nextSettings: SetStateAction<ReadingSettings>) {
+    rememberCurrentWord();
+    setSettings(nextSettings);
+  }
+
+  function turnPage(direction: "next" | "prev") {
+    if (pages.length === 0) return;
+    readingTimer.recordActivity();
+    setSelectedWord(null);
+    setSelectedSentence(null);
+    setPageDirection(direction);
+    window.setTimeout(() => setPageDirection(null), 260);
+
+    setCurrentPageIndex((current) => {
+      if (direction === "next") {
+        if (current < pages.length - 1) return current + 1;
+        setRestrictionOpen(true);
+        return current;
+      }
+
+      if (current > 0) return current - 1;
+      return current;
+    });
+  }
+
+  function handleReaderKeyDown(event: KeyboardEvent) {
+    if (isReaderInteractive(event.target)) return;
+
+    if (event.key === "ArrowRight" || event.key === "PageDown" || event.key === " ") {
+      event.preventDefault();
+      turnPage("next");
+    }
+
+    if (event.key === "ArrowLeft" || event.key === "PageUp") {
+      event.preventDefault();
+      turnPage("prev");
+    }
+  }
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleReaderKeyDown);
+    return () => window.removeEventListener("keydown", handleReaderKeyDown);
+  });
+
+  function handlePagePointerDown(event: ReactPointerEvent<HTMLElement>) {
+    if (isReaderInteractive(event.target)) return;
+    touchStartRef.current = { x: event.clientX, y: event.clientY };
+  }
+
+  function handlePagePointerUp(event: ReactPointerEvent<HTMLElement>) {
+    const start = touchStartRef.current;
+    touchStartRef.current = null;
+    if (!start || isReaderInteractive(event.target)) return;
+
+    const deltaX = event.clientX - start.x;
+    const deltaY = event.clientY - start.y;
+    const isSwipe = Math.abs(deltaX) >= 54 && Math.abs(deltaX) > Math.abs(deltaY) * 1.35;
+    if (isSwipe) {
+      turnPage(deltaX < 0 ? "next" : "prev");
+      return;
+    }
+
+    if (Math.abs(deltaX) > 10 || Math.abs(deltaY) > 10) return;
+    if (window.getSelection()?.toString()) return;
+
+    const rect = event.currentTarget.getBoundingClientRect();
+    const relativeX = event.clientX - rect.left;
+    if (relativeX > rect.width * 0.68) turnPage("next");
+    if (relativeX < rect.width * 0.32) turnPage("prev");
+  }
 
   return (
     <main
@@ -1508,35 +1658,65 @@ function ReaderPreview({
           <ReadingSettingsPanel
             panelRef={settingsPanelRef}
             settings={settings}
-            onChange={setSettings}
+            onChange={updateReadingSettings}
           />
         ) : null}
       </header>
 
-      <article className="reading-page" ref={readerContentRef}>
-        <div className="reading-chapter-heading">
-          <span>Chapter {chapter.number}</span>
-          <h1>{chapter.title}</h1>
-        </div>
-        <div className="structured-text">
-          {chapter.paragraphs.map((paragraph) => (
-            <ReaderParagraphView
-              key={paragraph.id}
-              paragraph={paragraph}
-              settings={settings}
-              onSpeak={(sentence) => speech.toggle(sentence.words.map((word) => word.text).join(" "))}
-            />
-          ))}
-        </div>
-      </article>
+      <section
+        className="paginated-reader-shell"
+        aria-label="Страница чтения"
+        onPointerDown={handlePagePointerDown}
+        onPointerUp={handlePagePointerUp}
+      >
+        <article className={`reading-page ${pageDirection ? `page-${pageDirection}` : ""}`} ref={readingPageRef}>
+          <div className="reading-page-title">
+            <span>Chapter {chapter.number}</span>
+            <strong>{chapter.title}</strong>
+          </div>
+          <div className="reading-text-frame" ref={readingTextFrameRef}>
+            {isPaginating || !activePage ? (
+              <div className="reader-pagination-loading">Пересчитываем страницы…</div>
+            ) : (
+              <ReaderPageView
+                page={activePage}
+                settings={settings}
+                onSpeak={(sentenceWords) => speech.toggle(sentenceWords.map((word) => word.text).join(" "))}
+                onSelectSentence={setSelectedSentence}
+                onSelectWord={setSelectedWord}
+              />
+            )}
+          </div>
+          {selectedWord ? (
+            <ReaderWordPopover word={selectedWord} onClose={() => setSelectedWord(null)} />
+          ) : null}
+          {selectedSentence ? (
+            <ReaderSentencePopover sentence={selectedSentence} onClose={() => setSelectedSentence(null)} />
+          ) : null}
+        </article>
+      </section>
 
       <footer className="reading-bottombar">
-        <span>Chapter {chapter.number} of {chapterCount}</span>
+        <span className="reading-progress-desktop">Глава {chapter.number} из {chapterCount} · Страница {Math.min(currentPageIndex + 1, pages.length || 1)} из {pages.length || 1} · {visibleBookPercent}% книги</span>
+        <span className="reading-progress-mobile">{Math.min(currentPageIndex + 1, pages.length || 1)} / {pages.length || 1}</span>
         <div className="reading-book-progress" aria-label={`${bookPercent}% книги`}>
-          <span style={{ width: `${bookPercent}%` }} />
+          <span style={{ width: `${visibleBookPercent}%` }} />
         </div>
-        <span>{bookPercent}% книги</span>
+        <span className="reading-progress-percent">{visibleBookPercent}%</span>
       </footer>
+      {restrictionOpen ? (
+        <div className="reader-restriction-layer" role="presentation" onClick={() => setRestrictionOpen(false)}>
+          <section className="reader-restriction-dialog" role="dialog" aria-modal="true" aria-label="Следующая глава недоступна" onClick={(event) => event.stopPropagation()}>
+            <button className="dialog-close" type="button" aria-label="Закрыть" onClick={() => setRestrictionOpen(false)}>
+              <X size={18} aria-hidden="true" />
+            </button>
+            <span className="eyebrow">Глава скоро</span>
+            <h2>Следующая глава пока недоступна</h2>
+            <p>Сейчас подключена только первая глава Alice. Экран уже готов к переходу на следующую главу, когда она появится в данных.</p>
+            <button className="primary-button" type="button" onClick={() => setRestrictionOpen(false)}>Понятно</button>
+          </section>
+        </div>
+      ) : null}
       <ReadingTimerButton
         bookTitle={book.title}
         chapterTitle={`Chapter ${chapter.number}: ${chapter.title}`}
@@ -1646,55 +1826,155 @@ function ReadingSettingsPanel({
   );
 }
 
-function ReaderParagraphView({
-  paragraph,
+function ReaderPageView({
+  page,
   settings,
   onSpeak,
+  onSelectSentence,
+  onSelectWord,
 }: {
-  paragraph: ReaderParagraph;
+  page: ReaderPage;
   settings: ReadingSettings;
-  onSpeak: (sentence: ReaderSentence) => void;
+  onSpeak: (words: ReaderPageWord[]) => void;
+  onSelectSentence: (word: ReaderPageWord) => void;
+  onSelectWord: (word: ReaderPageWord) => void;
 }) {
+  const paragraphs = groupPageWords(page.words);
+
   return (
-    <p className="reader-paragraph">
-      {paragraph.sentences.map((sentence) => (
-        <ReaderSentenceView key={sentence.id} sentence={sentence} settings={settings} onSpeak={onSpeak} />
+    <div className="structured-text">
+      {paragraphs.map((paragraph) => (
+        <p className="reader-paragraph" key={paragraph.paragraphId}>
+          {paragraph.sentences.map((sentence) => (
+            <ReaderSentenceView
+              key={`${paragraph.paragraphId}-${sentence.sentenceId}`}
+              sentenceWords={sentence.words}
+              settings={settings}
+              onSelectSentence={onSelectSentence}
+              onSelectWord={onSelectWord}
+              onSpeak={onSpeak}
+            />
+          ))}
+        </p>
       ))}
-    </p>
+    </div>
   );
 }
 
 function ReaderSentenceView({
-  sentence,
+  sentenceWords,
   settings,
   onSpeak,
+  onSelectSentence,
+  onSelectWord,
 }: {
-  sentence: ReaderSentence;
+  sentenceWords: ReaderPageWord[];
   settings: ReadingSettings;
-  onSpeak: (sentence: ReaderSentence) => void;
+  onSpeak: (words: ReaderPageWord[]) => void;
+  onSelectSentence: (word: ReaderPageWord) => void;
+  onSelectWord: (word: ReaderPageWord) => void;
 }) {
+  const firstWord = sentenceWords[0];
+
   return (
-    <span className="reader-sentence">
+    <span className="reader-sentence" data-sentence-id={firstWord?.sentenceId}>
       <span className="reader-sentence-words">
-        {sentence.words.map((word) => (
-          <ReaderWordView key={word.id} word={word} showTranslation={settings.showWordTranslation} />
+        {sentenceWords.map((word) => (
+          <ReaderWordView key={word.id} word={word} showTranslation={settings.showWordTranslation} onSelect={onSelectWord} />
         ))}
       </span>
-      <button className="sentence-audio-button" type="button" aria-label="Прослушать предложение" onClick={() => onSpeak(sentence)}>
+      <button className="sentence-audio-button" type="button" aria-label="Прослушать предложение" onClick={(event) => {
+        event.stopPropagation();
+        onSpeak(sentenceWords);
+      }}>
         <Volume2 size={15} aria-hidden="true" />
       </button>
-      {settings.showSentenceTranslation && sentence.translation ? <span className="sentence-translation">{sentence.translation}</span> : null}
+      {settings.showSentenceTranslation && firstWord?.sentenceTranslation ? (
+        <button className="sentence-translation-trigger" type="button" onClick={(event) => {
+          event.stopPropagation();
+          onSelectSentence(firstWord);
+        }}>
+          Перевод предложения
+        </button>
+      ) : null}
     </span>
   );
 }
 
-function ReaderWordView({ word, showTranslation }: { word: ReaderWord; showTranslation: boolean }) {
+function ReaderWordView({
+  word,
+  showTranslation,
+  onSelect,
+}: {
+  word: ReaderPageWord;
+  showTranslation: boolean;
+  onSelect: (word: ReaderPageWord) => void;
+}) {
   return (
-    <span className="reader-word" data-word-id={word.id}>
+    <span
+      className="reader-word"
+      data-word-id={word.id}
+      role="button"
+      tabIndex={0}
+      onClick={(event) => {
+        event.stopPropagation();
+        onSelect(word);
+      }}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          event.stopPropagation();
+          onSelect(word);
+        }
+      }}
+    >
       <span>{word.text}</span>
       {showTranslation && word.translation ? <small>{word.translation}</small> : null}
     </span>
   );
+}
+
+function ReaderWordPopover({ word, onClose }: { word: ReaderPageWord; onClose: () => void }) {
+  return (
+    <aside className="reader-translation-popover word-popover" role="dialog" aria-label={`Перевод слова ${word.text}`} onClick={(event) => event.stopPropagation()}>
+      <button className="popover-close" type="button" aria-label="Закрыть перевод" onClick={onClose}>×</button>
+      <strong>{word.text}</strong>
+      {word.transcription ? <span>{word.transcription}</span> : null}
+      <p>{word.translation ?? "Перевод слова будет подключён на следующем этапе."}</p>
+    </aside>
+  );
+}
+
+function ReaderSentencePopover({ sentence, onClose }: { sentence: ReaderPageWord; onClose: () => void }) {
+  return (
+    <aside className="reader-translation-popover sentence-popover" role="dialog" aria-label="Перевод предложения" onClick={(event) => event.stopPropagation()}>
+      <button className="popover-close" type="button" aria-label="Закрыть перевод" onClick={onClose}>×</button>
+      <strong>Перевод предложения</strong>
+      <p>{sentence.sentenceTranslation ?? "Перевод предложения будет подключён на следующем этапе."}</p>
+    </aside>
+  );
+}
+
+function groupPageWords(words: ReaderPageWord[]) {
+  const paragraphs: Array<{ paragraphId: string; sentences: Array<{ sentenceId: string; words: ReaderPageWord[] }> }> = [];
+
+  words.forEach((word) => {
+    let paragraph = paragraphs.find((item) => item.paragraphId === word.paragraphId);
+    if (!paragraph) {
+      paragraph = { paragraphId: word.paragraphId, sentences: [] };
+      paragraphs.push(paragraph);
+    }
+
+    let sentence = paragraph.sentences.find((item) => item.sentenceId === word.sentenceId);
+    if (!sentence) {
+      sentence = { sentenceId: word.sentenceId, words: [] };
+      paragraph.sentences.push(sentence);
+    }
+
+    sentence.words.push(word);
+  });
+
+  return paragraphs;
 }
 
 function createFallbackChapter(book: HomeShelfBook): ReaderChapter {
@@ -1724,6 +2004,15 @@ function readerFontStack(font: ReadingSettings["fontFamily"]) {
   if (font === "Georgia") return 'Georgia, "Times New Roman", serif';
   if (font === "Merriweather") return 'Merriweather, Georgia, "Times New Roman", serif';
   return 'Literata, Georgia, "Times New Roman", serif';
+}
+
+function isReaderInteractive(target: EventTarget | null) {
+  if (!(target instanceof Element)) return false;
+  return Boolean(
+    target.closest(
+      "button, input, select, textarea, a, .reader-word, .reading-settings-panel, .reading-timer-widget, .reading-timer-layer, .reader-translation-popover",
+    ),
+  );
 }
 
 function ReadingGoalDialog({
