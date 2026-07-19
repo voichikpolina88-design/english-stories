@@ -2100,6 +2100,15 @@ p {
   user-select: text;
 }
 
+.reader-page-track {
+  min-height: 0;
+  height: 100%;
+}
+
+.reader-mobile-neighbor {
+  display: none;
+}
+
 .reading-page {
   position: relative;
   display: grid;
@@ -2793,6 +2802,19 @@ blockquote {
     padding: 10px 10px calc(144px + env(safe-area-inset-bottom));
   }
 
+  .app-main:has(.reader-preview) {
+    height: calc(100dvh - 82px - env(safe-area-inset-bottom));
+    padding: 8px 10px 18px;
+  }
+
+  .app-main:has(.reader-preview) .reader-preview {
+    height: 100%;
+  }
+
+  .app-main:has(.reader-preview) .mobile-topbar {
+    display: none;
+  }
+
   .book-home,
   .page-stack,
   .reader-preview {
@@ -2800,9 +2822,11 @@ blockquote {
   }
 
   .reader-preview {
-    height: calc(100dvh - 20px);
-    gap: 12px;
-    padding-bottom: calc(78px + env(safe-area-inset-bottom));
+    height: calc(100dvh - 116px - env(safe-area-inset-bottom));
+    min-height: 0;
+    gap: 8px;
+    padding-bottom: 0;
+    touch-action: pan-y;
   }
 
   .mobile-topbar {
@@ -2838,6 +2862,45 @@ blockquote {
     padding: 8px;
   }
 
+  .paginated-reader-shell {
+    gap: 8px;
+    overflow: hidden;
+    touch-action: pan-y;
+  }
+
+  .reader-page-track {
+    display: grid;
+    grid-template-columns: repeat(3, 100%);
+    height: 100%;
+    min-height: 0;
+    transform: translate3d(calc(-100% + var(--reader-drag-x, 0px)), 0, 0);
+    transition: var(--reader-track-transition, none);
+    will-change: transform;
+  }
+
+  .reader-page-track .reading-page {
+    width: calc(100% - 4px);
+    max-width: none;
+    height: 100%;
+    min-height: 0;
+    padding: 24px 22px 26px;
+    box-shadow: 0 12px 32px rgba(71, 55, 35, 0.11);
+  }
+
+  .reading-page.page-next,
+  .reading-page.page-prev {
+    animation: none;
+  }
+
+  .reader-mobile-neighbor {
+    display: grid;
+    pointer-events: none;
+  }
+
+  .reader-page-edge {
+    display: none;
+  }
+
   .reading-title strong {
     font-size: 0.82rem;
   }
@@ -2852,7 +2915,13 @@ blockquote {
   }
 
   .reading-page-title {
-    margin-bottom: 10px;
+    min-height: 28px;
+    margin-bottom: 8px;
+  }
+
+  .reading-page-title.compact {
+    min-height: 20px;
+    margin-bottom: 4px;
   }
 
   .reading-page-title strong {
