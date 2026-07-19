@@ -1896,47 +1896,53 @@ p {
 }
 
 .reader-preview {
-  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-rows: auto minmax(0, 1fr);
   height: calc(100dvh - 48px);
   min-height: 0;
-  gap: 22px;
+  gap: 14px;
   overflow: hidden;
-  padding-bottom: 82px;
+  padding-bottom: 0;
   color: var(--reader-ink, var(--ink));
-  background: var(--reader-bg, transparent);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(30, 58, 138, 0.08), transparent 36%),
+    var(--reader-app-bg, var(--reader-bg, transparent));
   touch-action: pan-x;
 }
 
 .reading-theme-light {
-  --reader-bg: #fff;
+  --reader-app-bg: #f3f6fb;
   --reader-paper: #fff;
   --reader-ink: #1f2937;
   --reader-muted: #6b7280;
-  --reader-line: rgba(30, 58, 138, 0.12);
+  --reader-line: rgba(30, 58, 138, 0.14);
+  --reader-page-shadow: 0 18px 46px rgba(30, 58, 138, 0.12);
 }
 
 .reading-theme-cream {
-  --reader-bg: #fbf7f1;
+  --reader-app-bg: #f3efe8;
   --reader-paper: #fffdf8;
   --reader-ink: #25212d;
   --reader-muted: #77717f;
-  --reader-line: rgba(30, 58, 138, 0.12);
+  --reader-line: rgba(30, 58, 138, 0.14);
+  --reader-page-shadow: 0 18px 46px rgba(71, 55, 35, 0.11);
 }
 
 .reading-theme-sepia {
-  --reader-bg: #f4ead8;
+  --reader-app-bg: #e8d9c3;
   --reader-paper: #fbf1df;
   --reader-ink: #3a2b1f;
   --reader-muted: #7a6754;
   --reader-line: rgba(99, 67, 35, 0.18);
+  --reader-page-shadow: 0 18px 46px rgba(76, 47, 24, 0.14);
 }
 
 .reading-theme-dark {
-  --reader-bg: #121826;
+  --reader-app-bg: #0f172a;
   --reader-paper: #182033;
   --reader-ink: #f8fafc;
   --reader-muted: #cbd5e1;
   --reader-line: rgba(191, 219, 254, 0.18);
+  --reader-page-shadow: 0 18px 44px rgba(0, 0, 0, 0.26);
 }
 
 .reading-topbar {
@@ -2086,7 +2092,11 @@ p {
 
 .paginated-reader-shell {
   display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 10px;
   min-height: 0;
+  position: relative;
+  align-items: stretch;
   user-select: text;
 }
 
@@ -2103,7 +2113,8 @@ p {
   border: 1px solid var(--reader-line);
   border-radius: 22px;
   background: var(--reader-paper);
-  box-shadow: 0 18px 52px rgba(30, 58, 138, 0.08);
+  box-shadow: var(--reader-page-shadow);
+  overflow: hidden;
   transition: transform 220ms ease, opacity 220ms ease;
 }
 
@@ -2118,8 +2129,15 @@ p {
 .reading-page-title {
   display: grid;
   gap: 4px;
-  margin-bottom: 16px;
+  min-height: 46px;
+  align-content: center;
+  margin-bottom: 12px;
   text-align: center;
+}
+
+.reading-page-title.compact {
+  min-height: 46px;
+  margin-bottom: 8px;
 }
 
 .reading-page-title span {
@@ -2135,6 +2153,53 @@ p {
   font-family: Georgia, "Times New Roman", serif;
   font-size: clamp(1rem, 2vw, 1.28rem);
   line-height: 1.18;
+}
+
+.reader-page-edge {
+  position: absolute;
+  top: 12px;
+  bottom: 44px;
+  z-index: 4;
+  display: grid;
+  width: min(92px, 18%);
+  place-items: center;
+  border: 0;
+  background: transparent;
+  color: var(--reader-ink);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.paginated-reader-shell:hover .reader-page-edge:not(:disabled) {
+  opacity: 0.72;
+  pointer-events: auto;
+}
+
+.reader-page-edge:disabled {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.reader-page-edge svg {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  padding: 9px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--reader-paper) 72%, transparent);
+  box-shadow: 0 12px 26px rgba(30, 58, 138, 0.13);
+}
+
+.reader-page-edge-left {
+  left: max(10px, calc((100% - var(--reader-width)) / 2 - 54px));
+}
+
+.reader-page-edge-right {
+  right: max(10px, calc((100% - var(--reader-width)) / 2 - 54px));
+}
+
+.reader-page-edge-right svg {
+  transform: rotate(180deg);
 }
 
 .reading-text-frame {
@@ -2260,31 +2325,39 @@ p {
   font-size: 1.2rem;
 }
 
-.reading-bottombar {
-  position: fixed;
-  left: calc(var(--sidebar-width) + 24px);
-  right: 24px;
-  bottom: 20px;
-  z-index: 50;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(90px, 180px) auto;
-  gap: 12px;
-  align-items: center;
-  width: min(100% - var(--sidebar-width) - 48px, 560px);
-  margin: 0 auto;
-  padding: 10px 14px;
+.reader-page-indicator {
+  justify-self: center;
+  width: fit-content;
+  padding: 7px 14px;
   border: 1px solid var(--reader-line);
   border-radius: 999px;
-  background: color-mix(in srgb, var(--reader-paper) 94%, transparent);
+  background: color-mix(in srgb, var(--reader-paper) 86%, transparent);
   color: var(--reader-muted);
-  box-shadow: 0 16px 42px rgba(30, 58, 138, 0.12);
-  backdrop-filter: blur(14px);
+  box-shadow: 0 10px 24px rgba(30, 58, 138, 0.09);
+  backdrop-filter: blur(10px);
   font-size: 0.82rem;
-  font-weight: 780;
+  font-weight: 820;
+  text-align: center;
 }
 
-.reading-progress-mobile {
+.reader-page-indicator-mobile {
   display: none;
+}
+
+.reader-swipe-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 54px;
+  z-index: 6;
+  padding: 8px 12px;
+  border: 1px solid var(--reader-line);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--reader-paper) 90%, transparent);
+  color: var(--reader-muted);
+  box-shadow: 0 12px 28px rgba(30, 58, 138, 0.12);
+  transform: translateX(-50%);
+  font-size: 0.78rem;
+  font-weight: 820;
 }
 
 .reader-restriction-layer {
@@ -2347,20 +2420,6 @@ p {
   .reading-page.page-prev {
     animation: none;
   }
-}
-
-.reading-book-progress {
-  height: 7px;
-  overflow: hidden;
-  border-radius: 999px;
-  background: var(--purple-soft);
-}
-
-.reading-book-progress span {
-  display: block;
-  height: 100%;
-  border-radius: inherit;
-  background: linear-gradient(90deg, var(--accent-link), var(--purple));
 }
 
 .reader-card {
@@ -2677,13 +2736,6 @@ blockquote {
     display: none;
   }
 
-  .reading-bottombar {
-    left: 10px;
-    right: 10px;
-    bottom: calc(96px + env(safe-area-inset-bottom));
-    width: auto;
-  }
-
   .home-continue-panel {
     grid-template-columns: 170px minmax(0, 1fr);
   }
@@ -2811,25 +2863,23 @@ blockquote {
     font-size: min(var(--reader-font-size), 22px);
   }
 
-  .reading-bottombar {
-    grid-template-columns: auto minmax(72px, 1fr) auto;
-    gap: 8px;
-    padding: 9px 10px;
-    font-size: 0.72rem;
+  .reader-page-indicator {
+    padding: 6px 13px;
+    font-size: 0.78rem;
   }
 
-  .reading-progress-desktop {
+  .reader-page-indicator-desktop {
     display: none;
   }
 
-  .reading-progress-mobile {
+  .reader-page-indicator-mobile {
     display: inline;
-    min-width: 42px;
   }
 
-  .reading-progress-percent {
-    min-width: 34px;
-    text-align: right;
+  .reader-swipe-hint {
+    bottom: 44px;
+    max-width: calc(100% - 28px);
+    white-space: nowrap;
   }
 
   .home-decor {

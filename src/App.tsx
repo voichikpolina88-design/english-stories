@@ -34,6 +34,7 @@ type OpenContentOptions = {
 
 const READING_SETTINGS_KEY = "storylingo-reading-settings";
 const READER_POSITION_KEY = "storylingo-reader-positions";
+const READER_SWIPE_HINT_KEY = "storylingo-reader-swipe-hint-seen";
 
 const defaultReadingSettings: ReadingSettings = {
   theme: "cream",
@@ -1381,9 +1382,17 @@ function ReaderPreview({
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [pageSize, setPageSize] = useState(emptyPaginationSize);
   const [pageDirection, setPageDirection] = useState<"next" | "prev" | null>(null);
+  const [isPageTurning, setIsPageTurning] = useState(false);
   const [restrictionOpen, setRestrictionOpen] = useState(false);
   const [selectedWord, setSelectedWord] = useState<ReaderPageWord | null>(null);
   const [selectedSentence, setSelectedSentence] = useState<ReaderPageWord | null>(null);
+  const [showSwipeHint, setShowSwipeHint] = useState(() => {
+    try {
+      return window.localStorage.getItem(READER_SWIPE_HINT_KEY) !== "true";
+    } catch {
+      return true;
+    }
+  });
   const timerButtonRef = useRef<HTMLButtonElement | null>(null);
   const settingsButtonRef = useRef<HTMLButtonElement | null>(null);
   const settingsPanelRef = useRef<HTMLDivElement | null>(null);
@@ -1543,23 +1552,32 @@ function ReaderPreview({
   }
 
   function turnPage(direction: "next" | "prev") {
-    if (pages.length === 0) return;
+    if (pages.length === 0 || isPageTurning) return;
     readingTimer.recordActivity();
     setSelectedWord(null);
     setSelectedSentence(null);
+    setShowSwipeHint(false);
+    try {
+      window.localStorage.setItem(READER_SWIPE_HINT_KEY, "true");
+    } catch {
+      // The hint is cosmetic; storage failures should not affect reading.
+    }
+
+    const canTurnNext = direction === "next" && currentPageIndex < pages.length - 1;
+    const canTurnPrev = direction === "prev" && currentPageIndex > 0;
+
+    if (!canTurnNext && !canTurnPrev) {
+      if (direction === "next") setRestrictionOpen(true);
+      return;
+    }
+
+    setIsPageTurning(true);
     setPageDirection(direction);
-    window.setTimeout(() => setPageDirection(null), 260);
-
-    setCurrentPageIndex((current) => {
-      if (direction === "next") {
-        if (current < pages.length - 1) return current + 1;
-        setRestrictionOpen(true);
-        return current;
-      }
-
-      if (current > 0) return current - 1;
-      return current;
-    });
+    setCurrentPageIndex((current) => current + (direction === "next" ? 1 : -1));
+    window.setTimeout(() => {
+      setPageDirection(null);
+      setIsPageTurning(false);
+    }, 240);
   }
 
   function handleReaderKeyDown(event: KeyboardEvent) {
@@ -1669,10 +1687,22 @@ function ReaderPreview({
         onPointerDown={handlePagePointerDown}
         onPointerUp={handlePagePointerUp}
       >
+        <button
+          className="reader-page-edge reader-page-edge-left"
+          type="button"
+          aria-label="Предыдущая страница"
+          disabled={currentPageIndex <= 0 || isPageTurning}
+          onClick={(event) => {
+            event.stopPropagation();
+            turnPage("prev");
+          }}
+        >
+          <ArrowLeft size={24} aria-hidden="true" />
+        </button>
         <article className={`reading-page ${pageDirection ? `page-${pageDirection}` : ""}`} ref={readingPageRef}>
-          <div className="reading-page-title">
+          <div className={currentPageIndex === 0 ? "reading-page-title" : "reading-page-title compact"}>
             <span>Chapter {chapter.number}</span>
-            <strong>{chapter.title}</strong>
+            {currentPageIndex === 0 ? <strong>{chapter.title}</strong> : null}
           </div>
           <div className="reading-text-frame" ref={readingTextFrameRef}>
             {isPaginating || !activePage ? (
@@ -1694,16 +1724,24 @@ function ReaderPreview({
             <ReaderSentencePopover sentence={selectedSentence} onClose={() => setSelectedSentence(null)} />
           ) : null}
         </article>
-      </section>
-
-      <footer className="reading-bottombar">
-        <span className="reading-progress-desktop">Глава {chapter.number} из {chapterCount} · Страница {Math.min(currentPageIndex + 1, pages.length || 1)} из {pages.length || 1} · {visibleBookPercent}% книги</span>
-        <span className="reading-progress-mobile">{Math.min(currentPageIndex + 1, pages.length || 1)} / {pages.length || 1}</span>
-        <div className="reading-book-progress" aria-label={`${bookPercent}% книги`}>
-          <span style={{ width: `${visibleBookPercent}%` }} />
+        <button
+          className="reader-page-edge reader-page-edge-right"
+          type="button"
+          aria-label="Следующая страница"
+          disabled={isPageTurning || (currentPageIndex >= pages.length - 1 && book.id === "alice-in-wonderland")}
+          onClick={(event) => {
+            event.stopPropagation();
+            turnPage("next");
+          }}
+        >
+          <ArrowLeft size={24} aria-hidden="true" />
+        </button>
+        {showSwipeHint ? <div className="reader-swipe-hint">Листайте страницы свайпом</div> : null}
+        <div className="reader-page-indicator" role="status" aria-label="Текущая страница">
+          <span className="reader-page-indicator-desktop">Глава {chapter.number} из {chapterCount} · Страница {Math.min(currentPageIndex + 1, pages.length || 1)} из {pages.length || 1}</span>
+          <span className="reader-page-indicator-mobile">{Math.min(currentPageIndex + 1, pages.length || 1)} / {pages.length || 1}</span>
         </div>
-        <span className="reading-progress-percent">{visibleBookPercent}%</span>
-      </footer>
+      </section>
       {restrictionOpen ? (
         <div className="reader-restriction-layer" role="presentation" onClick={() => setRestrictionOpen(false)}>
           <section className="reader-restriction-dialog" role="dialog" aria-modal="true" aria-label="Следующая глава недоступна" onClick={(event) => event.stopPropagation()}>
