@@ -24,7 +24,9 @@ export const aliceInWonderlandBook: ReaderBook = {
           "sentences": [
             {
               "id": "alice-ch1-p1-s1",
-              "text": "Alice was beginning to get very tired of sitting by her sister on the bank, and of having nothing to do: once or twice she had peeped into the book her sister was reading, but it had no pictures or conversations in it, “and what is the use of a book,” thought Alice “without pictures or conversations?”"
+              "text": "Alice was beginning to get very tired of sitting by her sister on the bank, and of having nothing to do: once or twice she had peeped into the book her sister was reading, but it had no pictures or conversations in it, “and what is the use of a book,” thought Alice “without pictures or conversations?”",
+              "translation": "Алисе уже начинало очень надоедать сидеть рядом с сестрой на берегу и ничего не делать: раз или два она заглянула в книгу, которую читала сестра, но там не было ни картинок, ни разговоров, «а какой толк от книги, — подумала Алиса, — без картинок и разговоров?»",
+              "words": []
             }
           ]
         },
@@ -34,7 +36,9 @@ export const aliceInWonderlandBook: ReaderBook = {
           "sentences": [
             {
               "id": "alice-ch1-p2-s1",
-              "text": "So she was considering in her own mind (as well as she could, for the hot day made her feel very sleepy and stupid), whether the pleasure of making a daisy-chain would be worth the trouble of getting up and picking the daisies, when suddenly a White Rabbit with pink eyes ran close by her."
+              "text": "So she was considering in her own mind (as well as she could, for the hot day made her feel very sleepy and stupid), whether the pleasure of making a daisy-chain would be worth the trouble of getting up and picking the daisies, when suddenly a White Rabbit with pink eyes ran close by her.",
+              "translation": "И она размышляла про себя, насколько могла, потому что от жаркого дня ей очень хотелось спать и думалось с трудом, стоит ли удовольствие сплести венок из маргариток того, чтобы встать и нарвать цветов, как вдруг совсем рядом пробежал Белый Кролик с розовыми глазами.",
+              "words": []
             }
           ]
         },
@@ -44,19 +48,27 @@ export const aliceInWonderlandBook: ReaderBook = {
           "sentences": [
             {
               "id": "alice-ch1-p3-s1",
-              "text": "There was nothing so _very_ remarkable in that; nor did Alice think it so _very_ much out of the way to hear the Rabbit say to itself, “Oh dear!"
+              "text": "There was nothing so _very_ remarkable in that; nor did Alice think it so _very_ much out of the way to hear the Rabbit say to itself, “Oh dear!",
+              "translation": "В этом не было ничего уж такого _очень_ замечательного; и Алисе не показалось _очень_ странным услышать, как Кролик сказал самому себе: «Ах, боже мой!",
+              "words": []
             },
             {
               "id": "alice-ch1-p3-s2",
-              "text": "Oh dear!"
+              "text": "Oh dear!",
+              "translation": "Ах, боже мой!",
+              "words": []
             },
             {
               "id": "alice-ch1-p3-s3",
-              "text": "I shall be late!”"
+              "text": "I shall be late!”",
+              "translation": "Я опоздаю!»",
+              "words": []
             },
             {
               "id": "alice-ch1-p3-s4",
-              "text": "(when she thought it over afterwards, it occurred to her that she ought to have wondered at this, but at the time it all seemed quite natural); but when the Rabbit actually _took a watch out of its waistcoat-pocket_, and looked at it, and then hurried on, Alice started to her feet, for it flashed across her mind that she had never before seen a rabbit with either a waistcoat-pocket, or a watch to take out of it, and burning with curiosity, she ran across the field after it, and fortunately was just in time to see it pop down a large rabbit-hole under the hedge."
+              "text": "(when she thought it over afterwards, it occurred to her that she ought to have wondered at this, but at the time it all seemed quite natural); but when the Rabbit actually _took a watch out of its waistcoat-pocket_, and looked at it, and then hurried on, Alice started to her feet, for it flashed across her mind that she had never before seen a rabbit with either a waistcoat-pocket, or a watch to take out of it, and burning with curiosity, she ran across the field after it, and fortunately was just in time to see it pop down a large rabbit-hole under the hedge.",
+              "translation": "(когда она потом об этом подумала, ей пришло в голову, что этому следовало бы удивиться, но в тот момент всё казалось совершенно естественным); но когда Кролик и правда _вытащил часы из кармана жилета_, посмотрел на них и поспешил дальше, Алиса вскочила на ноги, потому что ей вдруг пришло в голову, что она никогда прежде не видела кролика ни с карманом в жилете, ни с часами, которые можно из него вынуть; сгорая от любопытства, она побежала за ним через поле и, к счастью, успела увидеть, как он юркнул в большую кроличью нору под изгородью.",
+              "words": []
             }
           ]
         },
@@ -66,7 +78,9 @@ export const aliceInWonderlandBook: ReaderBook = {
           "sentences": [
             {
               "id": "alice-ch1-p4-s1",
-              "text": "In another moment down went Alice after it, never once considering how in the world she was to get out again."
+              "text": "In another moment down went Alice after it, never once considering how in the world she was to get out again.",
+              "translation": "В следующее мгновение Алиса прыгнула за ним, ни разу не подумав, как же она потом выберется обратно.",
+              "words": []
             }
           ]
         },
@@ -76,7 +90,9 @@ export const aliceInWonderlandBook: ReaderBook = {
           "sentences": [
             {
               "id": "alice-ch1-p5-s1",
-              "text": "The rabbit-hole went straight on like a tunnel for some way, and then dipped suddenly down, so suddenly that Alice had not a moment to think about stopping herself before she found herself falling down a very deep well."
+              "text": "The rabbit-hole went straight on like a tunnel for some way, and then dipped suddenly down, so suddenly that Alice had not a moment to think about stopping herself before she found herself falling down a very deep well.",
+              "translation": "Кроличья нора некоторое время шла прямо, как туннель, а потом внезапно резко ушла вниз, так внезапно, что Алиса не успела даже подумать, как остановиться, прежде чем обнаружила, что падает в очень глубокий колодец.",
+              "words": []
             }
           ]
         },
@@ -86,15 +102,21 @@ export const aliceInWonderlandBook: ReaderBook = {
           "sentences": [
             {
               "id": "alice-ch1-p6-s1",
-              "text": "Either the well was very deep, or she fell very slowly, for she had plenty of time as she went down to look about her and to wonder what was going to happen next."
+              "text": "Either the well was very deep, or she fell very slowly, for she had plenty of time as she went down to look about her and to wonder what was going to happen next.",
+              "translation": "То ли колодец был очень глубоким, то ли падала она очень медленно, но у неё было достаточно времени, пока она летела вниз, чтобы оглядываться и гадать, что случится дальше.",
+              "words": []
             },
             {
               "id": "alice-ch1-p6-s2",
-              "text": "First, she tried to look down and make out what she was coming to, but it was too dark to see anything; then she looked at the sides of the well, and noticed that they were filled with cupboards and book-shelves; here and there she saw maps and pictures hung upon pegs."
+              "text": "First, she tried to look down and make out what she was coming to, but it was too dark to see anything; then she looked at the sides of the well, and noticed that they were filled with cupboards and book-shelves; here and there she saw maps and pictures hung upon pegs.",
+              "translation": "Сначала она попыталась посмотреть вниз и понять, к чему приближается, но было слишком темно, чтобы что-нибудь разглядеть; потом она взглянула на стенки колодца и заметила, что они уставлены шкафчиками и книжными полками; кое-где на крючках висели карты и картинки.",
+              "words": []
             },
             {
               "id": "alice-ch1-p6-s3",
-              "text": "She took down a jar from one of the shelves as she passed; it was labelled “ORANGE MARMALADE”, but to her great disappointment it was empty: she did not like to drop the jar for fear of killing somebody underneath, so managed to put it into one of the cupboards as she fell past it."
+              "text": "She took down a jar from one of the shelves as she passed; it was labelled “ORANGE MARMALADE”, but to her great disappointment it was empty: she did not like to drop the jar for fear of killing somebody underneath, so managed to put it into one of the cupboards as she fell past it.",
+              "translation": "Пролетая мимо одной из полок, она сняла с неё банку; на ней было написано «АПЕЛЬСИНОВЫЙ МАРМЕЛАД», но, к её большому разочарованию, банка оказалась пустой: Алисе не хотелось бросать её, боясь убить кого-нибудь внизу, поэтому, пролетая мимо, она ухитрилась поставить банку в один из шкафчиков.",
+              "words": []
             }
           ]
         },
@@ -104,19 +126,27 @@ export const aliceInWonderlandBook: ReaderBook = {
           "sentences": [
             {
               "id": "alice-ch1-p7-s1",
-              "text": "“Well!” thought Alice to herself, “after such a fall as this, I shall think nothing of tumbling down stairs!"
+              "text": "“Well!” thought Alice to herself, “after such a fall as this, I shall think nothing of tumbling down stairs!",
+              "translation": "«Ну что ж! — подумала Алиса. — После такого падения я и падение с лестницы буду считать пустяком!",
+              "words": []
             },
             {
               "id": "alice-ch1-p7-s2",
-              "text": "How brave they’ll all think me at home!"
+              "text": "How brave they’ll all think me at home!",
+              "translation": "Какой храброй все будут считать меня дома!",
+              "words": []
             },
             {
               "id": "alice-ch1-p7-s3",
-              "text": "Why, I wouldn’t say anything about it, even if I fell off the top of the house!”"
+              "text": "Why, I wouldn’t say anything about it, even if I fell off the top of the house!”",
+              "translation": "Да я бы и слова не сказала, даже если бы упала с крыши дома!»",
+              "words": []
             },
             {
               "id": "alice-ch1-p7-s4",
-              "text": "(Which was very likely true.)"
+              "text": "(Which was very likely true.)",
+              "translation": "(И это, скорее всего, было правдой.)",
+              "words": []
             }
           ]
         },
@@ -126,27 +156,39 @@ export const aliceInWonderlandBook: ReaderBook = {
           "sentences": [
             {
               "id": "alice-ch1-p8-s1",
-              "text": "Down, down, down."
+              "text": "Down, down, down.",
+              "translation": "Вниз, вниз, вниз.",
+              "words": []
             },
             {
               "id": "alice-ch1-p8-s2",
-              "text": "Would the fall _never_ come to an end?"
+              "text": "Would the fall _never_ come to an end?",
+              "translation": "Неужели это падение _никогда_ не закончится?",
+              "words": []
             },
             {
               "id": "alice-ch1-p8-s3",
-              "text": "“I wonder how many miles I’ve fallen by this time?” she said aloud."
+              "text": "“I wonder how many miles I’ve fallen by this time?” she said aloud.",
+              "translation": "«Интересно, сколько миль я уже пролетела?» — сказала она вслух.",
+              "words": []
             },
             {
               "id": "alice-ch1-p8-s4",
-              "text": "“I must be getting somewhere near the centre of the earth."
+              "text": "“I must be getting somewhere near the centre of the earth.",
+              "translation": "«Должно быть, я уже где-то недалеко от центра Земли.",
+              "words": []
             },
             {
               "id": "alice-ch1-p8-s5",
-              "text": "Let me see: that would be four thousand miles down, I think—” (for, you see, Alice had learnt several things of this sort in her lessons in the schoolroom, and though this was not a _very_ good opportunity for showing off her knowledge, as there was no one to listen to her, still it was good practice to say it over) “—yes, that’s about the right distance—but then I wonder what Latitude or Longitude I’ve got to?”"
+              "text": "Let me see: that would be four thousand miles down, I think—” (for, you see, Alice had learnt several things of this sort in her lessons in the schoolroom, and though this was not a _very_ good opportunity for showing off her knowledge, as there was no one to listen to her, still it was good practice to say it over) “—yes, that’s about the right distance—but then I wonder what Latitude or Longitude I’ve got to?”",
+              "translation": "Посмотрим: это, кажется, около четырёх тысяч миль вниз...» (видите ли, Алиса выучила на уроках в классной комнате несколько таких вещей, и хотя это была не _очень_ удачная возможность показать свои знания, ведь слушать её было некому, всё же произнести это вслух было хорошей практикой) «...да, примерно такое расстояние и должно быть, но интересно, на какой я теперь широте или долготе?»",
+              "words": []
             },
             {
               "id": "alice-ch1-p8-s6",
-              "text": "(Alice had no idea what Latitude was, or Longitude either, but thought they were nice grand words to say.)"
+              "text": "(Alice had no idea what Latitude was, or Longitude either, but thought they were nice grand words to say.)",
+              "translation": "(Алиса понятия не имела, что такое широта, да и долгота тоже, но ей казалось, что это красивые и важные слова.)",
+              "words": []
             }
           ]
         },
@@ -156,39 +198,57 @@ export const aliceInWonderlandBook: ReaderBook = {
           "sentences": [
             {
               "id": "alice-ch1-p9-s1",
-              "text": "Presently she began again."
+              "text": "Presently she began again.",
+              "translation": "Вскоре она снова заговорила.",
+              "words": []
             },
             {
               "id": "alice-ch1-p9-s2",
-              "text": "“I wonder if I shall fall right _through_ the earth!"
+              "text": "“I wonder if I shall fall right _through_ the earth!",
+              "translation": "«Интересно, не провалюсь ли я прямо _сквозь_ Землю!",
+              "words": []
             },
             {
               "id": "alice-ch1-p9-s3",
-              "text": "How funny it’ll seem to come out among the people that walk with their heads downward!"
+              "text": "How funny it’ll seem to come out among the people that walk with their heads downward!",
+              "translation": "Как забавно будет оказаться среди людей, которые ходят вниз головой!",
+              "words": []
             },
             {
               "id": "alice-ch1-p9-s4",
-              "text": "The Antipathies, I think—” (she was rather glad there _was_ no one listening, this time, as it didn’t sound at all the right word) “—but I shall have to ask them what the name of the country is, you know."
+              "text": "The Antipathies, I think—” (she was rather glad there _was_ no one listening, this time, as it didn’t sound at all the right word) “—but I shall have to ask them what the name of the country is, you know.",
+              "translation": "Антипатии, кажется...» (на этот раз она была даже рада, что никто её не слышит, потому что слово звучало совсем не так, как надо) «...но ведь мне придётся спросить у них, как называется эта страна, понимаете.",
+              "words": []
             },
             {
               "id": "alice-ch1-p9-s5",
-              "text": "Please, Ma’am, is this New Zealand or Australia?”"
+              "text": "Please, Ma’am, is this New Zealand or Australia?”",
+              "translation": "Скажите, сударыня, это Новая Зеландия или Австралия?»",
+              "words": []
             },
             {
               "id": "alice-ch1-p9-s6",
-              "text": "(and she tried to curtsey as she spoke—fancy _curtseying_ as you’re falling through the air!"
+              "text": "(and she tried to curtsey as she spoke—fancy _curtseying_ as you’re falling through the air!",
+              "translation": "(и, говоря это, она попыталась сделать реверанс — только представьте себе, _делать реверанс_, падая сквозь воздух!",
+              "words": []
             },
             {
               "id": "alice-ch1-p9-s7",
-              "text": "Do you think you could manage it?)"
+              "text": "Do you think you could manage it?)",
+              "translation": "Как вы думаете, у вас получилось бы?)",
+              "words": []
             },
             {
               "id": "alice-ch1-p9-s8",
-              "text": "“And what an ignorant little girl she’ll think me for asking!"
+              "text": "“And what an ignorant little girl she’ll think me for asking!",
+              "translation": "«И какой же невежливой маленькой девочкой она меня сочтёт за такой вопрос!",
+              "words": []
             },
             {
               "id": "alice-ch1-p9-s9",
-              "text": "No, it’ll never do to ask: perhaps I shall see it written up somewhere.”"
+              "text": "No, it’ll never do to ask: perhaps I shall see it written up somewhere.”",
+              "translation": "Нет, спрашивать ни в коем случае нельзя: может быть, я где-нибудь увижу надпись».",
+              "words": []
             }
           ]
         },
@@ -198,51 +258,75 @@ export const aliceInWonderlandBook: ReaderBook = {
           "sentences": [
             {
               "id": "alice-ch1-p10-s1",
-              "text": "Down, down, down."
+              "text": "Down, down, down.",
+              "translation": "Вниз, вниз, вниз.",
+              "words": []
             },
             {
               "id": "alice-ch1-p10-s2",
-              "text": "There was nothing else to do, so Alice soon began talking again."
+              "text": "There was nothing else to do, so Alice soon began talking again.",
+              "translation": "Делать больше было нечего, и Алиса вскоре снова принялась разговаривать.",
+              "words": []
             },
             {
               "id": "alice-ch1-p10-s3",
-              "text": "“Dinah’ll miss me very much to-night, I should think!”"
+              "text": "“Dinah’ll miss me very much to-night, I should think!”",
+              "translation": "«Дина сегодня вечером будет очень по мне скучать, я думаю!»",
+              "words": []
             },
             {
               "id": "alice-ch1-p10-s4",
-              "text": "(Dinah was the cat.)"
+              "text": "(Dinah was the cat.)",
+              "translation": "(Дина была кошкой.)",
+              "words": []
             },
             {
               "id": "alice-ch1-p10-s5",
-              "text": "“I hope they’ll remember her saucer of milk at tea-time."
+              "text": "“I hope they’ll remember her saucer of milk at tea-time.",
+              "translation": "«Надеюсь, ей не забудут поставить блюдце молока к чаю.",
+              "words": []
             },
             {
               "id": "alice-ch1-p10-s6",
-              "text": "Dinah my dear!"
+              "text": "Dinah my dear!",
+              "translation": "Дина, милая!",
+              "words": []
             },
             {
               "id": "alice-ch1-p10-s7",
-              "text": "I wish you were down here with me!"
+              "text": "I wish you were down here with me!",
+              "translation": "Как бы мне хотелось, чтобы ты была здесь со мной!",
+              "words": []
             },
             {
               "id": "alice-ch1-p10-s8",
-              "text": "There are no mice in the air, I’m afraid, but you might catch a bat, and that’s very like a mouse, you know."
+              "text": "There are no mice in the air, I’m afraid, but you might catch a bat, and that’s very like a mouse, you know.",
+              "translation": "Мышей в воздухе, боюсь, нет, но ты могла бы поймать летучую мышь, а она ведь очень похожа на мышь, знаешь ли.",
+              "words": []
             },
             {
               "id": "alice-ch1-p10-s9",
-              "text": "But do cats eat bats, I wonder?”"
+              "text": "But do cats eat bats, I wonder?”",
+              "translation": "Но едят ли кошки летучих мышей, интересно?»",
+              "words": []
             },
             {
               "id": "alice-ch1-p10-s10",
-              "text": "And here Alice began to get rather sleepy, and went on saying to herself, in a dreamy sort of way, “Do cats eat bats?"
+              "text": "And here Alice began to get rather sleepy, and went on saying to herself, in a dreamy sort of way, “Do cats eat bats?",
+              "translation": "Тут Алису начало изрядно клонить в сон, и она продолжала говорить себе мечтательным голосом: «Едят ли кошки летучих мышей?",
+              "words": []
             },
             {
               "id": "alice-ch1-p10-s11",
-              "text": "Do cats eat bats?” and sometimes, “Do bats eat cats?” for, you see, as she couldn’t answer either question, it didn’t much matter which way she put it."
+              "text": "Do cats eat bats?” and sometimes, “Do bats eat cats?” for, you see, as she couldn’t answer either question, it didn’t much matter which way she put it.",
+              "translation": "Едят ли кошки летучих мышей?» — а иногда: «Едят ли летучие мыши кошек?» — потому что, видите ли, раз она не могла ответить ни на один из вопросов, было уже не так важно, в каком порядке их задавать.",
+              "words": []
             },
             {
               "id": "alice-ch1-p10-s12",
-              "text": "She felt that she was dozing off, and had just begun to dream that she was walking hand in hand with Dinah, and saying to her very earnestly, “Now, Dinah, tell me the truth: did you ever eat a bat?” when suddenly, thump! thump! down she came upon a heap of sticks and dry leaves, and the fall was over."
+              "text": "She felt that she was dozing off, and had just begun to dream that she was walking hand in hand with Dinah, and saying to her very earnestly, “Now, Dinah, tell me the truth: did you ever eat a bat?” when suddenly, thump! thump! down she came upon a heap of sticks and dry leaves, and the fall was over.",
+              "translation": "Она почувствовала, что засыпает, и уже начала видеть сон, будто идёт с Диной рука об руку и очень серьёзно говорит ей: «Ну, Дина, скажи мне правду: ты когда-нибудь ела летучую мышь?» — как вдруг бух! бух! она упала на кучу веток и сухих листьев, и падение закончилось.",
+              "words": []
             }
           ]
         },
@@ -252,15 +336,21 @@ export const aliceInWonderlandBook: ReaderBook = {
           "sentences": [
             {
               "id": "alice-ch1-p11-s1",
-              "text": "Alice was not a bit hurt, and she jumped up on to her feet in a moment: she looked up, but it was all dark overhead; before her was another long passage, and the White Rabbit was still in sight, hurrying down it."
+              "text": "Alice was not a bit hurt, and she jumped up on to her feet in a moment: she looked up, but it was all dark overhead; before her was another long passage, and the White Rabbit was still in sight, hurrying down it.",
+              "translation": "Алиса нисколько не ушиблась и в тот же миг вскочила на ноги: она посмотрела вверх, но над головой была сплошная темнота; перед ней тянулся ещё один длинный проход, и Белый Кролик всё ещё был виден, торопливо убегая по нему.",
+              "words": []
             },
             {
               "id": "alice-ch1-p11-s2",
-              "text": "There was not a moment to be lost: away went Alice like the wind, and was just in time to hear it say, as it turned a corner, “Oh my ears and whiskers, how late it’s getting!”"
+              "text": "There was not a moment to be lost: away went Alice like the wind, and was just in time to hear it say, as it turned a corner, “Oh my ears and whiskers, how late it’s getting!”",
+              "translation": "Нельзя было терять ни минуты: Алиса помчалась как ветер и как раз успела услышать, как он, сворачивая за угол, сказал: «Ах, мои ушки и усики, как же поздно становится!»",
+              "words": []
             },
             {
               "id": "alice-ch1-p11-s3",
-              "text": "She was close behind it when she turned the corner, but the Rabbit was no longer to be seen: she found herself in a long, low hall, which was lit up by a row of lamps hanging from the roof."
+              "text": "She was close behind it when she turned the corner, but the Rabbit was no longer to be seen: she found herself in a long, low hall, which was lit up by a row of lamps hanging from the roof.",
+              "translation": "Она была совсем рядом с ним, когда сама свернула за угол, но Кролика уже нигде не было видно: она оказалась в длинном низком зале, освещённом рядом ламп, свисавших с потолка.",
+              "words": []
             }
           ]
         },
@@ -270,7 +360,9 @@ export const aliceInWonderlandBook: ReaderBook = {
           "sentences": [
             {
               "id": "alice-ch1-p12-s1",
-              "text": "There were doors all round the hall, but they were all locked; and when Alice had been all the way down one side and up the other, trying every door, she walked sadly down the middle, wondering how she was ever to get out again."
+              "text": "There were doors all round the hall, but they were all locked; and when Alice had been all the way down one side and up the other, trying every door, she walked sadly down the middle, wondering how she was ever to get out again.",
+              "translation": "Вокруг зала были двери, но все они были заперты; и когда Алиса прошла вдоль одной стороны и вернулась по другой, пробуя каждую дверь, она печально пошла по середине, размышляя, как же ей выбраться отсюда.",
+              "words": []
             }
           ]
         },
@@ -280,11 +372,15 @@ export const aliceInWonderlandBook: ReaderBook = {
           "sentences": [
             {
               "id": "alice-ch1-p13-s1",
-              "text": "Suddenly she came upon a little three-legged table, all made of solid glass; there was nothing on it except a tiny golden key, and Alice’s first thought was that it might belong to one of the doors of the hall; but, alas! either the locks were too large, or the key was too small, but at any rate it would not open any of them."
+              "text": "Suddenly she came upon a little three-legged table, all made of solid glass; there was nothing on it except a tiny golden key, and Alice’s first thought was that it might belong to one of the doors of the hall; but, alas! either the locks were too large, or the key was too small, but at any rate it would not open any of them.",
+              "translation": "Вдруг она наткнулась на маленький трёхногий столик, целиком сделанный из прочного стекла; на нём не было ничего, кроме крошечного золотого ключика, и первая мысль Алисы была о том, что он, возможно, подходит к одной из дверей зала; но, увы! либо замки были слишком велики, либо ключик слишком мал, во всяком случае он не открыл ни одной двери.",
+              "words": []
             },
             {
               "id": "alice-ch1-p13-s2",
-              "text": "However, on the second time round, she came upon a low curtain she had not noticed before, and behind it was a little door about fifteen inches high: she tried the little golden key in the lock, and to her great delight it fitted!"
+              "text": "However, on the second time round, she came upon a low curtain she had not noticed before, and behind it was a little door about fifteen inches high: she tried the little golden key in the lock, and to her great delight it fitted!",
+              "translation": "Однако, обходя зал во второй раз, она наткнулась на низкую занавеску, которую прежде не заметила, а за ней оказалась маленькая дверца высотой около пятнадцати дюймов: она попробовала вставить маленький золотой ключик в замок, и, к её великой радости, он подошёл!",
+              "words": []
             }
           ]
         },
@@ -294,23 +390,33 @@ export const aliceInWonderlandBook: ReaderBook = {
           "sentences": [
             {
               "id": "alice-ch1-p14-s1",
-              "text": "Alice opened the door and found that it led into a small passage, not much larger than a rat-hole: she knelt down and looked along the passage into the loveliest garden you ever saw."
+              "text": "Alice opened the door and found that it led into a small passage, not much larger than a rat-hole: she knelt down and looked along the passage into the loveliest garden you ever saw.",
+              "translation": "Алиса открыла дверцу и увидела, что она ведёт в маленький проход, ненамного больше крысиной норы: она опустилась на колени и заглянула по проходу в самый прекрасный сад, какой только можно представить.",
+              "words": []
             },
             {
               "id": "alice-ch1-p14-s2",
-              "text": "How she longed to get out of that dark hall, and wander about among those beds of bright flowers and those cool fountains, but she could not even get her head through the doorway; “and even if my head would go through,” thought poor Alice, “it would be of very little use without my shoulders."
+              "text": "How she longed to get out of that dark hall, and wander about among those beds of bright flowers and those cool fountains, but she could not even get her head through the doorway; “and even if my head would go through,” thought poor Alice, “it would be of very little use without my shoulders.",
+              "translation": "Как же ей хотелось выбраться из этого тёмного зала и побродить среди ярких цветочных клумб и прохладных фонтанов, но она не могла просунуть в дверцу даже голову; «а даже если бы голова и прошла, — подумала бедная Алиса, — от этого было бы мало пользы без плеч.",
+              "words": []
             },
             {
               "id": "alice-ch1-p14-s3",
-              "text": "Oh, how I wish I could shut up like a telescope!"
+              "text": "Oh, how I wish I could shut up like a telescope!",
+              "translation": "Ах, как бы мне хотелось складываться, как подзорная труба!",
+              "words": []
             },
             {
               "id": "alice-ch1-p14-s4",
-              "text": "I think I could, if I only knew how to begin.”"
+              "text": "I think I could, if I only knew how to begin.”",
+              "translation": "Думаю, я смогла бы, если бы только знала, с чего начать».",
+              "words": []
             },
             {
               "id": "alice-ch1-p14-s5",
-              "text": "For, you see, so many out-of-the-way things had happened lately, that Alice had begun to think that very few things indeed were really impossible."
+              "text": "For, you see, so many out-of-the-way things had happened lately, that Alice had begun to think that very few things indeed were really impossible.",
+              "translation": "Видите ли, в последнее время случилось столько необыкновенных вещей, что Алиса начала думать: по-настоящему невозможных вещей почти не бывает.",
+              "words": []
             }
           ]
         },
@@ -320,7 +426,9 @@ export const aliceInWonderlandBook: ReaderBook = {
           "sentences": [
             {
               "id": "alice-ch1-p15-s1",
-              "text": "There seemed to be no use in waiting by the little door, so she went back to the table, half hoping she might find another key on it, or at any rate a book of rules for shutting people up like telescopes: this time she found a little bottle on it, (“which certainly was not here before,” said Alice,) and round the neck of the bottle was a paper label, with the words “DRINK ME,” beautifully printed on it in large letters."
+              "text": "There seemed to be no use in waiting by the little door, so she went back to the table, half hoping she might find another key on it, or at any rate a book of rules for shutting people up like telescopes: this time she found a little bottle on it, (“which certainly was not here before,” said Alice,) and round the neck of the bottle was a paper label, with the words “DRINK ME,” beautifully printed on it in large letters.",
+              "translation": "Ждать у маленькой дверцы, казалось, не имело смысла, поэтому она вернулась к столику, втайне надеясь найти на нём другой ключ или хотя бы книгу правил о том, как складывать людей, словно подзорные трубы: на этот раз она нашла на нём маленькую бутылочку («которой здесь раньше точно не было», — сказала Алиса), а вокруг горлышка бутылочки висела бумажная этикетка, на которой крупными красивыми буквами было напечатано: «ВЫПЕЙ МЕНЯ».",
+              "words": []
             }
           ]
         },
@@ -330,11 +438,15 @@ export const aliceInWonderlandBook: ReaderBook = {
           "sentences": [
             {
               "id": "alice-ch1-p16-s1",
-              "text": "It was all very well to say “Drink me,” but the wise little Alice was not going to do _that_ in a hurry."
+              "text": "It was all very well to say “Drink me,” but the wise little Alice was not going to do _that_ in a hurry.",
+              "translation": "Сказать «Выпей меня» было, конечно, легко, но разумная маленькая Алиса не собиралась делать _это_ впопыхах.",
+              "words": []
             },
             {
               "id": "alice-ch1-p16-s2",
-              "text": "“No, I’ll look first,” she said, “and see whether it’s marked ‘_poison_’ or not”; for she had read several nice little histories about children who had got burnt, and eaten up by wild beasts and other unpleasant things, all because they _would_ not remember the simple rules their friends had taught them: such as, that a red-hot poker will burn you if you hold it too long; and that if you cut your finger _very_ deeply with a knife, it usually bleeds; and she had never forgotten that, if you drink much from a bottle marked “poison,” it is almost certain to disagree with you, sooner or later."
+              "text": "“No, I’ll look first,” she said, “and see whether it’s marked ‘_poison_’ or not”; for she had read several nice little histories about children who had got burnt, and eaten up by wild beasts and other unpleasant things, all because they _would_ not remember the simple rules their friends had taught them: such as, that a red-hot poker will burn you if you hold it too long; and that if you cut your finger _very_ deeply with a knife, it usually bleeds; and she had never forgotten that, if you drink much from a bottle marked “poison,” it is almost certain to disagree with you, sooner or later.",
+              "translation": "«Нет, сначала я посмотрю, — сказала она, — не написано ли на ней “_яд_”»; ведь она читала несколько поучительных маленьких историй о детях, которые обжигались, бывали съедены дикими зверями и попадали в другие неприятности только потому, что _не хотели_ помнить простые правила, которым учили их друзья: например, что раскалённая кочерга обожжёт, если слишком долго держать её в руках; и что если очень глубоко порезать палец ножом, он обычно кровоточит; и она никогда не забывала, что если много выпить из бутылки с надписью «яд», то рано или поздно это почти наверняка плохо отразится на самочувствии.",
+              "words": []
             }
           ]
         },
@@ -344,7 +456,9 @@ export const aliceInWonderlandBook: ReaderBook = {
           "sentences": [
             {
               "id": "alice-ch1-p17-s1",
-              "text": "However, this bottle was _not_ marked “poison,” so Alice ventured to taste it, and finding it very nice, (it had, in fact, a sort of mixed flavour of cherry-tart, custard, pine-apple, roast turkey, toffee, and hot buttered toast,) she very soon finished it off."
+              "text": "However, this bottle was _not_ marked “poison,” so Alice ventured to taste it, and finding it very nice, (it had, in fact, a sort of mixed flavour of cherry-tart, custard, pine-apple, roast turkey, toffee, and hot buttered toast,) she very soon finished it off.",
+              "translation": "Однако на этой бутылочке _не_ было написано «яд», поэтому Алиса решилась попробовать, и, найдя напиток очень приятным (у него, в самом деле, был какой-то смешанный вкус вишнёвого пирога, заварного крема, ананаса, жареной индейки, ирисок и горячего тоста с маслом), она очень быстро выпила всё до конца.",
+              "words": []
             }
           ]
         },
@@ -354,7 +468,9 @@ export const aliceInWonderlandBook: ReaderBook = {
           "sentences": [
             {
               "id": "alice-ch1-p18-s1",
-              "text": "* * * * * * *"
+              "text": "* * * * * * *",
+              "translation": "* * * * * * *",
+              "words": []
             }
           ]
         },
@@ -364,7 +480,9 @@ export const aliceInWonderlandBook: ReaderBook = {
           "sentences": [
             {
               "id": "alice-ch1-p19-s1",
-              "text": "* * * * * *"
+              "text": "* * * * * *",
+              "translation": "* * * * * *",
+              "words": []
             }
           ]
         },
@@ -374,7 +492,9 @@ export const aliceInWonderlandBook: ReaderBook = {
           "sentences": [
             {
               "id": "alice-ch1-p20-s1",
-              "text": "* * * * * * *"
+              "text": "* * * * * * *",
+              "translation": "* * * * * * *",
+              "words": []
             }
           ]
         },
@@ -384,7 +504,9 @@ export const aliceInWonderlandBook: ReaderBook = {
           "sentences": [
             {
               "id": "alice-ch1-p21-s1",
-              "text": "“What a curious feeling!” said Alice; “I must be shutting up like a telescope.”"
+              "text": "“What a curious feeling!” said Alice; “I must be shutting up like a telescope.”",
+              "translation": "«Какое странное чувство! — сказала Алиса. — Должно быть, я складываюсь, как подзорная труба».",
+              "words": []
             }
           ]
         },
@@ -394,19 +516,27 @@ export const aliceInWonderlandBook: ReaderBook = {
           "sentences": [
             {
               "id": "alice-ch1-p22-s1",
-              "text": "And so it was indeed: she was now only ten inches high, and her face brightened up at the thought that she was now the right size for going through the little door into that lovely garden."
+              "text": "And so it was indeed: she was now only ten inches high, and her face brightened up at the thought that she was now the right size for going through the little door into that lovely garden.",
+              "translation": "Так оно и было: теперь она была всего десять дюймов ростом, и её лицо просияло при мысли, что теперь она как раз подходящего размера, чтобы пройти через маленькую дверцу в тот прекрасный сад.",
+              "words": []
             },
             {
               "id": "alice-ch1-p22-s2",
-              "text": "First, however, she waited for a few minutes to see if she was going to shrink any further: she felt a little nervous about this; “for it might end, you know,” said Alice to herself, “in my going out altogether, like a candle."
+              "text": "First, however, she waited for a few minutes to see if she was going to shrink any further: she felt a little nervous about this; “for it might end, you know,” said Alice to herself, “in my going out altogether, like a candle.",
+              "translation": "Но сначала она подождала несколько минут, чтобы понять, не будет ли она уменьшаться дальше: это её немного тревожило; «ведь всё может закончиться, знаешь ли, — сказала Алиса сама себе, — тем, что я совсем исчезну, как свеча.",
+              "words": []
             },
             {
               "id": "alice-ch1-p22-s3",
-              "text": "I wonder what I should be like then?”"
+              "text": "I wonder what I should be like then?”",
+              "translation": "Интересно, какой я тогда буду?»",
+              "words": []
             },
             {
               "id": "alice-ch1-p22-s4",
-              "text": "And she tried to fancy what the flame of a candle is like after the candle is blown out, for she could not remember ever having seen such a thing."
+              "text": "And she tried to fancy what the flame of a candle is like after the candle is blown out, for she could not remember ever having seen such a thing.",
+              "translation": "И она попыталась представить, на что похоже пламя свечи после того, как свечу задули, потому что не могла припомнить, чтобы когда-нибудь видела такое.",
+              "words": []
             }
           ]
         },
@@ -416,7 +546,9 @@ export const aliceInWonderlandBook: ReaderBook = {
           "sentences": [
             {
               "id": "alice-ch1-p23-s1",
-              "text": "After a while, finding that nothing more happened, she decided on going into the garden at once; but, alas for poor Alice! when she got to the door, she found she had forgotten the little golden key, and when she went back to the table for it, she found she could not possibly reach it: she could see it quite plainly through the glass, and she tried her best to climb up one of the legs of the table, but it was too slippery; and when she had tired herself out with trying, the poor little thing sat down and cried."
+              "text": "After a while, finding that nothing more happened, she decided on going into the garden at once; but, alas for poor Alice! when she got to the door, she found she had forgotten the little golden key, and when she went back to the table for it, she found she could not possibly reach it: she could see it quite plainly through the glass, and she tried her best to climb up one of the legs of the table, but it was too slippery; and when she had tired herself out with trying, the poor little thing sat down and cried.",
+              "translation": "Через некоторое время, убедившись, что больше ничего не происходит, она решила немедленно отправиться в сад; но, увы, бедная Алиса! когда она добралась до дверцы, то обнаружила, что забыла маленький золотой ключик, а когда вернулась к столику за ним, поняла, что никак не может до него дотянуться: она ясно видела его сквозь стекло и изо всех сил пыталась взобраться по одной из ножек стола, но она была слишком скользкой; и, выбившись из сил от этих попыток, бедная малышка села и заплакала.",
+              "words": []
             }
           ]
         },
@@ -426,19 +558,27 @@ export const aliceInWonderlandBook: ReaderBook = {
           "sentences": [
             {
               "id": "alice-ch1-p24-s1",
-              "text": "“Come, there’s no use in crying like that!” said Alice to herself, rather sharply; “I advise you to leave off this minute!”"
+              "text": "“Come, there’s no use in crying like that!” said Alice to herself, rather sharply; “I advise you to leave off this minute!”",
+              "translation": "«Ну же, нет никакого смысла так плакать! — сказала Алиса сама себе довольно строго. — Советую тебе прекратить сейчас же!»",
+              "words": []
             },
             {
               "id": "alice-ch1-p24-s2",
-              "text": "She generally gave herself very good advice, (though she very seldom followed it), and sometimes she scolded herself so severely as to bring tears into her eyes; and once she remembered trying to box her own ears for having cheated herself in a game of croquet she was playing against herself, for this curious child was very fond of pretending to be two people."
+              "text": "She generally gave herself very good advice, (though she very seldom followed it), and sometimes she scolded herself so severely as to bring tears into her eyes; and once she remembered trying to box her own ears for having cheated herself in a game of croquet she was playing against herself, for this curious child was very fond of pretending to be two people.",
+              "translation": "Она вообще давала себе очень хорошие советы (хотя очень редко им следовала), а иногда ругала себя так строго, что у неё на глазах выступали слёзы; и однажды она вспомнила, как пыталась надрать себе уши за то, что схитрила сама с собой в игре в крокет, в которую играла против самой себя, ведь эта странная девочка очень любила притворяться двумя разными людьми.",
+              "words": []
             },
             {
               "id": "alice-ch1-p24-s3",
-              "text": "“But it’s no use now,” thought poor Alice, “to pretend to be two people!"
+              "text": "“But it’s no use now,” thought poor Alice, “to pretend to be two people!",
+              "translation": "«Но сейчас, — подумала бедная Алиса, — нет никакого смысла притворяться двумя людьми!",
+              "words": []
             },
             {
               "id": "alice-ch1-p24-s4",
-              "text": "Why, there’s hardly enough of me left to make _one_ respectable person!”"
+              "text": "Why, there’s hardly enough of me left to make _one_ respectable person!”",
+              "translation": "Да меня едва ли хватит даже на одного приличного человека!»",
+              "words": []
             }
           ]
         },
@@ -448,11 +588,15 @@ export const aliceInWonderlandBook: ReaderBook = {
           "sentences": [
             {
               "id": "alice-ch1-p25-s1",
-              "text": "Soon her eye fell on a little glass box that was lying under the table: she opened it, and found in it a very small cake, on which the words “EAT ME” were beautifully marked in currants."
+              "text": "Soon her eye fell on a little glass box that was lying under the table: she opened it, and found in it a very small cake, on which the words “EAT ME” were beautifully marked in currants.",
+              "translation": "Вскоре её взгляд упал на маленькую стеклянную коробочку, лежавшую под столом: она открыла её и нашла внутри совсем маленький пирожок, на котором смородинками были красиво выложены слова «СЪЕШЬ МЕНЯ».",
+              "words": []
             },
             {
               "id": "alice-ch1-p25-s2",
-              "text": "“Well, I’ll eat it,” said Alice, “and if it makes me grow larger, I can reach the key; and if it makes me grow smaller, I can creep under the door; so either way I’ll get into the garden, and I don’t care which happens!”"
+              "text": "“Well, I’ll eat it,” said Alice, “and if it makes me grow larger, I can reach the key; and if it makes me grow smaller, I can creep under the door; so either way I’ll get into the garden, and I don’t care which happens!”",
+              "translation": "«Что ж, я его съем, — сказала Алиса, — и если он заставит меня вырасти, я смогу достать ключик; а если он заставит меня уменьшиться, я пролезу под дверью; так или иначе я попаду в сад, и мне всё равно, что именно случится!»",
+              "words": []
             }
           ]
         },
@@ -462,15 +606,21 @@ export const aliceInWonderlandBook: ReaderBook = {
           "sentences": [
             {
               "id": "alice-ch1-p26-s1",
-              "text": "She ate a little bit, and said anxiously to herself, “Which way?"
+              "text": "She ate a little bit, and said anxiously to herself, “Which way?",
+              "translation": "Она откусила немного и тревожно сказала себе: «В какую сторону?",
+              "words": []
             },
             {
               "id": "alice-ch1-p26-s2",
-              "text": "Which way?”"
+              "text": "Which way?”",
+              "translation": "В какую сторону?»",
+              "words": []
             },
             {
               "id": "alice-ch1-p26-s3",
-              "text": ", holding her hand on the top of her head to feel which way it was growing, and she was quite surprised to find that she remained the same size: to be sure, this generally happens when one eats cake, but Alice had got so much into the way of expecting nothing but out-of-the-way things to happen, that it seemed quite dull and stupid for life to go on in the common way."
+              "text": ", holding her hand on the top of her head to feel which way it was growing, and she was quite surprised to find that she remained the same size: to be sure, this generally happens when one eats cake, but Alice had got so much into the way of expecting nothing but out-of-the-way things to happen, that it seemed quite dull and stupid for life to go on in the common way.",
+              "translation": ", держа руку на макушке, чтобы почувствовать, в какую сторону она растёт, и была очень удивлена, обнаружив, что осталась того же размера: конечно, обычно так и бывает, когда ешь пирожок, но Алиса так привыкла ожидать только необыкновенных событий, что обычное течение жизни показалось ей довольно скучным и глупым.",
+              "words": []
             }
           ]
         },
@@ -480,7 +630,9 @@ export const aliceInWonderlandBook: ReaderBook = {
           "sentences": [
             {
               "id": "alice-ch1-p27-s1",
-              "text": "So she set to work, and very soon finished off the cake."
+              "text": "So she set to work, and very soon finished off the cake.",
+              "translation": "Так что она принялась за дело и очень скоро доела пирожок.",
+              "words": []
             }
           ]
         },
@@ -490,7 +642,9 @@ export const aliceInWonderlandBook: ReaderBook = {
           "sentences": [
             {
               "id": "alice-ch1-p28-s1",
-              "text": "* * * * * * *"
+              "text": "* * * * * * *",
+              "translation": "* * * * * * *",
+              "words": []
             }
           ]
         },
@@ -500,7 +654,9 @@ export const aliceInWonderlandBook: ReaderBook = {
           "sentences": [
             {
               "id": "alice-ch1-p29-s1",
-              "text": "* * * * * *"
+              "text": "* * * * * *",
+              "translation": "* * * * * *",
+              "words": []
             }
           ]
         },
@@ -510,7 +666,9 @@ export const aliceInWonderlandBook: ReaderBook = {
           "sentences": [
             {
               "id": "alice-ch1-p30-s1",
-              "text": "* * * * * * *"
+              "text": "* * * * * * *",
+              "translation": "* * * * * * *",
+              "words": []
             }
           ]
         }
