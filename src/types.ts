@@ -137,13 +137,16 @@ export type ReaderWord = {
 
 export type ReaderSentence = {
   id: string;
-  words: ReaderWord[];
+  text: string;
+  words?: ReaderWord[];
   translation?: string;
   audioSrc?: string;
 };
 
 export type ReaderParagraph = {
   id: string;
+  type?: "paragraph" | "poem";
+  lines?: string[];
   sentences: ReaderSentence[];
 };
 
@@ -158,6 +161,14 @@ export type ReaderBook = {
   id: string;
   title: string;
   author: string;
+  originalPublicationYear?: number;
+  language?: string;
+  contentType?: "book" | "story";
+  isComplete?: boolean;
+  chapterCount?: number;
+  wordCount?: number;
+  estimatedReadingMinutes?: number;
+  source?: string;
   chapters: ReaderChapter[];
 };
 
@@ -176,8 +187,9 @@ export type ReadingSettings = {
 
 export type ReaderPosition = {
   chapterId: string;
+  paragraphId?: string;
   sentenceId: string;
-  wordId: string;
+  wordId?: string;
   wordIndex: number;
   progressRatio: number;
   updatedAt: string;

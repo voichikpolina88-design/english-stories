@@ -1,12 +1,12 @@
 import { ArrowLeft, BookOpen, Bookmark, Clock, Home, Languages, Library, Pause, Play, Search, User, Volume2, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type Dispatch, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode, type RefObject, type SetStateAction } from "react";
 import { getCatalogBook, getCategoryBooks, homeShelfBooks, libraryCategories, type HomeShelfBook } from "./data/homeShelves";
-import { getReaderChapter } from "./data/aliceReader";
+import { getReaderBook, getReaderChapter } from "./data/aliceReader";
 import { getAllVocabulary, type VocabularyEntry } from "./data/vocabulary";
 import { useLearnerProgress } from "./hooks/useLearnerProgress";
 import { emptyPaginationSize, type ReaderPage, type ReaderPageWord, useReaderPagination } from "./hooks/useReaderPagination";
 import { useReadingTimer } from "./hooks/useReadingTimer";
-import type { LastOpenedContent, NativeLanguage, ReaderChapter, ReaderPosition, ReaderSentence, ReaderWord, ReadingSettings } from "./types";
+import type { LastOpenedContent, NativeLanguage, ReaderChapter, ReaderPosition, ReadingSettings } from "./types";
 
 type Page = "home" | "library" | "dictionary" | "profile";
 
@@ -109,6 +109,12 @@ function writeReaderPosition(contentId: string, position: ReaderPosition) {
   }
 }
 
+function getDefaultChapterId(book: HomeShelfBook) {
+  const readerBook = getReaderBook(book.id);
+  if (!readerBook) return book.chapter;
+  return readReaderPosition(book.id)?.chapterId ?? readerBook.chapters[0]?.id ?? book.chapter;
+}
+
 function App() {
   const [page, setPage] = useState<Page>("home");
   const [activeBookId, setActiveBookId] = useState<string | null>(null);
@@ -128,7 +134,7 @@ function App() {
       ? {
           contentType: activeBook.type,
           contentId: activeBook.id,
-          chapterId: activeBook.chapter,
+          chapterId: getDefaultChapterId(activeBook),
         }
       : null,
   );
@@ -164,7 +170,7 @@ function App() {
     saveLastOpenedContent({
       contentId: book.id,
       contentType: book.type,
-      chapterId: options.chapterId ?? book.chapter,
+      chapterId: options.chapterId ?? getDefaultChapterId(book),
       readingProgress: options.readingProgress ?? fallbackProgress,
       scrollPosition: options.scrollPosition ?? 0,
       lastPosition: options.scrollPosition ?? 0,
@@ -1407,8 +1413,14 @@ function ReaderPreview({
   } | null>(null);
   const ghostClickUntilRef = useRef(0);
   const visibleWordIdBeforeRepaginate = useRef<string | null>(null);
-  const chapter = useMemo(() => getReaderChapter(book.id, "alice-chapter-1") ?? createFallbackChapter(book), [book]);
-  const chapterCount = book.id === "alice-in-wonderland" ? 12 : 1;
+  const readerBook = useMemo(() => getReaderBook(book.id), [book.id]);
+  const [activeChapterId, setActiveChapterId] = useState(() => {
+    const savedChapterId = readReaderPosition(book.id)?.chapterId;
+    return savedChapterId ?? getReaderBook(book.id)?.chapters[0]?.id ?? "chapter-1";
+  });
+  const pendingChapterEdgeRef = useRef<"first" | "last" | null>(null);
+  const chapter = useMemo(() => getReaderChapter(book.id, activeChapterId) ?? createFallbackChapter(book), [activeChapterId, book]);
+  const chapterCount = readerBook?.chapterCount ?? readerBook?.chapters.length ?? 1;
   const readerFont = readerFontStack(settings.fontFamily);
   const { flatWords, isPaginating, pages } = useReaderPagination({
     chapter,
@@ -1418,8 +1430,21 @@ function ReaderPreview({
   });
   const activePage = pages[currentPageIndex] ?? pages[0] ?? null;
   const bookPercent = Math.min(100, Math.max(progressValue, 0));
-  const pageProgressRatio = pages.length > 0 ? (currentPageIndex + 1) / pages.length : 0;
-  const visibleBookPercent = Math.min(100, Math.max(bookPercent, Math.round(((chapter.number - 1 + pageProgressRatio) / chapterCount) * 100)));
+  const chapterWordOffsets = useMemo(() => {
+    let total = 0;
+    const offsets = new Map<string, number>();
+    readerBook?.chapters.forEach((item) => {
+      offsets.set(item.id, total);
+      total += countReaderChapterWords(item);
+    });
+    return { offsets, total };
+  }, [readerBook]);
+  const firstVisibleWord = activePage?.words[0] ?? null;
+  const lastVisibleWord = activePage?.words.at(-1) ?? null;
+  const chapterStartWordCount = chapterWordOffsets.offsets.get(chapter.id) ?? 0;
+  const totalBookWords = readerBook?.wordCount ?? chapterWordOffsets.total ?? Math.max(1, flatWords.length);
+  const currentGlobalWordIndex = chapterStartWordCount + (lastVisibleWord?.absoluteIndex ?? firstVisibleWord?.absoluteIndex ?? 0) + 1;
+  const visibleBookPercent = Math.min(100, Math.max(bookPercent, Math.round((currentGlobalWordIndex / Math.max(1, totalBookWords)) * 100)));
   const closeTimer = () => {
     setTimerOpen(false);
     window.setTimeout(() => timerButtonRef.current?.focus(), 0);
@@ -1494,6 +1519,13 @@ function ReaderPreview({
 
   useEffect(() => {
     if (pages.length === 0) return;
+    const pendingEdge = pendingChapterEdgeRef.current;
+    if (pendingEdge) {
+      setCurrentPageIndex(pendingEdge === "last" ? pages.length - 1 : 0);
+      pendingChapterEdgeRef.current = null;
+      return;
+    }
+
     const saved = readReaderPosition(book.id);
     const targetWordId = visibleWordIdBeforeRepaginate.current ?? saved?.wordId;
     let nextIndex = targetWordId ? pages.findIndex((page) => page.words.some((word) => word.id === targetWordId)) : -1;
@@ -1516,10 +1548,12 @@ function ReaderPreview({
   useEffect(() => {
     if (!activePage || flatWords.length === 0 || pages.length === 0) return;
     const firstWord = activePage.words[0];
-    const progressRatio = Math.min(1, Math.max(0, firstWord.absoluteIndex / Math.max(1, flatWords.length - 1)));
+    const globalWordIndex = chapterStartWordCount + firstWord.absoluteIndex;
+    const progressRatio = Math.min(1, Math.max(0, globalWordIndex / Math.max(1, totalBookWords - 1)));
 
     writeReaderPosition(book.id, {
       chapterId: chapter.id,
+      paragraphId: firstWord.paragraphId,
       sentenceId: firstWord.sentenceId,
       wordId: firstWord.id,
       wordIndex: firstWord.absoluteIndex,
@@ -1532,7 +1566,7 @@ function ReaderPreview({
     if (visibleBookPercent > bookPercent) {
       onProgressRef.current(visibleBookPercent);
     }
-  }, [activePage, book.id, bookPercent, chapter.id, flatWords.length, pages.length, visibleBookPercent]);
+  }, [activePage, book.id, bookPercent, chapter.id, chapterStartWordCount, flatWords.length, pages.length, totalBookWords, visibleBookPercent]);
 
   useEffect(() => {
     if (!timerOpen) return;
@@ -1572,6 +1606,26 @@ function ReaderPreview({
     const canTurnPrev = direction === "prev" && currentPageIndex > 0;
 
     if (!canTurnNext && !canTurnPrev) {
+      const chapterIndex = readerBook?.chapters.findIndex((item) => item.id === chapter.id) ?? -1;
+      const nextChapter = direction === "next" ? readerBook?.chapters[chapterIndex + 1] : null;
+      const previousChapter = direction === "prev" ? readerBook?.chapters[chapterIndex - 1] : null;
+
+      if (nextChapter) {
+        pendingChapterEdgeRef.current = "first";
+        visibleWordIdBeforeRepaginate.current = null;
+        setActiveChapterId(nextChapter.id);
+        setCurrentPageIndex(0);
+        return;
+      }
+
+      if (previousChapter) {
+        pendingChapterEdgeRef.current = "last";
+        visibleWordIdBeforeRepaginate.current = null;
+        setActiveChapterId(previousChapter.id);
+        setCurrentPageIndex(0);
+        return;
+      }
+
       if (direction === "next") setRestrictionOpen(true);
       return;
     }
@@ -1663,6 +1717,25 @@ function ReaderPreview({
         <div className="reading-title">
           <strong>{book.title}</strong>
           <span>{book.author}</span>
+          {readerBook ? (
+            <select
+              className="reader-chapter-select"
+              value={chapter.id}
+              aria-label="Выбрать главу"
+              onChange={(event) => {
+                pendingChapterEdgeRef.current = "first";
+                visibleWordIdBeforeRepaginate.current = null;
+                setActiveChapterId(event.target.value);
+                setCurrentPageIndex(0);
+              }}
+            >
+              {readerBook.chapters.map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.number}. {item.title}
+                </option>
+              ))}
+            </select>
+          ) : null}
         </div>
         <div className="reading-actions">
           <button
@@ -2042,6 +2115,7 @@ function createFallbackChapter(book: HomeShelfBook): ReaderChapter {
         sentences: [
           {
             id: `${book.id}-s1`,
+            text: book.excerpt,
             words: book.excerpt.split(" ").map((word, index) => ({
               id: `${book.id}-w${index + 1}`,
               text: word,
@@ -2051,6 +2125,16 @@ function createFallbackChapter(book: HomeShelfBook): ReaderChapter {
       },
     ],
   };
+}
+
+function countReaderChapterWords(chapter: ReaderChapter) {
+  return chapter.paragraphs.reduce((chapterTotal, paragraph) => {
+    const paragraphWords = paragraph.sentences.reduce((sentenceTotal, sentence) => {
+      if (sentence.words?.length) return sentenceTotal + sentence.words.length;
+      return sentenceTotal + (sentence.text.match(/[A-Za-z]+(?:[’'-][A-Za-z]+)*/g) ?? []).length;
+    }, 0);
+    return chapterTotal + paragraphWords;
+  }, 0);
 }
 
 function readerFontStack(font: ReadingSettings["fontFamily"]) {

@@ -28,7 +28,7 @@ export function flattenChapterWords(chapter: ReaderChapter): ReaderPageWord[] {
 
   chapter.paragraphs.forEach((paragraph) => {
     paragraph.sentences.forEach((sentence) => {
-      sentence.words.forEach((word) => {
+      getSentenceWords(sentence).forEach((word) => {
         words.push({
           ...word,
           paragraphId: paragraph.id,
@@ -42,6 +42,15 @@ export function flattenChapterWords(chapter: ReaderChapter): ReaderPageWord[] {
   });
 
   return words;
+}
+
+function getSentenceWords(sentence: ReaderSentence): ReaderWord[] {
+  if (sentence.words?.length) return sentence.words;
+
+  return sentence.text.split(/\s+/).filter(Boolean).map((word, index) => ({
+    id: `${sentence.id}-w${index + 1}`,
+    text: word,
+  }));
 }
 
 export function useReaderPagination({
@@ -129,7 +138,7 @@ function paginateChapterContent({
 
   chapter.paragraphs.forEach((paragraph) => {
     const paragraphNode = document.createElement("p");
-    paragraphNode.className = "reader-paragraph";
+    paragraphNode.className = paragraph.type === "poem" ? "reader-paragraph reader-poem" : "reader-paragraph";
     paragraph.sentences.forEach((sentence) => appendSentenceMeasure(sentence, paragraph.id, paragraphNode, settings));
     textRoot.appendChild(paragraphNode);
   });
@@ -165,7 +174,7 @@ function paginateChapterContent({
 function appendSentenceMeasure(sentence: ReaderSentence, paragraphId: string, paragraphNode: HTMLElement, settings: ReadingSettings) {
   const sentenceNode = document.createElement("span");
   sentenceNode.className = "reader-sentence";
-  sentence.words.forEach((word) => {
+  getSentenceWords(sentence).forEach((word) => {
     const wordNode = document.createElement("span");
     wordNode.className = "reader-word";
     wordNode.dataset.measureWordId = word.id;

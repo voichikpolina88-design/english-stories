@@ -1985,6 +1985,17 @@ p {
   white-space: nowrap;
 }
 
+.reader-chapter-select {
+  width: min(100%, 360px);
+  margin-top: 4px;
+  border: 0;
+  background: transparent;
+  color: var(--reader-muted);
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 760;
+}
+
 .reading-actions {
   display: flex;
   gap: 6px;
@@ -2216,6 +2227,10 @@ p {
 
 .reader-paragraph {
   margin: 0 0 1.35em;
+}
+
+.reader-poem {
+  margin-left: clamp(12px, 4vw, 34px);
 }
 
 .reader-sentence {
