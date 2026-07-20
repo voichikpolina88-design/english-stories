@@ -35,7 +35,6 @@ type OpenContentOptions = {
 const READING_SETTINGS_KEY = "storylingo-reading-settings";
 const READER_POSITION_KEY = "storylingo-reader-positions";
 const READER_SWIPE_HINT_KEY = "storylingo-reader-swipe-hint-seen";
-const MOBILE_PAGE_TURN_MS = 220;
 
 const defaultReadingSettings: ReadingSettings = {
   theme: "cream",
@@ -1394,8 +1393,6 @@ function ReaderPreview({
       return true;
     }
   });
-  const [mobileDragX, setMobileDragX] = useState(0);
-  const [mobileTrackTransition, setMobileTrackTransition] = useState<string>("none");
   const timerButtonRef = useRef<HTMLButtonElement | null>(null);
   const settingsButtonRef = useRef<HTMLButtonElement | null>(null);
   const settingsPanelRef = useRef<HTMLDivElement | null>(null);
@@ -1406,11 +1403,7 @@ function ReaderPreview({
   const touchStartRef = useRef<{
     x: number;
     y: number;
-    time: number;
-    lastX: number;
-    lastTime: number;
     pointerId: number;
-    dragging: boolean;
   } | null>(null);
   const ghostClickUntilRef = useRef(0);
   const visibleWordIdBeforeRepaginate = useRef<string | null>(null);
@@ -1424,8 +1417,6 @@ function ReaderPreview({
     size: pageSize,
   });
   const activePage = pages[currentPageIndex] ?? pages[0] ?? null;
-  const previousPage = currentPageIndex > 0 ? pages[currentPageIndex - 1] : null;
-  const nextPage = currentPageIndex < pages.length - 1 ? pages[currentPageIndex + 1] : null;
   const bookPercent = Math.min(100, Math.max(progressValue, 0));
   const pageProgressRatio = pages.length > 0 ? (currentPageIndex + 1) / pages.length : 0;
   const visibleBookPercent = Math.min(100, Math.max(bookPercent, Math.round(((chapter.number - 1 + pageProgressRatio) / chapterCount) * 100)));
@@ -1594,46 +1585,6 @@ function ReaderPreview({
     }, 240);
   }
 
-  function finishMobileTurn(direction: "next" | "prev") {
-    if (pages.length === 0 || isPageTurning) return;
-    const canTurnNext = direction === "next" && currentPageIndex < pages.length - 1;
-    const canTurnPrev = direction === "prev" && currentPageIndex > 0;
-
-    readingTimer.recordActivity();
-    setSelectedWord(null);
-    setSelectedSentence(null);
-    setShowSwipeHint(false);
-    try {
-      window.localStorage.setItem(READER_SWIPE_HINT_KEY, "true");
-    } catch {
-      // The hint is cosmetic; storage failures should not affect reading.
-    }
-
-    if (!canTurnNext && !canTurnPrev) {
-      setIsPageTurning(true);
-      setMobileTrackTransition(`transform ${MOBILE_PAGE_TURN_MS}ms cubic-bezier(0.22, 1, 0.36, 1)`);
-      setMobileDragX(0);
-      window.setTimeout(() => {
-        setIsPageTurning(false);
-        setMobileTrackTransition("none");
-        if (direction === "next") setRestrictionOpen(true);
-      }, MOBILE_PAGE_TURN_MS);
-      return;
-    }
-
-    setIsPageTurning(true);
-    setPageDirection(direction);
-    setMobileTrackTransition(`transform ${MOBILE_PAGE_TURN_MS}ms cubic-bezier(0.22, 1, 0.36, 1)`);
-    setMobileDragX(direction === "next" ? -pageSize.width : pageSize.width);
-    window.setTimeout(() => {
-      setCurrentPageIndex((current) => current + (direction === "next" ? 1 : -1));
-      setPageDirection(null);
-      setMobileTrackTransition("none");
-      setMobileDragX(0);
-      requestAnimationFrame(() => setIsPageTurning(false));
-    }, MOBILE_PAGE_TURN_MS);
-  }
-
   function handleReaderKeyDown(event: KeyboardEvent) {
     if (isReaderInteractive(event.target)) return;
 
@@ -1655,39 +1606,11 @@ function ReaderPreview({
 
   function handlePagePointerDown(event: ReactPointerEvent<HTMLElement>) {
     if (isReaderInteractive(event.target)) return;
-    const now = performance.now();
     touchStartRef.current = {
       x: event.clientX,
       y: event.clientY,
-      time: now,
-      lastX: event.clientX,
-      lastTime: now,
       pointerId: event.pointerId,
-      dragging: false,
     };
-    setMobileTrackTransition("none");
-    if (event.pointerType !== "mouse") {
-      event.currentTarget.setPointerCapture?.(event.pointerId);
-    }
-  }
-
-  function handlePagePointerMove(event: ReactPointerEvent<HTMLElement>) {
-    const start = touchStartRef.current;
-    if (!start || start.pointerId !== event.pointerId || isReaderInteractive(event.target) || isPageTurning) return;
-
-    const deltaX = event.clientX - start.x;
-    const deltaY = event.clientY - start.y;
-    const horizontalIntent = Math.abs(deltaX) > 8 && Math.abs(deltaX) > Math.abs(deltaY) * 0.9;
-    if (!horizontalIntent && !start.dragging) return;
-
-    const movingBeyondStart = deltaX > 0 && currentPageIndex <= 0;
-    const movingBeyondEnd = deltaX < 0 && currentPageIndex >= pages.length - 1;
-    const resistedDelta = movingBeyondStart || movingBeyondEnd ? deltaX * 0.28 : deltaX;
-    start.dragging = true;
-    start.lastX = event.clientX;
-    start.lastTime = performance.now();
-    setMobileDragX(resistedDelta);
-    event.preventDefault();
   }
 
   function handlePagePointerUp(event: ReactPointerEvent<HTMLElement>) {
@@ -1697,27 +1620,10 @@ function ReaderPreview({
 
     const deltaX = event.clientX - start.x;
     const deltaY = event.clientY - start.y;
-    const elapsed = Math.max(1, performance.now() - start.time);
-    const velocity = Math.abs(deltaX) / elapsed;
-    const isSwipe = Math.abs(deltaX) >= 54 && Math.abs(deltaX) > Math.abs(deltaY) * 1.35;
-    const isFastSwipe = Math.abs(deltaX) >= 24 && velocity >= 0.42 && Math.abs(deltaX) > Math.abs(deltaY) * 1.15;
+    const isSwipe = Math.abs(deltaX) >= 45 && Math.abs(deltaX) > Math.abs(deltaY) * 1.3;
     if (isSwipe) {
       ghostClickUntilRef.current = Date.now() + 420;
-      finishMobileTurn(deltaX < 0 ? "next" : "prev");
-      return;
-    }
-
-    if (isFastSwipe) {
-      ghostClickUntilRef.current = Date.now() + 420;
-      finishMobileTurn(deltaX < 0 ? "next" : "prev");
-      return;
-    }
-
-    if (start.dragging) {
-      ghostClickUntilRef.current = Date.now() + 260;
-      setMobileTrackTransition(`transform ${MOBILE_PAGE_TURN_MS}ms cubic-bezier(0.22, 1, 0.36, 1)`);
-      setMobileDragX(0);
-      window.setTimeout(() => setMobileTrackTransition("none"), MOBILE_PAGE_TURN_MS);
+      turnPage(deltaX < 0 ? "next" : "prev");
       return;
     }
 
@@ -1733,32 +1639,6 @@ function ReaderPreview({
 
   function handlePagePointerCancel() {
     touchStartRef.current = null;
-    if (mobileDragX === 0) return;
-    setMobileTrackTransition(`transform ${MOBILE_PAGE_TURN_MS}ms cubic-bezier(0.22, 1, 0.36, 1)`);
-    setMobileDragX(0);
-    window.setTimeout(() => setMobileTrackTransition("none"), MOBILE_PAGE_TURN_MS);
-  }
-
-  function renderPageContent(page: ReaderPage | null, interactive: boolean) {
-    if (isPaginating || !page) {
-      return <div className="reader-pagination-loading">РџРµСЂРµСЃС‡РёС‚С‹РІР°РµРј СЃС‚СЂР°РЅРёС†С‹вЂ¦</div>;
-    }
-
-    return (
-      <ReaderPageView
-        page={page}
-        settings={settings}
-        onSpeak={(sentenceWords) => {
-          if (interactive) speech.toggle(sentenceWords.map((word) => word.text).join(" "));
-        }}
-        onSelectSentence={(word) => {
-          if (interactive) setSelectedSentence(word);
-        }}
-        onSelectWord={(word) => {
-          if (interactive) setSelectedWord(word);
-        }}
-      />
-    );
   }
 
   return (
@@ -1820,7 +1700,6 @@ function ReaderPreview({
         className="paginated-reader-shell"
         aria-label="Страница чтения"
         onPointerDown={handlePagePointerDown}
-        onPointerMove={handlePagePointerMove}
         onPointerUp={handlePagePointerUp}
         onPointerCancel={handlePagePointerCancel}
       >
@@ -1836,20 +1715,7 @@ function ReaderPreview({
         >
           <ArrowLeft size={24} aria-hidden="true" />
         </button>
-        <div
-          className="reader-page-track"
-          style={{
-            "--reader-drag-x": `${mobileDragX}px`,
-            "--reader-track-transition": mobileTrackTransition,
-          } as CSSProperties}
-        >
-          <article className="reading-page reader-mobile-neighbor" aria-hidden="true">
-            <div className="reading-page-title compact">
-              <span>Chapter {chapter.number}</span>
-            </div>
-            <div className="reading-text-frame">{renderPageContent(previousPage, false)}</div>
-          </article>
-        <article className={`reading-page reader-current-page ${pageDirection ? `page-${pageDirection}` : ""}`} ref={readingPageRef}>
+        <article className={`reading-page ${pageDirection ? `page-${pageDirection}` : ""}`} ref={readingPageRef}>
           <div className={currentPageIndex === 0 ? "reading-page-title" : "reading-page-title compact"}>
             <span>Chapter {chapter.number}</span>
             {currentPageIndex === 0 ? <strong>{chapter.title}</strong> : null}
@@ -1874,13 +1740,6 @@ function ReaderPreview({
             <ReaderSentencePopover sentence={selectedSentence} onClose={() => setSelectedSentence(null)} />
           ) : null}
         </article>
-          <article className="reading-page reader-mobile-neighbor" aria-hidden="true">
-            <div className="reading-page-title compact">
-              <span>Chapter {chapter.number}</span>
-            </div>
-            <div className="reading-text-frame">{renderPageContent(nextPage, false)}</div>
-          </article>
-        </div>
         <button
           className="reader-page-edge reader-page-edge-right"
           type="button"
