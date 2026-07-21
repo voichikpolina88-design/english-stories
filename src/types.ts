@@ -173,7 +173,8 @@ export type ReaderBook = {
 };
 
 export type ReadingTheme = "light" | "cream" | "sepia" | "dark";
-export type ReadingFont = "Literata" | "Merriweather" | "Georgia" | "Inter";
+export type ReadingFont = "Literata" | "Georgia" | "Merriweather" | "Source Serif 4" | "Inter" | "Atkinson Hyperlegible";
+export type ReadingTextAlign = "left" | "justify";
 
 export type ReadingSettings = {
   theme: ReadingTheme;
@@ -181,6 +182,8 @@ export type ReadingSettings = {
   lineHeight: number;
   fontFamily: ReadingFont;
   textWidth: number;
+  textAlign: ReadingTextAlign;
+  accentedReading: boolean;
   showSentenceTranslation: boolean;
   showWordTranslation: boolean;
 };

@@ -39,10 +39,12 @@ const READER_SWIPE_HINT_KEY = "storylingo-reader-swipe-hint-seen";
 const defaultReadingSettings: ReadingSettings = {
   theme: "cream",
   textSize: 21,
-  lineHeight: 1.7,
+  lineHeight: 1.6,
   fontFamily: "Literata",
   textWidth: 720,
-  showSentenceTranslation: false,
+  textAlign: "left",
+  accentedReading: false,
+  showSentenceTranslation: true,
   showWordTranslation: false,
 };
 
@@ -53,7 +55,20 @@ const readingThemes: Array<{ id: ReadingSettings["theme"]; label: string }> = [
   { id: "dark", label: "Dark" },
 ];
 
-const readingFonts: ReadingSettings["fontFamily"][] = ["Literata", "Merriweather", "Georgia", "Inter"];
+const readingFonts: ReadingSettings["fontFamily"][] = [
+  "Literata",
+  "Georgia",
+  "Merriweather",
+  "Source Serif 4",
+  "Inter",
+  "Atkinson Hyperlegible",
+];
+
+const lineHeightOptions: Array<{ label: string; value: number }> = [
+  { label: "Компактный", value: 1.4 },
+  { label: "Обычный", value: 1.6 },
+  { label: "Свободный", value: 1.8 },
+];
 
 const getShelfBooks = (shelfId: string) => getCategoryBooks(shelfId);
 const getShelfBook = (bookId: string) => getCatalogBook(bookId);
@@ -72,7 +87,7 @@ function useReadingSettings() {
   const [settings, setSettings] = useState<ReadingSettings>(() => {
     try {
       const saved = window.localStorage.getItem(READING_SETTINGS_KEY);
-      return saved ? { ...defaultReadingSettings, ...JSON.parse(saved) } : defaultReadingSettings;
+      return saved ? normalizeReadingSettings({ ...defaultReadingSettings, ...JSON.parse(saved) }) : defaultReadingSettings;
     } catch {
       return defaultReadingSettings;
     }
@@ -87,6 +102,18 @@ function useReadingSettings() {
   }, [settings]);
 
   return { settings, setSettings };
+}
+
+function normalizeReadingSettings(settings: ReadingSettings): ReadingSettings {
+  return {
+    ...settings,
+    textSize: Math.min(32, Math.max(16, Number(settings.textSize) || defaultReadingSettings.textSize)),
+    lineHeight: lineHeightOptions.some((option) => option.value === settings.lineHeight) ? settings.lineHeight : defaultReadingSettings.lineHeight,
+    fontFamily: readingFonts.includes(settings.fontFamily) ? settings.fontFamily : defaultReadingSettings.fontFamily,
+    textWidth: Math.min(760, Math.max(600, Number(settings.textWidth) || defaultReadingSettings.textWidth)),
+    textAlign: settings.textAlign === "justify" ? "justify" : "left",
+    accentedReading: Boolean(settings.accentedReading),
+  };
 }
 
 function readReaderPosition(contentId: string): ReaderPosition | null {
@@ -1708,6 +1735,7 @@ function ReaderPreview({
         "--reader-line-height": settings.lineHeight,
         "--reader-font-family": readerFontStack(settings.fontFamily),
         "--reader-width": `${settings.textWidth}px`,
+        "--reader-text-align": settings.textAlign,
       } as CSSProperties}
     >
       <header className="reading-topbar">
@@ -1886,46 +1914,75 @@ function ReadingSettingsPanel({
       </div>
 
       <label className="settings-range">
-        <span>Размер текста</span>
+        <span>Размер текста · {settings.textSize}px</span>
         <input
           type="range"
           min={16}
-          max={30}
+          max={32}
           value={settings.textSize}
           onChange={(event) => onChange((current) => ({ ...current, textSize: Number(event.target.value) }))}
         />
       </label>
 
-      <label className="settings-range">
-        <span>Межстрочный интервал</span>
-        <input
-          type="range"
-          min={1.35}
-          max={2.1}
-          step={0.05}
-          value={settings.lineHeight}
-          onChange={(event) => onChange((current) => ({ ...current, lineHeight: Number(event.target.value) }))}
-        />
-      </label>
-
-      <label className="settings-select">
+      <div className="settings-group">
         <span>Шрифт</span>
-        <select
-          value={settings.fontFamily}
-          onChange={(event) => onChange((current) => ({ ...current, fontFamily: event.target.value as ReadingSettings["fontFamily"] }))}
-        >
+        <div className="font-choice-list">
           {readingFonts.map((font) => (
-            <option key={font} value={font}>{font}</option>
+            <button
+              className={settings.fontFamily === font ? "active" : ""}
+              key={font}
+              type="button"
+              style={{ fontFamily: readerFontStack(font) }}
+              onClick={() => onChange((current) => ({ ...current, fontFamily: font }))}
+            >
+              {font}
+            </button>
           ))}
-        </select>
-      </label>
+        </div>
+      </div>
+
+      <div className="settings-group">
+        <span>Интервал</span>
+        <div className="segmented-control three">
+          {lineHeightOptions.map((option) => (
+            <button
+              className={settings.lineHeight === option.value ? "active" : ""}
+              key={option.value}
+              type="button"
+              onClick={() => onChange((current) => ({ ...current, lineHeight: option.value }))}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="settings-group">
+        <span>Выравнивание</span>
+        <div className="segmented-control two">
+          <button
+            className={settings.textAlign === "left" ? "active" : ""}
+            type="button"
+            onClick={() => onChange((current) => ({ ...current, textAlign: "left" }))}
+          >
+            Слева
+          </button>
+          <button
+            className={settings.textAlign === "justify" ? "active" : ""}
+            type="button"
+            onClick={() => onChange((current) => ({ ...current, textAlign: "justify" }))}
+          >
+            По ширине
+          </button>
+        </div>
+      </div>
 
       <label className="settings-range desktop-only-setting">
         <span>Ширина текста</span>
         <input
           type="range"
-          min={560}
-          max={920}
+          min={600}
+          max={760}
           step={20}
           value={settings.textWidth}
           onChange={(event) => onChange((current) => ({ ...current, textWidth: Number(event.target.value) }))}
@@ -1949,10 +2006,21 @@ function ReadingSettingsPanel({
           onChange={(event) => onChange((current) => ({ ...current, showWordTranslation: event.target.checked }))}
         />
       </label>
+
+      <label className="settings-toggle accent-toggle">
+        <span>
+          Акцентированное чтение
+          <small>Выделяет начало слов, чтобы взгляду было легче двигаться по строке.</small>
+        </span>
+        <input
+          type="checkbox"
+          checked={settings.accentedReading}
+          onChange={(event) => onChange((current) => ({ ...current, accentedReading: event.target.checked }))}
+        />
+      </label>
     </div>
   );
 }
-
 function ReaderPageView({
   page,
   settings,
@@ -2007,36 +2075,49 @@ function ReaderSentenceView({
     <span className="reader-sentence" data-sentence-id={firstWord?.sentenceId}>
       <span className="reader-sentence-words">
         {sentenceWords.map((word) => (
-          <ReaderWordView key={word.id} word={word} showTranslation={settings.showWordTranslation} onSelect={onSelectWord} />
+          <ReaderWordView
+            key={word.id}
+            word={word}
+            accented={settings.accentedReading}
+            showTranslation={settings.showWordTranslation}
+            onSelect={onSelectWord}
+          />
         ))}
       </span>
-      <button className="sentence-audio-button" type="button" aria-label="Прослушать предложение" onClick={(event) => {
-        event.stopPropagation();
-        onSpeak(sentenceWords);
-      }}>
-        <Volume2 size={15} aria-hidden="true" />
-      </button>
-      {settings.showSentenceTranslation && firstWord?.sentenceTranslation ? (
-        <button className="sentence-translation-trigger" type="button" onClick={(event) => {
+      <span className="sentence-actions" data-reader-interactive="true">
+        <button className="sentence-audio-button" type="button" aria-label="Прослушать предложение" onClick={(event) => {
           event.stopPropagation();
-          onSelectSentence(firstWord);
+          onSpeak(sentenceWords);
         }}>
-          Перевод предложения
+          <Volume2 size={14} aria-hidden="true" />
         </button>
-      ) : null}
+        {settings.showSentenceTranslation && firstWord?.sentenceTranslation ? (
+          <button className="sentence-translation-trigger" type="button" aria-label="Показать перевод предложения" onClick={(event) => {
+            event.stopPropagation();
+            onSelectSentence(firstWord);
+          }}>
+            <Languages size={13} aria-hidden="true" />
+            <span>RU</span>
+          </button>
+        ) : null}
+      </span>
     </span>
   );
 }
 
 function ReaderWordView({
   word,
+  accented,
   showTranslation,
   onSelect,
 }: {
   word: ReaderPageWord;
+  accented: boolean;
   showTranslation: boolean;
   onSelect: (word: ReaderPageWord) => void;
 }) {
+  const accentParts = splitWordForAccent(word.text);
+
   return (
     <span
       className="reader-word"
@@ -2055,12 +2136,34 @@ function ReaderWordView({
         }
       }}
     >
-      <span>{word.text}</span>
+      <span>
+        {accented && accentParts ? (
+          <>
+            <strong className="word-accent">{accentParts.accent}</strong>
+            <span>{accentParts.rest}</span>
+          </>
+        ) : (
+          word.text
+        )}
+      </span>
       {showTranslation && word.translation ? <small>{word.translation}</small> : null}
     </span>
   );
 }
 
+function splitWordForAccent(text: string): { accent: string; rest: string } | null {
+  const match = text.match(/^([^A-Za-zА-Яа-яЁё]*)([A-Za-zА-Яа-яЁё][A-Za-zА-Яа-яЁё’'-]*)(.*)$/);
+  if (!match) return null;
+
+  const [, prefix, core, suffix] = match;
+  if (core.length <= 2) return null;
+
+  const accentLength = Math.min(Math.max(2, Math.ceil(core.length * 0.38)), Math.max(2, core.length - 1));
+  return {
+    accent: `${prefix}${core.slice(0, accentLength)}`,
+    rest: `${core.slice(accentLength)}${suffix}`,
+  };
+}
 function ReaderWordPopover({ word, onClose }: { word: ReaderPageWord; onClose: () => void }) {
   return (
     <aside className="reader-translation-popover word-popover" role="dialog" aria-label={`Перевод слова ${word.text}`} onClick={(event) => event.stopPropagation()}>
@@ -2141,6 +2244,8 @@ function readerFontStack(font: ReadingSettings["fontFamily"]) {
   if (font === "Inter") return "Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif";
   if (font === "Georgia") return 'Georgia, "Times New Roman", serif';
   if (font === "Merriweather") return 'Merriweather, Georgia, "Times New Roman", serif';
+  if (font === "Source Serif 4") return '"Source Serif 4", Georgia, "Times New Roman", serif';
+  if (font === "Atkinson Hyperlegible") return '"Atkinson Hyperlegible", Inter, system-ui, sans-serif';
   return 'Literata, Georgia, "Times New Roman", serif';
 }
 
