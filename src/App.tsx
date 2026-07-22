@@ -1816,11 +1816,13 @@ function ReaderPreview({
         >
           <ArrowLeft size={24} aria-hidden="true" />
         </button>
-        <article className={`reading-page ${pageDirection ? `page-${pageDirection}` : ""}`} ref={readingPageRef}>
-          <div className={currentPageIndex === 0 ? "reading-page-title" : "reading-page-title compact"}>
-            <span>Chapter {chapter.number}</span>
-            {currentPageIndex === 0 ? <strong>{chapter.title}</strong> : null}
-          </div>
+        <article className={`reading-page ${currentPageIndex === 0 ? "has-title" : "no-title"} ${pageDirection ? `page-${pageDirection}` : ""}`} ref={readingPageRef}>
+          {currentPageIndex === 0 ? (
+            <div className="reading-page-title">
+              <span>Chapter {chapter.number}</span>
+              <strong>{chapter.title}</strong>
+            </div>
+          ) : null}
           <div className="reading-text-frame" ref={readingTextFrameRef}>
             {isPaginating || !activePage ? (
               <div className="reader-pagination-loading">Пересчитываем страницы…</div>
@@ -1828,7 +1830,7 @@ function ReaderPreview({
               <ReaderPageView
                 page={activePage}
                 settings={settings}
-                onSpeak={(sentenceWords) => speech.toggle(sentenceWords.map((word) => word.text).join(" "))}
+                onSpeak={(sentenceText) => speech.toggle(sentenceText)}
                 onSelectSentence={setSelectedSentence}
                 onSelectWord={setSelectedWord}
               />
@@ -2030,7 +2032,7 @@ function ReaderPageView({
 }: {
   page: ReaderPage;
   settings: ReadingSettings;
-  onSpeak: (words: ReaderPageWord[]) => void;
+  onSpeak: (sentenceText: string) => void;
   onSelectSentence: (word: ReaderPageWord) => void;
   onSelectWord: (word: ReaderPageWord) => void;
 }) {
@@ -2065,11 +2067,13 @@ function ReaderSentenceView({
 }: {
   sentenceWords: ReaderPageWord[];
   settings: ReadingSettings;
-  onSpeak: (words: ReaderPageWord[]) => void;
+  onSpeak: (sentenceText: string) => void;
   onSelectSentence: (word: ReaderPageWord) => void;
   onSelectWord: (word: ReaderPageWord) => void;
 }) {
   const firstWord = sentenceWords[0];
+  const lastWord = sentenceWords.at(-1);
+  const showSentenceActions = Boolean(lastWord?.isSentenceEnd);
 
   return (
     <span className="reader-sentence" data-sentence-id={firstWord?.sentenceId}>
@@ -2084,23 +2088,25 @@ function ReaderSentenceView({
           />
         ))}
       </span>
-      <span className="sentence-actions" data-reader-interactive="true">
-        <button className="sentence-audio-button" type="button" aria-label="Прослушать предложение" onClick={(event) => {
-          event.stopPropagation();
-          onSpeak(sentenceWords);
-        }}>
-          <Volume2 size={14} aria-hidden="true" />
-        </button>
-        {settings.showSentenceTranslation && firstWord?.sentenceTranslation ? (
-          <button className="sentence-translation-trigger" type="button" aria-label="Показать перевод предложения" onClick={(event) => {
+      {showSentenceActions ? (
+        <span className="sentence-actions" data-reader-interactive="true">
+          <button className="sentence-audio-button" type="button" aria-label="Прослушать предложение" onClick={(event) => {
             event.stopPropagation();
-            onSelectSentence(firstWord);
+            onSpeak(firstWord?.sentenceText ?? sentenceWords.map((word) => word.text).join(" "));
           }}>
-            <Languages size={13} aria-hidden="true" />
-            <span>RU</span>
+            <Volume2 size={14} aria-hidden="true" />
           </button>
-        ) : null}
-      </span>
+          {settings.showSentenceTranslation && firstWord?.sentenceTranslation ? (
+            <button className="sentence-translation-trigger" type="button" aria-label="Показать перевод предложения" onClick={(event) => {
+              event.stopPropagation();
+              onSelectSentence(firstWord);
+            }}>
+              <Languages size={13} aria-hidden="true" />
+              <span>RU</span>
+            </button>
+          ) : null}
+        </span>
+      ) : null}
     </span>
   );
 }

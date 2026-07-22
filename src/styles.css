@@ -2172,6 +2172,10 @@ p {
   transition: transform 220ms ease, opacity 220ms ease;
 }
 
+.reading-page.no-title {
+  grid-template-rows: minmax(0, 1fr);
+}
+
 .reading-page.page-next {
   animation: reader-page-next 220ms ease both;
 }
