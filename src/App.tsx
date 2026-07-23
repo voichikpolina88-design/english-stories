@@ -38,8 +38,8 @@ const READER_SWIPE_HINT_KEY = "storylingo-reader-swipe-hint-seen";
 
 const defaultReadingSettings: ReadingSettings = {
   theme: "cream",
-  textSize: 21,
-  lineHeight: 1.6,
+  textSize: 20,
+  lineHeight: 1.55,
   fontFamily: "Literata",
   textWidth: 720,
   textAlign: "left",
@@ -57,17 +57,17 @@ const readingThemes: Array<{ id: ReadingSettings["theme"]; label: string }> = [
 
 const readingFonts: ReadingSettings["fontFamily"][] = [
   "Literata",
-  "Georgia",
   "Merriweather",
   "Source Serif 4",
-  "Inter",
+  "Georgia",
   "Atkinson Hyperlegible",
+  "Inter",
 ];
 
 const lineHeightOptions: Array<{ label: string; value: number }> = [
   { label: "Компактный", value: 1.4 },
-  { label: "Обычный", value: 1.6 },
-  { label: "Свободный", value: 1.8 },
+  { label: "Обычный", value: 1.55 },
+  { label: "Свободный", value: 1.75 },
 ];
 
 const getShelfBooks = (shelfId: string) => getCategoryBooks(shelfId);
@@ -107,12 +107,14 @@ function useReadingSettings() {
 function normalizeReadingSettings(settings: ReadingSettings): ReadingSettings {
   return {
     ...settings,
-    textSize: Math.min(32, Math.max(16, Number(settings.textSize) || defaultReadingSettings.textSize)),
+    textSize: Math.min(28, Math.max(16, Number(settings.textSize) || defaultReadingSettings.textSize)),
     lineHeight: lineHeightOptions.some((option) => option.value === settings.lineHeight) ? settings.lineHeight : defaultReadingSettings.lineHeight,
     fontFamily: readingFonts.includes(settings.fontFamily) ? settings.fontFamily : defaultReadingSettings.fontFamily,
     textWidth: Math.min(760, Math.max(600, Number(settings.textWidth) || defaultReadingSettings.textWidth)),
     textAlign: settings.textAlign === "justify" ? "justify" : "left",
     accentedReading: Boolean(settings.accentedReading),
+    showSentenceTranslation: true,
+    showWordTranslation: false,
   };
 }
 
@@ -1701,7 +1703,7 @@ function ReaderPreview({
 
     const deltaX = event.clientX - start.x;
     const deltaY = event.clientY - start.y;
-    const isSwipe = Math.abs(deltaX) >= 45 && Math.abs(deltaX) > Math.abs(deltaY) * 1.3;
+    const isSwipe = Math.abs(deltaX) >= 45 && Math.abs(deltaX) > Math.abs(deltaY) * 1.25;
     if (isSwipe) {
       ghostClickUntilRef.current = Date.now() + 420;
       turnPage(deltaX < 0 ? "next" : "prev");
@@ -1897,129 +1899,117 @@ function ReadingSettingsPanel({
   settings: ReadingSettings;
   onChange: Dispatch<SetStateAction<ReadingSettings>>;
 }) {
+  const [view, setView] = useState<"main" | "font">("main");
+  const decreaseTextSize = () => onChange((current) => ({ ...current, textSize: Math.max(16, current.textSize - 1) }));
+  const increaseTextSize = () => onChange((current) => ({ ...current, textSize: Math.min(28, current.textSize + 1) }));
+
   return (
     <div className="reading-settings-panel" ref={panelRef} role="dialog" aria-label="Настройки чтения">
-      <div className="settings-group">
-        <span>Тема</span>
-        <div className="segmented-control">
-          {readingThemes.map((theme) => (
-            <button
-              className={settings.theme === theme.id ? "active" : ""}
-              key={theme.id}
-              type="button"
-              onClick={() => onChange((current) => ({ ...current, theme: theme.id }))}
-            >
-              {theme.label}
+      {view === "font" ? (
+        <>
+          <div className="settings-subheader">
+            <button className="settings-back-button" type="button" onClick={() => setView("main")}>
+              ←
             </button>
-          ))}
-        </div>
-      </div>
+            <strong>Шрифт</strong>
+          </div>
+          <div className="font-choice-list nested">
+            {readingFonts.map((font) => (
+              <button
+                className={settings.fontFamily === font ? "active" : ""}
+                key={font}
+                type="button"
+                style={{ fontFamily: readerFontStack(font) }}
+                onClick={() => onChange((current) => ({ ...current, fontFamily: font }))}
+              >
+                <span>{font}</span>
+                {settings.fontFamily === font ? <span className="font-check" aria-hidden="true">✓</span> : null}
+              </button>
+            ))}
+          </div>
+        </>
+      ) : (
+        <>
+          <div className="settings-group">
+            <span>Тема</span>
+            <div className="segmented-control">
+              {readingThemes.map((theme) => (
+                <button
+                  className={settings.theme === theme.id ? "active" : ""}
+                  key={theme.id}
+                  type="button"
+                  onClick={() => onChange((current) => ({ ...current, theme: theme.id }))}
+                >
+                  {theme.label}
+                </button>
+              ))}
+            </div>
+          </div>
 
-      <label className="settings-range">
-        <span>Размер текста · {settings.textSize}px</span>
-        <input
-          type="range"
-          min={16}
-          max={32}
-          value={settings.textSize}
-          onChange={(event) => onChange((current) => ({ ...current, textSize: Number(event.target.value) }))}
-        />
-      </label>
+          <div className="settings-group">
+            <span>Размер текста</span>
+            <div className="text-size-stepper" role="group" aria-label="Размер текста">
+              <button type="button" aria-label="Уменьшить текст" onClick={decreaseTextSize}>A−</button>
+              <strong>{settings.textSize}</strong>
+              <button type="button" aria-label="Увеличить текст" onClick={increaseTextSize}>A+</button>
+            </div>
+          </div>
 
-      <div className="settings-group">
-        <span>Шрифт</span>
-        <div className="font-choice-list">
-          {readingFonts.map((font) => (
-            <button
-              className={settings.fontFamily === font ? "active" : ""}
-              key={font}
-              type="button"
-              style={{ fontFamily: readerFontStack(font) }}
-              onClick={() => onChange((current) => ({ ...current, fontFamily: font }))}
-            >
-              {font}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="settings-group">
-        <span>Интервал</span>
-        <div className="segmented-control three">
-          {lineHeightOptions.map((option) => (
-            <button
-              className={settings.lineHeight === option.value ? "active" : ""}
-              key={option.value}
-              type="button"
-              onClick={() => onChange((current) => ({ ...current, lineHeight: option.value }))}
-            >
-              {option.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="settings-group">
-        <span>Выравнивание</span>
-        <div className="segmented-control two">
-          <button
-            className={settings.textAlign === "left" ? "active" : ""}
-            type="button"
-            onClick={() => onChange((current) => ({ ...current, textAlign: "left" }))}
-          >
-            Слева
+          <button className="settings-nav-row" type="button" onClick={() => setView("font")}>
+            <span>Шрифт</span>
+            <strong style={{ fontFamily: readerFontStack(settings.fontFamily) }}>{settings.fontFamily}</strong>
+            <span aria-hidden="true">›</span>
           </button>
-          <button
-            className={settings.textAlign === "justify" ? "active" : ""}
-            type="button"
-            onClick={() => onChange((current) => ({ ...current, textAlign: "justify" }))}
-          >
-            По ширине
-          </button>
-        </div>
-      </div>
 
-      <label className="settings-range desktop-only-setting">
-        <span>Ширина текста</span>
-        <input
-          type="range"
-          min={600}
-          max={760}
-          step={20}
-          value={settings.textWidth}
-          onChange={(event) => onChange((current) => ({ ...current, textWidth: Number(event.target.value) }))}
-        />
-      </label>
+          <div className="settings-group">
+            <span>Межстрочный интервал</span>
+            <div className="segmented-control three">
+              {lineHeightOptions.map((option) => (
+                <button
+                  className={settings.lineHeight === option.value ? "active" : ""}
+                  key={option.value}
+                  type="button"
+                  onClick={() => onChange((current) => ({ ...current, lineHeight: option.value }))}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </div>
 
-      <label className="settings-toggle">
-        <span>Показывать перевод предложения</span>
-        <input
-          type="checkbox"
-          checked={settings.showSentenceTranslation}
-          onChange={(event) => onChange((current) => ({ ...current, showSentenceTranslation: event.target.checked }))}
-        />
-      </label>
+          <div className="settings-group">
+            <span>Выравнивание</span>
+            <div className="segmented-control two">
+              <button
+                className={settings.textAlign === "left" ? "active" : ""}
+                type="button"
+                onClick={() => onChange((current) => ({ ...current, textAlign: "left" }))}
+              >
+                По левому краю
+              </button>
+              <button
+                className={settings.textAlign === "justify" ? "active" : ""}
+                type="button"
+                onClick={() => onChange((current) => ({ ...current, textAlign: "justify" }))}
+              >
+                По ширине
+              </button>
+            </div>
+          </div>
 
-      <label className="settings-toggle">
-        <span>Показывать перевод слова</span>
-        <input
-          type="checkbox"
-          checked={settings.showWordTranslation}
-          onChange={(event) => onChange((current) => ({ ...current, showWordTranslation: event.target.checked }))}
-        />
-      </label>
-
-      <label className="settings-toggle accent-toggle">
-        <span>
-          Акцентированное чтение
-          <small>Выделяет начало слов, чтобы взгляду было легче двигаться по строке.</small>
-        </span>
-        <input
-          type="checkbox"
-          checked={settings.accentedReading}
-          onChange={(event) => onChange((current) => ({ ...current, accentedReading: event.target.checked }))}
-        />
-      </label>
+          <label className="settings-toggle accent-toggle">
+            <span>
+              Акцентированное чтение
+              <small>Выделяет начало слов, чтобы взгляду было легче двигаться по строке.</small>
+            </span>
+            <input
+              type="checkbox"
+              checked={settings.accentedReading}
+              onChange={(event) => onChange((current) => ({ ...current, accentedReading: event.target.checked }))}
+            />
+          </label>
+        </>
+      )}
     </div>
   );
 }

@@ -7,7 +7,6 @@ export type ReaderPageWord = ReaderWord & {
   sentenceText: string;
   sentenceTranslation?: string;
   sentenceAudioSrc?: string;
-  sentenceWordIndex: number;
   isSentenceEnd: boolean;
   absoluteIndex: number;
 };
@@ -40,7 +39,6 @@ export function flattenChapterWords(chapter: ReaderChapter): ReaderPageWord[] {
           sentenceText: sentence.text,
           sentenceTranslation: sentence.translation,
           sentenceAudioSrc: sentence.audioSrc,
-          sentenceWordIndex,
           isSentenceEnd: sentenceWordIndex === sentenceWords.length - 1,
           absoluteIndex: words.length,
         });
@@ -167,11 +165,9 @@ function paginateChapterContent({
   document.body.appendChild(measureRoot);
 
   const pages: ReaderPage[] = [];
-  const measuredWords = words.map((word, index) => {
+  const measuredWords = words.map((word) => {
     const node = measureRoot.querySelector<HTMLElement>(`[data-measure-word-id="${word.id}"]`);
     return {
-      index,
-      word,
       top: node?.offsetTop ?? 0,
       bottom: node ? node.offsetTop + node.offsetHeight : 0,
     };

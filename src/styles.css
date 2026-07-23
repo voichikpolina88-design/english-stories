@@ -2091,7 +2091,15 @@ p {
   gap: 8px;
 }
 
+.font-choice-list.nested {
+  grid-template-columns: 1fr;
+}
+
 .font-choice-list button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   min-height: 38px;
   padding: 0 10px;
   border: 1px solid var(--reader-line);
@@ -2107,6 +2115,93 @@ p {
   border-color: rgba(37, 99, 235, 0.38);
   background: var(--purple-soft);
   color: var(--purple);
+}
+
+.font-check {
+  font-family: Inter, system-ui, sans-serif;
+  font-weight: 860;
+}
+
+.settings-subheader {
+  display: grid;
+  grid-template-columns: 34px 1fr 34px;
+  align-items: center;
+  gap: 8px;
+}
+
+.settings-subheader strong {
+  color: var(--reader-ink);
+  font-size: 1rem;
+  text-align: center;
+}
+
+.settings-back-button {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 0;
+  border-radius: 999px;
+  background: var(--purple-soft);
+  color: var(--purple);
+  font-size: 1.1rem;
+  font-weight: 860;
+}
+
+.settings-nav-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--reader-line);
+  border-radius: 14px;
+  background: var(--reader-paper);
+  color: var(--reader-ink);
+  text-align: left;
+}
+
+.settings-nav-row > span:first-child {
+  color: var(--reader-muted);
+  font-size: 0.78rem;
+  font-weight: 820;
+}
+
+.settings-nav-row strong {
+  overflow: hidden;
+  font-size: 0.92rem;
+  font-weight: 600;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.text-size-stepper {
+  display: grid;
+  grid-template-columns: 1fr 64px 1fr;
+  align-items: center;
+  gap: 8px;
+}
+
+.text-size-stepper button,
+.text-size-stepper strong {
+  display: grid;
+  min-height: 38px;
+  place-items: center;
+  border-radius: 999px;
+}
+
+.text-size-stepper button {
+  border: 0;
+  background: var(--purple-soft);
+  color: var(--purple);
+  font-weight: 860;
+}
+
+.text-size-stepper strong {
+  color: var(--reader-ink);
+  font-size: 1rem;
 }
 
 .settings-range input,
@@ -2274,6 +2369,7 @@ p {
   line-height: var(--reader-line-height);
   font-weight: 400;
   text-align: var(--reader-text-align, left);
+  text-justify: inter-word;
   text-wrap: pretty;
 }
 
@@ -2315,7 +2411,7 @@ p {
 }
 
 .word-accent {
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .sentence-actions {
@@ -2991,7 +3087,6 @@ blockquote {
   .structured-text {
     font-size: min(var(--reader-font-size), 22px);
     line-height: var(--reader-line-height);
-    text-align: left;
   }
 
   .font-choice-list {
