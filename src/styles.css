@@ -2966,6 +2966,16 @@ blockquote {
   }
 }
 
+@media (max-width: 767px) {
+  .reading-page {
+    box-sizing: border-box;
+    width: calc(100% - 48px);
+    max-width: calc(100% - 48px);
+    margin-inline: auto;
+    padding: 26px 22px 28px;
+  }
+}
+
 @media (max-width: 480px) {
   .app-main {
     padding: 10px 10px calc(144px + env(safe-area-inset-bottom));
@@ -2993,7 +3003,7 @@ blockquote {
   .reader-preview {
     height: 100%;
     min-height: 0;
-    gap: 8px;
+    gap: 28px;
     overflow: hidden;
     padding-bottom: 0;
     overscroll-behavior: none;
@@ -3034,7 +3044,9 @@ blockquote {
   }
 
   .paginated-reader-shell {
-    gap: 8px;
+    grid-template-rows: minmax(0, calc(100% - 82px)) auto;
+    align-content: start;
+    gap: 14px;
     overflow: hidden;
     min-height: 0;
     overscroll-behavior: none;
@@ -3042,11 +3054,13 @@ blockquote {
   }
 
   .reading-page {
-    width: 100%;
-    max-width: none;
+    box-sizing: border-box;
+    width: calc(100% - 48px);
+    max-width: calc(100% - 48px);
     height: 100%;
     min-height: 0;
-    padding: 22px 18px 24px;
+    margin-inline: auto;
+    padding: 26px 22px 28px;
     box-shadow: 0 12px 32px rgba(71, 55, 35, 0.11);
   }
 
