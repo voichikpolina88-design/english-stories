@@ -1442,6 +1442,7 @@ function ReaderPreview({
   } | null>(null);
   const ghostClickUntilRef = useRef(0);
   const visibleWordIdBeforeRepaginate = useRef<string | null>(null);
+  const restoredPositionKeyRef = useRef<string | null>(null);
   const readerBook = useMemo(() => getReaderBook(book.id), [book.id]);
   const [activeChapterId, setActiveChapterId] = useState(() => {
     const savedChapterId = readReaderPosition(book.id)?.chapterId;
@@ -1505,9 +1506,13 @@ function ReaderPreview({
       const textFrame = readingTextFrameRef.current;
       if (!page || !textFrame) return;
       const frameRect = textFrame.getBoundingClientRect();
-      setPageSize({
+      const nextSize = {
         width: Math.max(1, Math.floor(frameRect.width)),
         height: Math.max(1, Math.floor(frameRect.height)),
+      };
+      setPageSize((current) => {
+        if (current.width === nextSize.width && current.height === nextSize.height) return current;
+        return nextSize;
       });
     }
 
@@ -1548,15 +1553,19 @@ function ReaderPreview({
 
   useEffect(() => {
     if (pages.length === 0) return;
+    const restoreKey = `${book.id}:${chapter.id}`;
     const pendingEdge = pendingChapterEdgeRef.current;
     if (pendingEdge) {
       setCurrentPageIndex(pendingEdge === "last" ? pages.length - 1 : 0);
       pendingChapterEdgeRef.current = null;
+      restoredPositionKeyRef.current = restoreKey;
       return;
     }
 
-    const saved = readReaderPosition(book.id);
-    const targetWordId = visibleWordIdBeforeRepaginate.current ?? saved?.wordId;
+    const repaginateWordId = visibleWordIdBeforeRepaginate.current;
+    const shouldRestoreSavedPosition = !repaginateWordId && restoredPositionKeyRef.current !== restoreKey;
+    const saved = shouldRestoreSavedPosition ? readReaderPosition(book.id) : null;
+    const targetWordId = repaginateWordId ?? saved?.wordId;
     let nextIndex = targetWordId ? pages.findIndex((page) => page.words.some((word) => word.id === targetWordId)) : -1;
 
     if (nextIndex < 0 && saved?.sentenceId) {
@@ -1572,6 +1581,7 @@ function ReaderPreview({
       return Math.min(current, pages.length - 1);
     });
     visibleWordIdBeforeRepaginate.current = null;
+    restoredPositionKeyRef.current = restoreKey;
   }, [book.id, chapter.id, pages]);
 
   useEffect(() => {
@@ -1668,17 +1678,25 @@ function ReaderPreview({
     }, 240);
   }
 
+  function goToNextPage() {
+    turnPage("next");
+  }
+
+  function goToPreviousPage() {
+    turnPage("prev");
+  }
+
   function handleReaderKeyDown(event: KeyboardEvent) {
     if (isReaderInteractive(event.target)) return;
 
     if (event.key === "ArrowRight" || event.key === "PageDown" || event.key === " ") {
       event.preventDefault();
-      turnPage("next");
+      goToNextPage();
     }
 
     if (event.key === "ArrowLeft" || event.key === "PageUp") {
       event.preventDefault();
-      turnPage("prev");
+      goToPreviousPage();
     }
   }
 
@@ -1706,7 +1724,8 @@ function ReaderPreview({
     const isSwipe = Math.abs(deltaX) >= 45 && Math.abs(deltaX) > Math.abs(deltaY) * 1.25;
     if (isSwipe) {
       ghostClickUntilRef.current = Date.now() + 420;
-      turnPage(deltaX < 0 ? "next" : "prev");
+      if (deltaX < 0) goToNextPage();
+      if (deltaX > 0) goToPreviousPage();
       return;
     }
 
@@ -1716,8 +1735,8 @@ function ReaderPreview({
 
     const rect = event.currentTarget.getBoundingClientRect();
     const relativeX = event.clientX - rect.left;
-    if (relativeX > rect.width * 0.68) turnPage("next");
-    if (relativeX < rect.width * 0.32) turnPage("prev");
+    if (relativeX > rect.width * 0.75) goToNextPage();
+    if (relativeX < rect.width * 0.25) goToPreviousPage();
   }
 
   function handlePagePointerCancel() {
@@ -1813,7 +1832,7 @@ function ReaderPreview({
           disabled={currentPageIndex <= 0 || isPageTurning}
           onClick={(event) => {
             event.stopPropagation();
-            turnPage("prev");
+            goToPreviousPage();
           }}
         >
           <ArrowLeft size={24} aria-hidden="true" />
@@ -1852,7 +1871,7 @@ function ReaderPreview({
           disabled={isPageTurning || (currentPageIndex >= pages.length - 1 && book.id === "alice-in-wonderland")}
           onClick={(event) => {
             event.stopPropagation();
-            turnPage("next");
+            goToNextPage();
           }}
         >
           <ArrowLeft size={24} aria-hidden="true" />

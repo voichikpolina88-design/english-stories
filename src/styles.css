@@ -3046,8 +3046,19 @@ blockquote {
     max-width: none;
     height: 100%;
     min-height: 0;
-    padding: 24px 22px 26px;
+    padding: 22px 18px 24px;
     box-shadow: 0 12px 32px rgba(71, 55, 35, 0.11);
+  }
+
+  .reading-text-frame,
+  .structured-text,
+  .reader-paragraph,
+  .reader-sentence,
+  .reader-sentence-words {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: none;
+    margin-inline: 0;
   }
 
   .reader-page-edge {
