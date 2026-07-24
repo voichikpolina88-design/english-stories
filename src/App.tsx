@@ -4,7 +4,14 @@ import { getCatalogBook, getCategoryBooks, homeShelfBooks, libraryCategories, ty
 import { getReaderBook, getReaderChapter } from "./data/aliceReader";
 import { getAllVocabulary, type VocabularyEntry } from "./data/vocabulary";
 import { useLearnerProgress } from "./hooks/useLearnerProgress";
-import { emptyPaginationSize, readerDisplayWordText, type ReaderPage, type ReaderPageWord, useReaderPagination } from "./hooks/useReaderPagination";
+import {
+  emptyPaginationSize,
+  readerDisplayWordText,
+  readerWordHasEmphasis,
+  type ReaderPage,
+  type ReaderPageWord,
+  useReaderPagination,
+} from "./hooks/useReaderPagination";
 import { useReadingTimer } from "./hooks/useReadingTimer";
 import type { LastOpenedContent, NativeLanguage, ReaderChapter, ReaderPosition, ReadingSettings } from "./types";
 
@@ -2150,7 +2157,7 @@ function ReaderWordView({
 
   return (
     <span
-      className="reader-word"
+      className={readerWordHasEmphasis(word) ? "reader-word reader-emphasis-word" : "reader-word"}
       data-word-id={word.id}
       role="button"
       tabIndex={0}

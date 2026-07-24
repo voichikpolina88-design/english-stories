@@ -236,15 +236,19 @@ export function isQuotedReaderBlock(type?: ReaderPageWord["paragraphType"]) {
 }
 
 export function readerDisplayWordText(word: ReaderPageWord) {
-  if (!isQuotedReaderBlock(word.paragraphType)) return word.text;
-
   let text = word.text;
-  if (word.isParagraphStart || text.startsWith("“")) {
-    text = text.replace(/^“/, "— ");
+  if (isQuotedReaderBlock(word.paragraphType)) {
+    if (word.isParagraphStart || text.startsWith("“")) {
+      text = text.replace(/^“/, "— ");
+    }
+    text = text.replace(/([,;:.!?])”(?=\S)/g, "$1 —");
+    text = text.replace(/([,;:.!?])”$/g, word.isParagraphEnd ? "$1" : "$1 —");
   }
-  text = text.replace(/([,;:.!?])”(?=\S)/g, "$1 —");
-  text = text.replace(/([,;:.!?])”$/g, word.isParagraphEnd ? "$1" : "$1 —");
-  return text;
+  return text.replace(/_/g, "");
+}
+
+export function readerWordHasEmphasis(word: ReaderPageWord) {
+  return word.text.includes("_");
 }
 
 function appendSentenceMeasure({
@@ -282,7 +286,7 @@ function appendSentenceMeasure({
       sentenceAudioSrc: sentence.audioSrc,
     };
     const wordNode = document.createElement("span");
-    wordNode.className = "reader-word";
+    wordNode.className = readerWordHasEmphasis(measureWord) ? "reader-word reader-emphasis-word" : "reader-word";
     wordNode.dataset.measureWordId = word.id;
     wordNode.dataset.measureSentenceId = sentence.id;
     wordNode.dataset.measureParagraphId = paragraphId;

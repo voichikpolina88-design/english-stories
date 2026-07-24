@@ -1538,7 +1538,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch3-p4",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch3-p4-s1",
@@ -1564,7 +1564,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch3-p5",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch3-p5-s1",
@@ -1574,7 +1574,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch3-p6",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch3-p6-s1",
@@ -1584,7 +1584,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch3-p7",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch3-p7-s1",
@@ -1594,7 +1594,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch3-p8",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch3-p8-s1",
@@ -1612,7 +1612,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch3-p9",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch3-p9-s1",
@@ -1622,7 +1622,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch3-p10",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch3-p10-s1",
@@ -1632,7 +1632,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch3-p11",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch3-p11-s1",
@@ -1664,7 +1664,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch3-p13",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch3-p13-s1",
@@ -1674,7 +1674,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch3-p14",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch3-p14-s1",
@@ -1684,7 +1684,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch3-p15",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch3-p15-s1",
@@ -1702,7 +1702,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch3-p16",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch3-p16-s1",
@@ -1712,7 +1712,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch3-p17",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch3-p17-s1",
@@ -1722,7 +1722,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch3-p18",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch3-p18-s1",
@@ -1768,7 +1768,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch3-p21",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch3-p21-s1",
@@ -1778,7 +1778,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch3-p22",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch3-p22-s1",
@@ -1806,7 +1806,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch3-p24",
-          "type": "narrative",
+          "type": "thought",
           "sentences": [
             {
               "id": "alice-ch3-p24-s1",
@@ -1816,7 +1816,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch3-p25",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch3-p25-s1",
@@ -1830,7 +1830,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch3-p26",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch3-p26-s1",
@@ -1840,7 +1840,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch3-p27",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch3-p27-s1",
@@ -1884,7 +1884,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch3-p31",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch3-p31-s1",
@@ -1894,7 +1894,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch3-p32",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch3-p32-s1",
@@ -1904,7 +1904,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch3-p33",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch3-p33-s1",
@@ -1961,7 +1961,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch3-p35",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch3-p35-s1",
@@ -1975,7 +1975,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch3-p36",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch3-p36-s1",
@@ -1985,7 +1985,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch3-p37",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch3-p37-s1",
@@ -1999,7 +1999,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch3-p38",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch3-p38-s1",
@@ -2031,7 +2031,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch3-p40",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch3-p40-s1",
@@ -2055,7 +2055,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch3-p42",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch3-p42-s1",
@@ -2069,7 +2069,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch3-p43",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch3-p43-s1",
@@ -2109,7 +2109,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch3-p45",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch3-p45-s1",
@@ -2163,7 +2163,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch3-p48",
-          "type": "narrative",
+          "type": "thought",
           "sentences": [
             {
               "id": "alice-ch3-p48-s1",
@@ -2256,7 +2256,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch4-p3",
-          "type": "narrative",
+          "type": "thought",
           "sentences": [
             {
               "id": "alice-ch4-p3-s1",
@@ -2286,7 +2286,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch4-p4",
-          "type": "narrative",
+          "type": "thought",
           "sentences": [
             {
               "id": "alice-ch4-p4-s1",
@@ -2388,7 +2388,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch4-p9",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch4-p9-s1",
@@ -2418,7 +2418,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch4-p10",
-          "type": "narrative",
+          "type": "thought",
           "sentences": [
             {
               "id": "alice-ch4-p10-s1",
@@ -2440,7 +2440,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch4-p11",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch4-p11-s1",
@@ -2468,7 +2468,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch4-p13",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch4-p13-s1",
@@ -2508,7 +2508,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch4-p15",
-          "type": "narrative",
+          "type": "thought",
           "sentences": [
             {
               "id": "alice-ch4-p15-s1",
@@ -2548,7 +2548,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch4-p17",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch4-p17-s1",
@@ -2570,7 +2570,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch4-p18",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch4-p18-s1",
@@ -2580,7 +2580,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch4-p19",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch4-p19-s1",
@@ -2594,7 +2594,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch4-p20",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch4-p20-s1",
@@ -2612,7 +2612,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch4-p21",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch4-p21-s1",
@@ -2622,7 +2622,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch4-p22",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch4-p22-s1",
@@ -2716,7 +2716,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch4-p25",
-          "type": "narrative",
+          "type": "thought",
           "sentences": [
             {
               "id": "alice-ch4-p25-s1",
@@ -2776,7 +2776,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch4-p29",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch4-p29-s1",
@@ -2786,7 +2786,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch4-p30",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch4-p30-s1",
@@ -2814,7 +2814,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch4-p32",
-          "type": "narrative",
+          "type": "thought",
           "sentences": [
             {
               "id": "alice-ch4-p32-s1",
@@ -2868,7 +2868,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch4-p35",
-          "type": "narrative",
+          "type": "thought",
           "sentences": [
             {
               "id": "alice-ch4-p35-s1",
@@ -2926,7 +2926,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch4-p40",
-          "type": "narrative",
+          "type": "thought",
           "sentences": [
             {
               "id": "alice-ch4-p40-s1",
@@ -2997,7 +2997,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch5-p2",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch5-p2-s1",
@@ -3025,7 +3025,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch5-p4",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch5-p4-s1",
@@ -3039,7 +3039,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch5-p5",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch5-p5-s1",
@@ -3049,7 +3049,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch5-p6",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch5-p6-s1",
@@ -3059,7 +3059,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch5-p7",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch5-p7-s1",
@@ -3069,7 +3069,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch5-p8",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch5-p8-s1",
@@ -3079,7 +3079,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch5-p9",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch5-p9-s1",
@@ -3089,7 +3089,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch5-p10",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch5-p10-s1",
@@ -3099,7 +3099,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch5-p11",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch5-p11-s1",
@@ -3109,7 +3109,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch5-p12",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch5-p12-s1",
@@ -3141,7 +3141,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch5-p14",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch5-p14-s1",
@@ -3189,7 +3189,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch5-p18",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch5-p18-s1",
@@ -3199,7 +3199,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch5-p19",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch5-p19-s1",
@@ -3209,7 +3209,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch5-p20",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch5-p20-s1",
@@ -3233,7 +3233,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch5-p22",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch5-p22-s1",
@@ -3243,7 +3243,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch5-p23",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch5-p23-s1",
@@ -3253,7 +3253,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch5-p24",
-          "type": "narrative",
+          "type": "thought",
           "sentences": [
             {
               "id": "alice-ch5-p24-s1",
@@ -3267,7 +3267,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch5-p25",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch5-p25-s1",
@@ -3511,7 +3511,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch5-p35",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch5-p35-s1",
@@ -3521,7 +3521,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch5-p36",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch5-p36-s1",
@@ -3531,7 +3531,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch5-p37",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch5-p37-s1",
@@ -3551,7 +3551,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch5-p39",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch5-p39-s1",
@@ -3561,7 +3561,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch5-p40",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch5-p40-s1",
@@ -3571,7 +3571,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch5-p41",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch5-p41-s1",
@@ -3591,7 +3591,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch5-p43",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch5-p43-s1",
@@ -3601,7 +3601,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch5-p44",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch5-p44-s1",
@@ -3611,7 +3611,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch5-p45",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch5-p45-s1",
@@ -3621,7 +3621,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch5-p46",
-          "type": "narrative",
+          "type": "thought",
           "sentences": [
             {
               "id": "alice-ch5-p46-s1",
@@ -3635,7 +3635,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch5-p47",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch5-p47-s1",
@@ -3681,7 +3681,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch5-p50",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch5-p50-s1",
@@ -3705,7 +3705,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch5-p52",
-          "type": "narrative",
+          "type": "thought",
           "sentences": [
             {
               "id": "alice-ch5-p52-s1",
@@ -3759,7 +3759,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch5-p57",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch5-p57-s1",
@@ -3769,7 +3769,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch5-p58",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch5-p58-s1",
@@ -3805,7 +3805,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch5-p60",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch5-p60-s1",
@@ -3815,7 +3815,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch5-p61",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch5-p61-s1",
@@ -3829,7 +3829,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch5-p62",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch5-p62-s1",
@@ -3839,7 +3839,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch5-p63",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch5-p63-s1",
@@ -3849,7 +3849,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch5-p64",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch5-p64-s1",
@@ -3873,7 +3873,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch5-p66",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch5-p66-s1",
@@ -3887,7 +3887,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch5-p67",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch5-p67-s1",
@@ -3897,7 +3897,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch5-p68",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch5-p68-s1",
@@ -3911,7 +3911,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch5-p69",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch5-p69-s1",
@@ -3925,7 +3925,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch5-p70",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch5-p70-s1",
@@ -3943,7 +3943,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch5-p71",
-          "type": "narrative",
+          "type": "thought",
           "sentences": [
             {
               "id": "alice-ch5-p71-s1",
@@ -3953,7 +3953,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch5-p72",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch5-p72-s1",
@@ -3979,7 +3979,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch5-p73",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch5-p73-s1",
@@ -4017,7 +4017,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch5-p76",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch5-p76-s1",
@@ -4027,7 +4027,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch5-p77",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch5-p77-s1",
@@ -4160,7 +4160,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch6-p6",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch6-p6-s1",
@@ -4178,7 +4178,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch6-p7",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch6-p7-s1",
@@ -4188,7 +4188,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch6-p8",
-          "type": "narrative",
+          "type": "thought",
           "sentences": [
             {
               "id": "alice-ch6-p8-s1",
@@ -4218,7 +4218,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch6-p9",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch6-p9-s1",
@@ -4238,7 +4238,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch6-p11",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch6-p11-s1",
@@ -4248,7 +4248,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch6-p12",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch6-p12-s1",
@@ -4258,7 +4258,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch6-p13",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch6-p13-s1",
@@ -4304,7 +4304,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch6-p16",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch6-p16-s1",
@@ -4314,7 +4314,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch6-p17",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch6-p17-s1",
@@ -4324,7 +4324,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch6-p18",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch6-p18-s1",
@@ -4384,7 +4384,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch6-p22",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch6-p22-s1",
@@ -4394,7 +4394,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch6-p23",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch6-p23-s1",
@@ -4418,7 +4418,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch6-p25",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch6-p25-s1",
@@ -4428,7 +4428,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch6-p26",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch6-p26-s1",
@@ -4438,7 +4438,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch6-p27",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch6-p27-s1",
@@ -4448,7 +4448,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch6-p28",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch6-p28-s1",
@@ -4476,7 +4476,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch6-p30",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch6-p30-s1",
@@ -4490,7 +4490,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch6-p31",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch6-p31-s1",
@@ -4500,7 +4500,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch6-p32",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch6-p32-s1",
@@ -4518,7 +4518,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch6-p33",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch6-p33-s1",
@@ -4542,7 +4542,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch6-p35",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch6-p35-s1",
@@ -4602,7 +4602,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch6-p38",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch6-p38-s1",
@@ -4660,7 +4660,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch6-p42",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch6-p42-s1",
@@ -4670,7 +4670,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch6-p43",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch6-p43-s1",
@@ -4810,7 +4810,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch6-p51",
-          "type": "narrative",
+          "type": "thought",
           "sentences": [
             {
               "id": "alice-ch6-p51-s1",
@@ -4828,7 +4828,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch6-p52",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch6-p52-s1",
@@ -4838,7 +4838,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch6-p53",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch6-p53-s1",
@@ -4848,7 +4848,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch6-p54",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch6-p54-s1",
@@ -4858,7 +4858,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch6-p55",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch6-p55-s1",
@@ -4868,7 +4868,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch6-p56",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch6-p56-s1",
@@ -4896,7 +4896,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch6-p58",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch6-p58-s1",
@@ -4910,7 +4910,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch6-p59",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch6-p59-s1",
@@ -4920,7 +4920,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch6-p60",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch6-p60-s1",
@@ -4938,7 +4938,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch6-p61",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch6-p61-s1",
@@ -4948,7 +4948,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch6-p62",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch6-p62-s1",
@@ -4968,7 +4968,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch6-p64",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch6-p64-s1",
@@ -4982,7 +4982,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch6-p65",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch6-p65-s1",
@@ -4992,7 +4992,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch6-p66",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch6-p66-s1",
@@ -5010,7 +5010,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch6-p67",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch6-p67-s1",
@@ -5020,7 +5020,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch6-p68",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch6-p68-s1",
@@ -5034,7 +5034,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch6-p69",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch6-p69-s1",
@@ -5044,7 +5044,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch6-p70",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch6-p70-s1",
@@ -5086,7 +5086,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch6-p73",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch6-p73-s1",
@@ -5096,7 +5096,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch6-p74",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch6-p74-s1",
@@ -5124,7 +5124,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch6-p76",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch6-p76-s1",
@@ -5134,7 +5134,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch6-p77",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch6-p77-s1",
@@ -5144,7 +5144,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch6-p78",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch6-p78-s1",
@@ -5154,7 +5154,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch6-p79",
-          "type": "narrative",
+          "type": "thought",
           "sentences": [
             {
               "id": "alice-ch6-p79-s1",
@@ -5229,7 +5229,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p3",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p3-s1",
@@ -5253,7 +5253,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p5",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p5-s1",
@@ -5263,7 +5263,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p6",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p6-s1",
@@ -5273,7 +5273,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p7",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p7-s1",
@@ -5283,7 +5283,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p8",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p8-s1",
@@ -5293,7 +5293,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p9",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p9-s1",
@@ -5307,7 +5307,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p10",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p10-s1",
@@ -5327,7 +5327,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p12",
-          "type": "narrative",
+          "type": "thought",
           "sentences": [
             {
               "id": "alice-ch7-p12-s1",
@@ -5345,7 +5345,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p13",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p13-s1",
@@ -5355,7 +5355,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p14",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p14-s1",
@@ -5365,7 +5365,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p15",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p15-s1",
@@ -5393,7 +5393,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p17",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p17-s1",
@@ -5407,7 +5407,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p18",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p18-s1",
@@ -5417,7 +5417,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p19",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p19-s1",
@@ -5479,7 +5479,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p23",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p23-s1",
@@ -5493,7 +5493,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p24",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p24-s1",
@@ -5503,7 +5503,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p25",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p25-s1",
@@ -5541,7 +5541,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p28",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p28-s1",
@@ -5555,7 +5555,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p29",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p29-s1",
@@ -5565,7 +5565,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p30",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p30-s1",
@@ -5589,7 +5589,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p32",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p32-s1",
@@ -5609,7 +5609,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p34",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p34-s1",
@@ -5619,7 +5619,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p35",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p35-s1",
@@ -5629,7 +5629,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p36",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p36-s1",
@@ -5639,7 +5639,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p37",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p37-s1",
@@ -5663,7 +5663,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p39",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p39-s1",
@@ -5677,7 +5677,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p40",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p40-s1",
@@ -5705,7 +5705,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p42",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p42-s1",
@@ -5715,7 +5715,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p43",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p43-s1",
@@ -5751,7 +5751,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p45",
-          "type": "narrative",
+          "type": "thought",
           "sentences": [
             {
               "id": "alice-ch7-p45-s1",
@@ -5761,7 +5761,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p46",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p46-s1",
@@ -5771,7 +5771,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p47",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p47-s1",
@@ -5831,7 +5831,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p51",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p51-s1",
@@ -5841,7 +5841,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p52",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p52-s1",
@@ -5884,7 +5884,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p55",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p55-s1",
@@ -5898,7 +5898,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p56",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p56-s1",
@@ -5908,7 +5908,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p57",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p57-s1",
@@ -5936,7 +5936,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p59",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p59-s1",
@@ -5946,7 +5946,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p60",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p60-s1",
@@ -5956,7 +5956,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p61",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p61-s1",
@@ -5966,7 +5966,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p62",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p62-s1",
@@ -5980,7 +5980,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p63",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p63-s1",
@@ -6016,7 +6016,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p65",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p65-s1",
@@ -6048,7 +6048,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p67",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p67-s1",
@@ -6058,7 +6058,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p68",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p68-s1",
@@ -6068,7 +6068,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p69",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p69-s1",
@@ -6078,7 +6078,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p70",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p70-s1",
@@ -6088,7 +6088,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p71",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p71-s1",
@@ -6098,7 +6098,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p72",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p72-s1",
@@ -6126,7 +6126,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p74",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p74-s1",
@@ -6146,7 +6146,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p76",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p76-s1",
@@ -6156,7 +6156,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p77",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p77-s1",
@@ -6166,7 +6166,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p78",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p78-s1",
@@ -6176,7 +6176,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p79",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p79-s1",
@@ -6186,7 +6186,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p80",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p80-s1",
@@ -6220,7 +6220,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p83",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p83-s1",
@@ -6234,7 +6234,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p84",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p84-s1",
@@ -6252,7 +6252,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p85",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p85-s1",
@@ -6270,7 +6270,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p86",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p86-s1",
@@ -6280,7 +6280,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p87",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p87-s1",
@@ -6290,7 +6290,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p88",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p88-s1",
@@ -6328,7 +6328,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p91",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p91-s1",
@@ -6338,7 +6338,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p92",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p92-s1",
@@ -6348,7 +6348,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p93",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p93-s1",
@@ -6368,7 +6368,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p95",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p95-s1",
@@ -6378,7 +6378,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p96",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p96-s1",
@@ -6388,7 +6388,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p97",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p97-s1",
@@ -6418,7 +6418,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p100",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p100-s1",
@@ -6428,7 +6428,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p101",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p101-s1",
@@ -6448,7 +6448,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch7-p103",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch7-p103-s1",
@@ -6531,7 +6531,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch8-p2",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch8-p2-s1",
@@ -6555,7 +6555,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch8-p4",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch8-p4-s1",
@@ -6569,7 +6569,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch8-p5",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch8-p5-s1",
@@ -6579,7 +6579,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch8-p6",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch8-p6-s1",
@@ -6589,7 +6589,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch8-p7",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch8-p7-s1",
@@ -6703,7 +6703,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch8-p14",
-          "type": "narrative",
+          "type": "thought",
           "sentences": [
             {
               "id": "alice-ch8-p14-s1",
@@ -6713,7 +6713,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch8-p15",
-          "type": "narrative",
+          "type": "thought",
           "sentences": [
             {
               "id": "alice-ch8-p15-s1",
@@ -6727,7 +6727,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch8-p16",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch8-p16-s1",
@@ -6741,7 +6741,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch8-p17",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch8-p17-s1",
@@ -6769,7 +6769,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch8-p19",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch8-p19-s1",
@@ -6809,7 +6809,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch8-p23",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch8-p23-s1",
@@ -6819,7 +6819,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch8-p24",
-          "type": "narrative",
+          "type": "thought",
           "sentences": [
             {
               "id": "alice-ch8-p24-s1",
@@ -6837,7 +6837,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch8-p25",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch8-p25-s1",
@@ -6847,7 +6847,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch8-p26",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch8-p26-s1",
@@ -6861,7 +6861,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch8-p27",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch8-p27-s1",
@@ -6875,7 +6875,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch8-p28",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch8-p28-s1",
@@ -6885,7 +6885,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch8-p29",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch8-p29-s1",
@@ -6895,7 +6895,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch8-p30",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch8-p30-s1",
@@ -6919,7 +6919,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch8-p32",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch8-p32-s1",
@@ -6929,7 +6929,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch8-p33",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch8-p33-s1",
@@ -6939,7 +6939,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch8-p34",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch8-p34-s1",
@@ -6953,7 +6953,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch8-p35",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch8-p35-s1",
@@ -6963,7 +6963,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch8-p36",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch8-p36-s1",
@@ -6981,7 +6981,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch8-p37",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch8-p37-s1",
@@ -6991,7 +6991,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch8-p38",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch8-p38-s1",
@@ -7005,7 +7005,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch8-p39",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch8-p39-s1",
@@ -7019,7 +7019,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch8-p40",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch8-p40-s1",
@@ -7045,7 +7045,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch8-p41",
-          "type": "narrative",
+          "type": "thought",
           "sentences": [
             {
               "id": "alice-ch8-p41-s1",
@@ -7103,7 +7103,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch8-p46",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch8-p46-s1",
@@ -7135,7 +7135,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch8-p48",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch8-p48-s1",
@@ -7145,7 +7145,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch8-p49",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch8-p49-s1",
@@ -7155,7 +7155,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch8-p50",
-          "type": "narrative",
+          "type": "thought",
           "sentences": [
             {
               "id": "alice-ch8-p50-s1",
@@ -7175,7 +7175,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch8-p52",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch8-p52-s1",
@@ -7203,7 +7203,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch8-p54",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch8-p54-s1",
@@ -7213,7 +7213,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch8-p55",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch8-p55-s1",
@@ -7223,7 +7223,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch8-p56",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch8-p56-s1",
@@ -7237,7 +7237,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch8-p57",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch8-p57-s1",
@@ -7251,7 +7251,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch8-p58",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch8-p58-s1",
@@ -7279,7 +7279,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch8-p60",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch8-p60-s1",
@@ -7411,7 +7411,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch8-p70",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch8-p70-s1",
@@ -7442,7 +7442,7 @@ export const aliceInWonderlandBook: ReaderBook = {
       "paragraphs": [
         {
           "id": "alice-ch9-p1",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p1-s1",
@@ -7462,7 +7462,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p3",
-          "type": "narrative",
+          "type": "thought",
           "sentences": [
             {
               "id": "alice-ch9-p3-s1",
@@ -7498,7 +7498,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p5",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p5-s1",
@@ -7508,7 +7508,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p6",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p6-s1",
@@ -7540,7 +7540,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p8",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p8-s1",
@@ -7550,7 +7550,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p9",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p9-s1",
@@ -7560,7 +7560,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p10",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p10-s1",
@@ -7570,7 +7570,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p11",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p11-s1",
@@ -7602,7 +7602,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p13",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p13-s1",
@@ -7616,7 +7616,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p14",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p14-s1",
@@ -7626,7 +7626,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p15",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p15-s1",
@@ -7640,7 +7640,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p16",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p16-s1",
@@ -7650,7 +7650,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p17",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p17-s1",
@@ -7660,7 +7660,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p18",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p18-s1",
@@ -7670,7 +7670,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p19",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p19-s1",
@@ -7702,7 +7702,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p21",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p21-s1",
@@ -7712,7 +7712,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p22",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p22-s1",
@@ -7722,7 +7722,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p23",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p23-s1",
@@ -7732,7 +7732,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p24",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p24-s1",
@@ -7742,7 +7742,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p25",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p25-s1",
@@ -7756,7 +7756,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p26",
-          "type": "narrative",
+          "type": "thought",
           "sentences": [
             {
               "id": "alice-ch9-p26-s1",
@@ -7774,7 +7774,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p27",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p27-s1",
@@ -7784,7 +7784,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p28",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p28-s1",
@@ -7794,7 +7794,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p29",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p29-s1",
@@ -7818,7 +7818,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p31",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p31-s1",
@@ -7828,7 +7828,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p32",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p32-s1",
@@ -7852,7 +7852,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p34",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p34-s1",
@@ -7896,7 +7896,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p38",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p38-s1",
@@ -7910,7 +7910,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p39",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p39-s1",
@@ -7920,7 +7920,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p40",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p40-s1",
@@ -7930,7 +7930,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p41",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p41-s1",
@@ -7994,7 +7994,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p45",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p45-s1",
@@ -8004,7 +8004,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p46",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p46-s1",
@@ -8022,7 +8022,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p47",
-          "type": "narrative",
+          "type": "thought",
           "sentences": [
             {
               "id": "alice-ch9-p47-s1",
@@ -8064,7 +8064,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p50",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p50-s1",
@@ -8074,7 +8074,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p51",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p51-s1",
@@ -8102,7 +8102,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p53",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p53-s1",
@@ -8126,7 +8126,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p55",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p55-s1",
@@ -8140,7 +8140,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p56",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p56-s1",
@@ -8154,7 +8154,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p57",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p57-s1",
@@ -8164,7 +8164,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p58",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p58-s1",
@@ -8182,7 +8182,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p59",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p59-s1",
@@ -8192,7 +8192,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p60",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p60-s1",
@@ -8202,7 +8202,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p61",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p61-s1",
@@ -8212,7 +8212,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p62",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p62-s1",
@@ -8226,7 +8226,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p63",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p63-s1",
@@ -8236,7 +8236,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p64",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p64-s1",
@@ -8246,7 +8246,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p65",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p65-s1",
@@ -8256,7 +8256,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p66",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p66-s1",
@@ -8266,7 +8266,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p67",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p67-s1",
@@ -8276,7 +8276,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p68",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p68-s1",
@@ -8286,7 +8286,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p69",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p69-s1",
@@ -8300,7 +8300,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p70",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p70-s1",
@@ -8310,7 +8310,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p71",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p71-s1",
@@ -8324,7 +8324,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p72",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p72-s1",
@@ -8334,7 +8334,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p73",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p73-s1",
@@ -8344,7 +8344,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p74",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p74-s1",
@@ -8380,7 +8380,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p76",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p76-s1",
@@ -8390,7 +8390,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p77",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p77-s1",
@@ -8410,7 +8410,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p79",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p79-s1",
@@ -8420,7 +8420,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p80",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p80-s1",
@@ -8430,7 +8430,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p81",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p81-s1",
@@ -8462,7 +8462,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p83",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p83-s1",
@@ -8472,7 +8472,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p84",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p84-s1",
@@ -8482,7 +8482,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p85",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p85-s1",
@@ -8492,7 +8492,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p86",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p86-s1",
@@ -8502,7 +8502,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p87",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p87-s1",
@@ -8512,7 +8512,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p88",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p88-s1",
@@ -8536,7 +8536,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p90",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch9-p90-s1",
@@ -8546,7 +8546,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch9-p91",
-          "type": "narrative",
+          "type": "thought",
           "sentences": [
             {
               "id": "alice-ch9-p91-s1",
@@ -8607,7 +8607,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p2",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p2-s1",
@@ -8617,7 +8617,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p3",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p3-s1",
@@ -8649,7 +8649,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p5",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p5-s1",
@@ -8663,7 +8663,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p6",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p6-s1",
@@ -8673,7 +8673,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p7",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p7-s1",
@@ -8683,7 +8683,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p8",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p8-s1",
@@ -8693,7 +8693,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p9",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p9-s1",
@@ -8703,7 +8703,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p10",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p10-s1",
@@ -8713,7 +8713,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p11",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p11-s1",
@@ -8723,7 +8723,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p12",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p12-s1",
@@ -8733,7 +8733,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p13",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p13-s1",
@@ -8743,7 +8743,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p14",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p14-s1",
@@ -8753,7 +8753,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p15",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p15-s1",
@@ -8763,7 +8763,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p16",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p16-s1",
@@ -8773,7 +8773,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p17",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p17-s1",
@@ -8783,7 +8783,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p18",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p18-s1",
@@ -8793,7 +8793,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p19",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p19-s1",
@@ -8803,7 +8803,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p20",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p20-s1",
@@ -8813,7 +8813,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p21",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p21-s1",
@@ -8831,7 +8831,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p22",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p22-s1",
@@ -8855,7 +8855,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p24",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p24-s1",
@@ -8885,7 +8885,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p25",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p25-s1",
@@ -8907,7 +8907,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p26",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p26-s1",
@@ -8933,7 +8933,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p27",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p27-s1",
@@ -8943,7 +8943,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p28",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p28-s1",
@@ -8953,7 +8953,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p29",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p29-s1",
@@ -8963,7 +8963,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p30",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p30-s1",
@@ -8973,7 +8973,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p31",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p31-s1",
@@ -8987,7 +8987,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p32",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p32-s1",
@@ -9005,7 +9005,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p33",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p33-s1",
@@ -9035,7 +9035,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p34",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p34-s1",
@@ -9049,7 +9049,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p35",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p35-s1",
@@ -9063,7 +9063,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p36",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p36-s1",
@@ -9077,7 +9077,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p37",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p37-s1",
@@ -9101,7 +9101,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p39",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p39-s1",
@@ -9129,7 +9129,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p41",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p41-s1",
@@ -9143,7 +9143,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p42",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p42-s1",
@@ -9157,7 +9157,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p43",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p43-s1",
@@ -9190,7 +9190,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p45",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p45-s1",
@@ -9200,7 +9200,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p46",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p46-s1",
@@ -9210,7 +9210,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p47",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p47-s1",
@@ -9220,7 +9220,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p48",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p48-s1",
@@ -9230,7 +9230,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p49",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p49-s1",
@@ -9244,7 +9244,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p50",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p50-s1",
@@ -9254,7 +9254,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p51",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p51-s1",
@@ -9264,7 +9264,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p52",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p52-s1",
@@ -9296,7 +9296,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p54",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p54-s1",
@@ -9306,7 +9306,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p55",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p55-s1",
@@ -9328,7 +9328,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p56",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p56-s1",
@@ -9338,7 +9338,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p57",
-          "type": "narrative",
+          "type": "thought",
           "sentences": [
             {
               "id": "alice-ch10-p57-s1",
@@ -9413,7 +9413,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p60",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p60-s1",
@@ -9423,7 +9423,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p61",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p61-s1",
@@ -9443,7 +9443,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p63",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p63-s1",
@@ -9453,7 +9453,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p64",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p64-s1",
@@ -9467,7 +9467,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p65",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p65-s1",
@@ -9481,7 +9481,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p66",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p66-s1",
@@ -9495,7 +9495,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p67",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p67-s1",
@@ -9576,7 +9576,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p71",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p71-s1",
@@ -9590,7 +9590,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p72",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p72-s1",
@@ -9600,7 +9600,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p73",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p73-s1",
@@ -9614,7 +9614,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p74",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p74-s1",
@@ -9743,7 +9743,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p78",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p78-s1",
@@ -9753,7 +9753,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p79",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p79-s1",
@@ -9763,7 +9763,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch10-p80",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch10-p80-s1",
@@ -9844,7 +9844,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p4",
-          "type": "narrative",
+          "type": "thought",
           "sentences": [
             {
               "id": "alice-ch11-p4-s1",
@@ -9884,7 +9884,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p6",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch11-p6-s1",
@@ -9954,7 +9954,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p10",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch11-p10-s1",
@@ -10002,7 +10002,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p13",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch11-p13-s1",
@@ -10012,7 +10012,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p14",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch11-p14-s1",
@@ -10026,7 +10026,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p15",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch11-p15-s1",
@@ -10054,7 +10054,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p17",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch11-p17-s1",
@@ -10082,7 +10082,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p19",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch11-p19-s1",
@@ -10092,7 +10092,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p20",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch11-p20-s1",
@@ -10102,7 +10102,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p21",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch11-p21-s1",
@@ -10112,7 +10112,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p22",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch11-p22-s1",
@@ -10122,7 +10122,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p23",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch11-p23-s1",
@@ -10132,7 +10132,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p24",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch11-p24-s1",
@@ -10146,7 +10146,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p25",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch11-p25-s1",
@@ -10170,7 +10170,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p27",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch11-p27-s1",
@@ -10200,7 +10200,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p30",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch11-p30-s1",
@@ -10214,7 +10214,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p31",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch11-p31-s1",
@@ -10224,7 +10224,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p32",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch11-p32-s1",
@@ -10234,7 +10234,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p33",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch11-p33-s1",
@@ -10244,7 +10244,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p34",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch11-p34-s1",
@@ -10268,7 +10268,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p36",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch11-p36-s1",
@@ -10278,7 +10278,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p37",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch11-p37-s1",
@@ -10288,7 +10288,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p38",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch11-p38-s1",
@@ -10302,7 +10302,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p39",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch11-p39-s1",
@@ -10312,7 +10312,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p40",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch11-p40-s1",
@@ -10330,7 +10330,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p41",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch11-p41-s1",
@@ -10340,7 +10340,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p42",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch11-p42-s1",
@@ -10350,7 +10350,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p43",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch11-p43-s1",
@@ -10360,7 +10360,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p44",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch11-p44-s1",
@@ -10370,7 +10370,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p45",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch11-p45-s1",
@@ -10380,7 +10380,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p46",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch11-p46-s1",
@@ -10390,7 +10390,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p47",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch11-p47-s1",
@@ -10400,7 +10400,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p48",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch11-p48-s1",
@@ -10410,7 +10410,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p49",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch11-p49-s1",
@@ -10420,7 +10420,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p50",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch11-p50-s1",
@@ -10444,7 +10444,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p52",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch11-p52-s1",
@@ -10472,7 +10472,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p54",
-          "type": "narrative",
+          "type": "thought",
           "sentences": [
             {
               "id": "alice-ch11-p54-s1",
@@ -10486,7 +10486,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p55",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch11-p55-s1",
@@ -10496,7 +10496,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p56",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch11-p56-s1",
@@ -10506,7 +10506,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p57",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch11-p57-s1",
@@ -10526,7 +10526,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p59",
-          "type": "narrative",
+          "type": "thought",
           "sentences": [
             {
               "id": "alice-ch11-p59-s1",
@@ -10540,7 +10540,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p60",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch11-p60-s1",
@@ -10550,7 +10550,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p61",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch11-p61-s1",
@@ -10560,7 +10560,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p62",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch11-p62-s1",
@@ -10570,7 +10570,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p63",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch11-p63-s1",
@@ -10594,7 +10594,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p65",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch11-p65-s1",
@@ -10604,7 +10604,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p66",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch11-p66-s1",
@@ -10624,7 +10624,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p68",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch11-p68-s1",
@@ -10634,7 +10634,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p69",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch11-p69-s1",
@@ -10644,7 +10644,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p70",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch11-p70-s1",
@@ -10654,7 +10654,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p71",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch11-p71-s1",
@@ -10694,7 +10694,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch11-p73",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch11-p73-s1",
@@ -10737,7 +10737,7 @@ export const aliceInWonderlandBook: ReaderBook = {
       "paragraphs": [
         {
           "id": "alice-ch12-p1",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch12-p1-s1",
@@ -10747,7 +10747,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch12-p2",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch12-p2-s1",
@@ -10757,7 +10757,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch12-p3",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch12-p3-s1",
@@ -10791,7 +10791,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch12-p6",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch12-p6-s1",
@@ -10801,7 +10801,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch12-p7",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch12-p7-s1",
@@ -10811,7 +10811,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch12-p8",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch12-p8-s1",
@@ -10825,7 +10825,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch12-p9",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch12-p9-s1",
@@ -10835,7 +10835,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch12-p10",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch12-p10-s1",
@@ -10849,7 +10849,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch12-p11",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch12-p11-s1",
@@ -10859,7 +10859,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch12-p12",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch12-p12-s1",
@@ -10907,7 +10907,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch12-p16",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch12-p16-s1",
@@ -10917,7 +10917,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch12-p17",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch12-p17-s1",
@@ -10927,7 +10927,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch12-p18",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch12-p18-s1",
@@ -10937,7 +10937,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch12-p19",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch12-p19-s1",
@@ -10947,7 +10947,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch12-p20",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch12-p20-s1",
@@ -10957,7 +10957,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch12-p21",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch12-p21-s1",
@@ -10981,7 +10981,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch12-p23",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch12-p23-s1",
@@ -10991,7 +10991,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch12-p24",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch12-p24-s1",
@@ -11001,7 +11001,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch12-p25",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch12-p25-s1",
@@ -11011,7 +11011,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch12-p26",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch12-p26-s1",
@@ -11021,7 +11021,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch12-p27",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch12-p27-s1",
@@ -11031,7 +11031,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch12-p28",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch12-p28-s1",
@@ -11045,7 +11045,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch12-p29",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch12-p29-s1",
@@ -11055,7 +11055,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch12-p30",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch12-p30-s1",
@@ -11069,7 +11069,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch12-p31",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch12-p31-s1",
@@ -11083,7 +11083,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch12-p32",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch12-p32-s1",
@@ -11093,7 +11093,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch12-p33",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch12-p33-s1",
@@ -11117,7 +11117,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch12-p35",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch12-p35-s1",
@@ -11127,7 +11127,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch12-p36",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch12-p36-s1",
@@ -11141,7 +11141,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch12-p37",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch12-p37-s1",
@@ -11165,7 +11165,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch12-p39",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch12-p39-s1",
@@ -11353,7 +11353,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch12-p47",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch12-p47-s1",
@@ -11363,7 +11363,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch12-p48",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch12-p48-s1",
@@ -11387,7 +11387,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch12-p50",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch12-p50-s1",
@@ -11423,7 +11423,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch12-p52",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch12-p52-s1",
@@ -11433,7 +11433,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch12-p53",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch12-p53-s1",
@@ -11443,7 +11443,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch12-p54",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch12-p54-s1",
@@ -11461,7 +11461,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch12-p55",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch12-p55-s1",
@@ -11475,7 +11475,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch12-p56",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch12-p56-s1",
@@ -11489,7 +11489,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch12-p57",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch12-p57-s1",
@@ -11499,7 +11499,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch12-p58",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch12-p58-s1",
@@ -11531,7 +11531,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch12-p60",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch12-p60-s1",
@@ -11541,7 +11541,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch12-p61",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch12-p61-s1",
@@ -11551,7 +11551,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch12-p62",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch12-p62-s1",
@@ -11565,7 +11565,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch12-p63",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch12-p63-s1",
@@ -11589,7 +11589,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch12-p65",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch12-p65-s1",
@@ -11599,7 +11599,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch12-p66",
-          "type": "narrative",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch12-p66-s1",
@@ -11665,77 +11665,13 @@ export const aliceInWonderlandBook: ReaderBook = {
     }
   ]
 };
-export const aliceInWonderlandChapterStats = [
-  {
-    "chapterId": "chapter-1",
-    "paragraphs": 30,
-    "sentences": 79,
-    "wordCount": 2143
-  },
-  {
-    "chapterId": "chapter-2",
-    "paragraphs": 26,
-    "sentences": 104,
-    "wordCount": 2111
-  },
-  {
-    "chapterId": "chapter-3",
-    "paragraphs": 48,
-    "sentences": 99,
-    "wordCount": 1697
-  },
-  {
-    "chapterId": "chapter-4",
-    "paragraphs": 42,
-    "sentences": 132,
-    "wordCount": 2648
-  },
-  {
-    "chapterId": "chapter-5",
-    "paragraphs": 78,
-    "sentences": 142,
-    "wordCount": 2169
-  },
-  {
-    "chapterId": "chapter-6",
-    "paragraphs": 80,
-    "sentences": 148,
-    "wordCount": 2594
-  },
-  {
-    "chapterId": "chapter-7",
-    "paragraphs": 105,
-    "sentences": 162,
-    "wordCount": 2293
-  },
-  {
-    "chapterId": "chapter-8",
-    "paragraphs": 71,
-    "sentences": 120,
-    "wordCount": 2488
-  },
-  {
-    "chapterId": "chapter-9",
-    "paragraphs": 92,
-    "sentences": 142,
-    "wordCount": 2286
-  },
-  {
-    "chapterId": "chapter-10",
-    "paragraphs": 81,
-    "sentences": 166,
-    "wordCount": 2048
-  },
-  {
-    "chapterId": "chapter-11",
-    "paragraphs": 74,
-    "sentences": 118,
-    "wordCount": 1878
-  },
-  {
-    "chapterId": "chapter-12",
-    "paragraphs": 71,
-    "sentences": 115,
-    "wordCount": 2119
-  }
-] as const;
+
+export const aliceInWonderlandChapters = aliceInWonderlandBook.chapters;
+export const aliceInWonderlandChapterOne = aliceInWonderlandBook.chapters[0];
+export const aliceInWonderlandChapterOneText = aliceInWonderlandChapterOne.paragraphs
+  .map((paragraph) => paragraph.sentences.map((sentence) => sentence.text).join(" "))
+  .join("\n\n");
+export const aliceInWonderlandChapterTwo = aliceInWonderlandBook.chapters[1];
+export const aliceInWonderlandChapterTwoText = aliceInWonderlandChapterTwo.paragraphs
+  .map((paragraph) => paragraph.sentences.map((sentence) => sentence.text).join(" "))
+  .join("\n\n");

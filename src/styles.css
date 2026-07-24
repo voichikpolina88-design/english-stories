@@ -2415,6 +2415,10 @@ p {
   background: rgba(37, 99, 235, 0.09);
 }
 
+.reader-emphasis-word {
+  font-style: italic;
+}
+
 .reader-word small {
   color: var(--purple);
   font-family: Inter, system-ui, sans-serif;
