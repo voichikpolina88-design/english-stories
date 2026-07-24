@@ -21,6 +21,11 @@ type LexicalEntry = {
   isProperNoun?: boolean;
 };
 
+type PhraseContext = {
+  phrase: string;
+  phraseTranslation: string;
+};
+
 type BuildWordsOptions = {
   sentence: ReaderSentence;
   paragraphId: string;
@@ -817,12 +822,78 @@ const contextualOverrides: Record<string, Record<string, string>> = {
   watch: { "alice-ch1-p3-s4": "часы" },
 };
 
+const phraseOverrides: Record<string, Record<string, PhraseContext>> = {
+  tired: {
+    "alice-ch1-p1-s1": {
+      phrase: "get tired of",
+      phraseTranslation: "устать от / надоесть",
+    },
+  },
+  looked: {
+    "alice-ch1-p3-s4": {
+      phrase: "look at",
+      phraseTranslation: "посмотреть на",
+    },
+    "alice-ch1-p6-s2": {
+      phrase: "look at",
+      phraseTranslation: "посмотреть на",
+    },
+  },
+  ran: {
+    "alice-ch1-p3-s4": {
+      phrase: "run across",
+      phraseTranslation: "перебежать через",
+    },
+  },
+  pop: {
+    "alice-ch1-p3-s4": {
+      phrase: "pop down",
+      phraseTranslation: "юркнуть вниз",
+    },
+  },
+  fall: {
+    "alice-ch1-p9-s2": {
+      phrase: "fall through",
+      phraseTranslation: "провалиться сквозь",
+    },
+  },
+  thought: {
+    "alice-ch1-p1-s1": {
+      phrase: "think to herself",
+      phraseTranslation: "подумать про себя",
+    },
+    "alice-ch1-p7-s1": {
+      phrase: "think to herself",
+      phraseTranslation: "подумать про себя",
+    },
+  },
+  shutting: {
+    "alice-ch1-p21-s1": {
+      phrase: "shut up like a telescope",
+      phraseTranslation: "складываться / сжиматься, как телескоп",
+    },
+  },
+  ventured: {
+    "alice-ch1-p17-s1": {
+      phrase: "venture to taste",
+      phraseTranslation: "решиться попробовать",
+    },
+  },
+  make: {
+    "alice-ch1-p6-s2": {
+      phrase: "make out",
+      phraseTranslation: "разобрать / понять",
+    },
+  },
+};
+
 export function buildAliceChapterOneSentenceWords({ sentence, paragraphId, chapterId }: BuildWordsOptions): ReaderWord[] {
   return sentence.text.split(/\s+/).filter(Boolean).map((text, index) => {
     const normalized = normalizeReaderToken(text);
     const isPunctuation = normalized.length === 0;
     const lexical = isPunctuation ? punctuationEntry() : getLexicalEntry(normalized);
     const contextualTranslation = normalized ? contextualOverrides[normalized]?.[sentence.id] : undefined;
+    const phraseContext = normalized ? phraseOverrides[normalized]?.[sentence.id] : undefined;
 
     return {
       id: `${sentence.id}-w${index + 1}`,
@@ -832,6 +903,8 @@ export function buildAliceChapterOneSentenceWords({ sentence, paragraphId, chapt
       translation: contextualTranslation ?? lexical.translation,
       contextualTranslation,
       commonTranslations: lexical.commonTranslations,
+      phrase: phraseContext?.phrase,
+      phraseTranslation: phraseContext?.phraseTranslation,
       transcription: lexical.transcription,
       partOfSpeech: lexical.partOfSpeech,
       sentenceId: sentence.id,

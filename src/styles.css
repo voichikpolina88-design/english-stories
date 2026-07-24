@@ -2415,6 +2415,14 @@ p {
   background: rgba(37, 99, 235, 0.09);
 }
 
+.reader-punctuation-word {
+  cursor: text;
+}
+
+.reader-punctuation-word:hover {
+  background: transparent;
+}
+
 .reader-emphasis-word {
   font-style: italic;
 }
@@ -2431,6 +2439,14 @@ p {
   color: var(--muted);
   font-size: 0.78rem;
   text-transform: lowercase;
+}
+
+.word-popover-phrase {
+  color: var(--ink);
+  display: block;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  margin-top: 0.35rem;
 }
 
 .word-popover-actions {

@@ -134,6 +134,8 @@ export type ReaderWord = {
   translation?: string;
   contextualTranslation?: string;
   commonTranslations?: string[];
+  phrase?: string;
+  phraseTranslation?: string;
   transcription?: string;
   partOfSpeech?: string;
   audioSrc?: string;

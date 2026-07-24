@@ -2166,13 +2166,20 @@ function ReaderWordView({
 
   return (
     <span
-      className={readerWordHasEmphasis(word) ? "reader-word reader-emphasis-word" : "reader-word"}
+      className={[
+        "reader-word",
+        readerWordHasEmphasis(word) ? "reader-emphasis-word" : "",
+        isInteractiveWord ? "" : "reader-punctuation-word",
+      ]
+        .filter(Boolean)
+        .join(" ")}
       data-word-id={word.id}
       role={isInteractiveWord ? "button" : undefined}
       tabIndex={isInteractiveWord ? 0 : undefined}
       onClick={(event) => {
+        if (!isInteractiveWord) return;
         event.stopPropagation();
-        if (isInteractiveWord) onSelect(word);
+        onSelect(word);
       }}
       onKeyDown={(event) => {
         if (isInteractiveWord && (event.key === "Enter" || event.key === " ")) {
@@ -2214,6 +2221,8 @@ type SavedReaderWord = {
   lexicalEntryId: string;
   word: string;
   translation: string;
+  phrase?: string;
+  phraseTranslation?: string;
   transcription?: string;
   partOfSpeech?: string;
   sentenceText: string;
@@ -2243,6 +2252,8 @@ function ReaderWordPopover({
       lexicalEntryId,
       word: cleanWord,
       translation: word.translation ?? "",
+      phrase: word.phrase,
+      phraseTranslation: word.phraseTranslation,
       transcription: word.transcription,
       partOfSpeech: word.partOfSpeech,
       sentenceText: word.sentenceText,
@@ -2259,16 +2270,22 @@ function ReaderWordPopover({
       <button className="popover-close" type="button" aria-label="Закрыть перевод" onClick={onClose}>×</button>
       <strong>{cleanWord}</strong>
       {word.transcription ? <span>{word.transcription}</span> : null}
+      {word.lemma ? <span className="word-popover-meta">lemma: {word.lemma}</span> : null}
       {word.partOfSpeech ? <span className="word-popover-meta">{word.partOfSpeech}</span> : null}
       <p>{word.contextualTranslation ?? word.translation ?? "Перевод слова будет подключён на следующем этапе."}</p>
       {word.commonTranslations?.length ? <small>Также: {word.commonTranslations.slice(0, 2).join(", ")}</small> : null}
+      {word.phrase && word.phraseTranslation ? (
+        <small className="word-popover-phrase">
+          {word.phrase}: {word.phraseTranslation}
+        </small>
+      ) : null}
       <div className="word-popover-actions">
         <button type="button" onClick={() => onSpeak(cleanWord)} aria-label={`Прослушать ${cleanWord}`}>
           <Volume2 size={14} aria-hidden="true" />
           Audio
         </button>
         <button type="button" onClick={toggleSavedWord}>
-          {isSaved ? "Удалить из словаря" : "Добавить в словарь"}
+          {isSaved ? "✓ В словаре" : "+ В словарь"}
         </button>
       </div>
     </aside>
