@@ -1443,6 +1443,7 @@ function ReaderPreview({
   const ghostClickUntilRef = useRef(0);
   const visibleWordIdBeforeRepaginate = useRef<string | null>(null);
   const restoredPositionKeyRef = useRef<string | null>(null);
+  const titleReserveHeightRef = useRef(0);
   const readerBook = useMemo(() => getReaderBook(book.id), [book.id]);
   const [activeChapterId, setActiveChapterId] = useState(() => {
     const savedChapterId = readReaderPosition(book.id)?.chapterId;
@@ -1505,13 +1506,26 @@ function ReaderPreview({
       const page = readingPageRef.current;
       const textFrame = readingTextFrameRef.current;
       if (!page || !textFrame) return;
+      const pageStyles = window.getComputedStyle(page);
+      const paddingTop = parseFloat(pageStyles.paddingTop) || 0;
+      const paddingBottom = parseFloat(pageStyles.paddingBottom) || 0;
       const frameRect = textFrame.getBoundingClientRect();
+      const contentHeight = Math.max(1, Math.floor(page.clientHeight - paddingTop - paddingBottom));
+      const titleReserve = Math.max(0, contentHeight - Math.floor(frameRect.height));
+      if (currentPageIndex === 0 || titleReserve > 0) {
+        titleReserveHeightRef.current = titleReserve;
+      }
       const nextSize = {
         width: Math.max(1, Math.floor(frameRect.width)),
-        height: Math.max(1, Math.floor(frameRect.height)),
+        height: contentHeight,
+        firstPageHeight: Math.max(1, contentHeight - titleReserveHeightRef.current),
       };
       setPageSize((current) => {
-        if (current.width === nextSize.width && current.height === nextSize.height) return current;
+        if (
+          current.width === nextSize.width &&
+          current.height === nextSize.height &&
+          current.firstPageHeight === nextSize.firstPageHeight
+        ) return current;
         return nextSize;
       });
     }
@@ -1526,7 +1540,7 @@ function ReaderPreview({
       observer.disconnect();
       window.removeEventListener("resize", measurePage);
     };
-  }, []);
+  }, [currentPageIndex]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {

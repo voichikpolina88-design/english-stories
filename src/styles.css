@@ -3110,7 +3110,7 @@ blockquote {
   }
 
   .structured-text {
-    font-size: min(var(--reader-font-size), 22px);
+    font-size: var(--reader-font-size);
     line-height: var(--reader-line-height);
   }
 

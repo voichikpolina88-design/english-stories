@@ -21,9 +21,10 @@ export type ReaderPage = {
 type PaginationSize = {
   width: number;
   height: number;
+  firstPageHeight: number;
 };
 
-const EMPTY_SIZE: PaginationSize = { width: 0, height: 0 };
+const EMPTY_SIZE: PaginationSize = { width: 0, height: 0, firstPageHeight: 0 };
 
 export function flattenChapterWords(chapter: ReaderChapter): ReaderPageWord[] {
   const words: ReaderPageWord[] = [];
@@ -74,7 +75,7 @@ export function useReaderPagination({
   const [isPaginating, setIsPaginating] = useState(true);
 
   useEffect(() => {
-    if (size.width <= 0 || size.height <= 0 || words.length === 0) {
+    if (size.width <= 0 || size.height <= 0 || size.firstPageHeight <= 0 || words.length === 0) {
       setPages([]);
       setIsPaginating(true);
       return;
@@ -83,10 +84,17 @@ export function useReaderPagination({
     let cancelled = false;
     setIsPaginating(true);
 
-    window.requestAnimationFrame(() => {
+    window.requestAnimationFrame(async () => {
+      if ("fonts" in document) {
+        await document.fonts.ready;
+      }
+
+      if (cancelled) return;
+
       const nextPages = paginateChapterContent({
         chapter,
         fontFamily,
+        firstPageHeight: Math.max(1, size.firstPageHeight),
         pageHeight: Math.max(1, size.height),
         pageWidth: size.width,
         settings,
@@ -113,6 +121,7 @@ export function useReaderPagination({
     settings.textSize,
     settings.textWidth,
     size.height,
+    size.firstPageHeight,
     size.width,
     words,
   ]);
@@ -123,6 +132,7 @@ export function useReaderPagination({
 function paginateChapterContent({
   chapter,
   fontFamily,
+  firstPageHeight,
   pageHeight,
   pageWidth,
   settings,
@@ -130,6 +140,7 @@ function paginateChapterContent({
 }: {
   chapter: ReaderChapter;
   fontFamily: string;
+  firstPageHeight: number;
   pageHeight: number;
   pageWidth: number;
   settings: ReadingSettings;
@@ -177,8 +188,9 @@ function paginateChapterContent({
   let pageTop = measuredWords[0]?.top ?? 0;
 
   measuredWords.forEach((measuredWord, index) => {
+    const currentPageHeight = pages.length === 0 ? firstPageHeight : pageHeight;
     const wordBottom = measuredWord.bottom;
-    const doesNotFit = index > pageStartWordIndex && wordBottom - pageTop > pageHeight;
+    const doesNotFit = index > pageStartWordIndex && wordBottom - pageTop > currentPageHeight;
 
     if (doesNotFit) {
       pages.push(createPage(words, pageStartWordIndex, index));
@@ -221,6 +233,12 @@ function appendSentenceMeasure(sentence: ReaderSentence, paragraphId: string, pa
   const audioPlaceholder = document.createElement("span");
   audioPlaceholder.className = "sentence-audio-button measure-audio-placeholder";
   sentenceNode.appendChild(audioPlaceholder);
+  if (settings.showSentenceTranslation && sentence.translation) {
+    const translationPlaceholder = document.createElement("span");
+    translationPlaceholder.className = "sentence-translation-trigger measure-translation-placeholder";
+    translationPlaceholder.textContent = "RU";
+    sentenceNode.appendChild(translationPlaceholder);
+  }
   paragraphNode.appendChild(sentenceNode);
 }
 
