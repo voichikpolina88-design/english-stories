@@ -2064,7 +2064,7 @@ function ReaderPageView({
   return (
     <div className="structured-text">
       {paragraphs.map((paragraph) => (
-        <p className="reader-paragraph" key={paragraph.paragraphId}>
+        <p className={readerParagraphClassName(paragraph.paragraphType)} key={paragraph.paragraphId}>
           {paragraph.sentences.map((sentence) => (
             <ReaderSentenceView
               key={`${paragraph.paragraphId}-${sentence.sentenceId}`}
@@ -2215,12 +2215,16 @@ function ReaderSentencePopover({ sentence, onClose }: { sentence: ReaderPageWord
 }
 
 function groupPageWords(words: ReaderPageWord[]) {
-  const paragraphs: Array<{ paragraphId: string; sentences: Array<{ sentenceId: string; words: ReaderPageWord[] }> }> = [];
+  const paragraphs: Array<{
+    paragraphId: string;
+    paragraphType?: ReaderPageWord["paragraphType"];
+    sentences: Array<{ sentenceId: string; words: ReaderPageWord[] }>;
+  }> = [];
 
   words.forEach((word) => {
     let paragraph = paragraphs.find((item) => item.paragraphId === word.paragraphId);
     if (!paragraph) {
-      paragraph = { paragraphId: word.paragraphId, sentences: [] };
+      paragraph = { paragraphId: word.paragraphId, paragraphType: word.paragraphType, sentences: [] };
       paragraphs.push(paragraph);
     }
 
@@ -2234,6 +2238,13 @@ function groupPageWords(words: ReaderPageWord[]) {
   });
 
   return paragraphs;
+}
+
+function readerParagraphClassName(type?: ReaderPageWord["paragraphType"]) {
+  if (type === "poem") return "reader-paragraph reader-poem";
+  if (type === "dialogue") return "reader-paragraph reader-dialogue";
+  if (type === "thought") return "reader-paragraph reader-thought";
+  return "reader-paragraph";
 }
 
 function createFallbackChapter(book: HomeShelfBook): ReaderChapter {

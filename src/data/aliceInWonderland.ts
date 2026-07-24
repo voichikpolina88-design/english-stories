@@ -43,8 +43,8 @@ export const aliceInWonderlandBook: ReaderBook = {
           ]
         },
         {
-          "id": "alice-ch1-p3",
-          "type": "paragraph",
+          "id": "alice-ch1-p3-1",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch1-p3-s1",
@@ -63,7 +63,13 @@ export const aliceInWonderlandBook: ReaderBook = {
               "text": "I shall be late!”",
               "translation": "Я опоздаю!»",
               "words": []
-            },
+            }
+          ]
+        },
+        {
+          "id": "alice-ch1-p3-2",
+          "type": "paragraph",
+          "sentences": [
             {
               "id": "alice-ch1-p3-s4",
               "text": "(when she thought it over afterwards, it occurred to her that she ought to have wondered at this, but at the time it all seemed quite natural); but when the Rabbit actually _took a watch out of its waistcoat-pocket_, and looked at it, and then hurried on, Alice started to her feet, for it flashed across her mind that she had never before seen a rabbit with either a waistcoat-pocket, or a watch to take out of it, and burning with curiosity, she ran across the field after it, and fortunately was just in time to see it pop down a large rabbit-hole under the hedge.",
@@ -122,7 +128,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch1-p7",
-          "type": "paragraph",
+          "type": "thought",
           "sentences": [
             {
               "id": "alice-ch1-p7-s1",
@@ -151,7 +157,7 @@ export const aliceInWonderlandBook: ReaderBook = {
           ]
         },
         {
-          "id": "alice-ch1-p8",
+          "id": "alice-ch1-p8-1",
           "type": "paragraph",
           "sentences": [
             {
@@ -165,7 +171,13 @@ export const aliceInWonderlandBook: ReaderBook = {
               "text": "Would the fall _never_ come to an end?",
               "translation": "Неужели это падение _никогда_ не закончится?",
               "words": []
-            },
+            }
+          ]
+        },
+        {
+          "id": "alice-ch1-p8-2",
+          "type": "thought",
+          "sentences": [
             {
               "id": "alice-ch1-p8-s3",
               "text": "“I wonder how many miles I’ve fallen by this time?” she said aloud.",
@@ -183,7 +195,13 @@ export const aliceInWonderlandBook: ReaderBook = {
               "text": "Let me see: that would be four thousand miles down, I think—” (for, you see, Alice had learnt several things of this sort in her lessons in the schoolroom, and though this was not a _very_ good opportunity for showing off her knowledge, as there was no one to listen to her, still it was good practice to say it over) “—yes, that’s about the right distance—but then I wonder what Latitude or Longitude I’ve got to?”",
               "translation": "Посмотрим: это, кажется, около четырёх тысяч миль вниз...» (видите ли, Алиса выучила на уроках в классной комнате несколько таких вещей, и хотя это была не _очень_ удачная возможность показать свои знания, ведь слушать её было некому, всё же произнести это вслух было хорошей практикой) «...да, примерно такое расстояние и должно быть, но интересно, на какой я теперь широте или долготе?»",
               "words": []
-            },
+            }
+          ]
+        },
+        {
+          "id": "alice-ch1-p8-3",
+          "type": "paragraph",
+          "sentences": [
             {
               "id": "alice-ch1-p8-s6",
               "text": "(Alice had no idea what Latitude was, or Longitude either, but thought they were nice grand words to say.)",
@@ -193,7 +211,7 @@ export const aliceInWonderlandBook: ReaderBook = {
           ]
         },
         {
-          "id": "alice-ch1-p9",
+          "id": "alice-ch1-p9-1",
           "type": "paragraph",
           "sentences": [
             {
@@ -201,7 +219,13 @@ export const aliceInWonderlandBook: ReaderBook = {
               "text": "Presently she began again.",
               "translation": "Вскоре она снова заговорила.",
               "words": []
-            },
+            }
+          ]
+        },
+        {
+          "id": "alice-ch1-p9-2",
+          "type": "thought",
+          "sentences": [
             {
               "id": "alice-ch1-p9-s2",
               "text": "“I wonder if I shall fall right _through_ the earth!",
@@ -225,7 +249,13 @@ export const aliceInWonderlandBook: ReaderBook = {
               "text": "Please, Ma’am, is this New Zealand or Australia?”",
               "translation": "Скажите, сударыня, это Новая Зеландия или Австралия?»",
               "words": []
-            },
+            }
+          ]
+        },
+        {
+          "id": "alice-ch1-p9-3",
+          "type": "paragraph",
+          "sentences": [
             {
               "id": "alice-ch1-p9-s6",
               "text": "(and she tried to curtsey as she spoke—fancy _curtseying_ as you’re falling through the air!",
@@ -237,7 +267,13 @@ export const aliceInWonderlandBook: ReaderBook = {
               "text": "Do you think you could manage it?)",
               "translation": "Как вы думаете, у вас получилось бы?)",
               "words": []
-            },
+            }
+          ]
+        },
+        {
+          "id": "alice-ch1-p9-4",
+          "type": "thought",
+          "sentences": [
             {
               "id": "alice-ch1-p9-s8",
               "text": "“And what an ignorant little girl she’ll think me for asking!",
@@ -253,7 +289,7 @@ export const aliceInWonderlandBook: ReaderBook = {
           ]
         },
         {
-          "id": "alice-ch1-p10",
+          "id": "alice-ch1-p10-1",
           "type": "paragraph",
           "sentences": [
             {
@@ -267,19 +303,37 @@ export const aliceInWonderlandBook: ReaderBook = {
               "text": "There was nothing else to do, so Alice soon began talking again.",
               "translation": "Делать больше было нечего, и Алиса вскоре снова принялась разговаривать.",
               "words": []
-            },
+            }
+          ]
+        },
+        {
+          "id": "alice-ch1-p10-2",
+          "type": "thought",
+          "sentences": [
             {
               "id": "alice-ch1-p10-s3",
               "text": "“Dinah’ll miss me very much to-night, I should think!”",
               "translation": "«Дина сегодня вечером будет очень по мне скучать, я думаю!»",
               "words": []
-            },
+            }
+          ]
+        },
+        {
+          "id": "alice-ch1-p10-3",
+          "type": "paragraph",
+          "sentences": [
             {
               "id": "alice-ch1-p10-s4",
               "text": "(Dinah was the cat.)",
               "translation": "(Дина была кошкой.)",
               "words": []
-            },
+            }
+          ]
+        },
+        {
+          "id": "alice-ch1-p10-4",
+          "type": "thought",
+          "sentences": [
             {
               "id": "alice-ch1-p10-s5",
               "text": "“I hope they’ll remember her saucer of milk at tea-time.",
@@ -309,7 +363,13 @@ export const aliceInWonderlandBook: ReaderBook = {
               "text": "But do cats eat bats, I wonder?”",
               "translation": "Но едят ли кошки летучих мышей, интересно?»",
               "words": []
-            },
+            }
+          ]
+        },
+        {
+          "id": "alice-ch1-p10-5",
+          "type": "thought",
+          "sentences": [
             {
               "id": "alice-ch1-p10-s10",
               "text": "And here Alice began to get rather sleepy, and went on saying to herself, in a dreamy sort of way, “Do cats eat bats?",
@@ -321,7 +381,13 @@ export const aliceInWonderlandBook: ReaderBook = {
               "text": "Do cats eat bats?” and sometimes, “Do bats eat cats?” for, you see, as she couldn’t answer either question, it didn’t much matter which way she put it.",
               "translation": "Едят ли кошки летучих мышей?» — а иногда: «Едят ли летучие мыши кошек?» — потому что, видите ли, раз она не могла ответить ни на один из вопросов, было уже не так важно, в каком порядке их задавать.",
               "words": []
-            },
+            }
+          ]
+        },
+        {
+          "id": "alice-ch1-p10-6",
+          "type": "paragraph",
+          "sentences": [
             {
               "id": "alice-ch1-p10-s12",
               "text": "She felt that she was dozing off, and had just begun to dream that she was walking hand in hand with Dinah, and saying to her very earnestly, “Now, Dinah, tell me the truth: did you ever eat a bat?” when suddenly, thump! thump! down she came upon a heap of sticks and dry leaves, and the fall was over.",
@@ -331,7 +397,7 @@ export const aliceInWonderlandBook: ReaderBook = {
           ]
         },
         {
-          "id": "alice-ch1-p11",
+          "id": "alice-ch1-p11-1",
           "type": "paragraph",
           "sentences": [
             {
@@ -339,13 +405,25 @@ export const aliceInWonderlandBook: ReaderBook = {
               "text": "Alice was not a bit hurt, and she jumped up on to her feet in a moment: she looked up, but it was all dark overhead; before her was another long passage, and the White Rabbit was still in sight, hurrying down it.",
               "translation": "Алиса нисколько не ушиблась и в тот же миг вскочила на ноги: она посмотрела вверх, но над головой была сплошная темнота; перед ней тянулся ещё один длинный проход, и Белый Кролик всё ещё был виден, торопливо убегая по нему.",
               "words": []
-            },
+            }
+          ]
+        },
+        {
+          "id": "alice-ch1-p11-2",
+          "type": "dialogue",
+          "sentences": [
             {
               "id": "alice-ch1-p11-s2",
               "text": "There was not a moment to be lost: away went Alice like the wind, and was just in time to hear it say, as it turned a corner, “Oh my ears and whiskers, how late it’s getting!”",
               "translation": "Нельзя было терять ни минуты: Алиса помчалась как ветер и как раз успела услышать, как он, сворачивая за угол, сказал: «Ах, мои ушки и усики, как же поздно становится!»",
               "words": []
-            },
+            }
+          ]
+        },
+        {
+          "id": "alice-ch1-p11-3",
+          "type": "paragraph",
+          "sentences": [
             {
               "id": "alice-ch1-p11-s3",
               "text": "She was close behind it when she turned the corner, but the Rabbit was no longer to be seen: she found herself in a long, low hall, which was lit up by a row of lamps hanging from the roof.",
@@ -433,7 +511,7 @@ export const aliceInWonderlandBook: ReaderBook = {
           ]
         },
         {
-          "id": "alice-ch1-p16",
+          "id": "alice-ch1-p16-1",
           "type": "paragraph",
           "sentences": [
             {
@@ -441,7 +519,13 @@ export const aliceInWonderlandBook: ReaderBook = {
               "text": "It was all very well to say “Drink me,” but the wise little Alice was not going to do _that_ in a hurry.",
               "translation": "Сказать «Выпей меня» было, конечно, легко, но разумная маленькая Алиса не собиралась делать _это_ впопыхах.",
               "words": []
-            },
+            }
+          ]
+        },
+        {
+          "id": "alice-ch1-p16-2",
+          "type": "thought",
+          "sentences": [
             {
               "id": "alice-ch1-p16-s2",
               "text": "“No, I’ll look first,” she said, “and see whether it’s marked ‘_poison_’ or not”; for she had read several nice little histories about children who had got burnt, and eaten up by wild beasts and other unpleasant things, all because they _would_ not remember the simple rules their friends had taught them: such as, that a red-hot poker will burn you if you hold it too long; and that if you cut your finger _very_ deeply with a knife, it usually bleeds; and she had never forgotten that, if you drink much from a bottle marked “poison,” it is almost certain to disagree with you, sooner or later.",
@@ -500,7 +584,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch1-p21",
-          "type": "paragraph",
+          "type": "thought",
           "sentences": [
             {
               "id": "alice-ch1-p21-s1",
@@ -554,7 +638,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch1-p24",
-          "type": "paragraph",
+          "type": "thought",
           "sentences": [
             {
               "id": "alice-ch1-p24-s1",
@@ -583,7 +667,7 @@ export const aliceInWonderlandBook: ReaderBook = {
           ]
         },
         {
-          "id": "alice-ch1-p25",
+          "id": "alice-ch1-p25-1",
           "type": "paragraph",
           "sentences": [
             {
@@ -591,7 +675,13 @@ export const aliceInWonderlandBook: ReaderBook = {
               "text": "Soon her eye fell on a little glass box that was lying under the table: she opened it, and found in it a very small cake, on which the words “EAT ME” were beautifully marked in currants.",
               "translation": "Вскоре её взгляд упал на маленькую стеклянную коробочку, лежавшую под столом: она открыла её и нашла внутри совсем маленький пирожок, на котором смородинками были красиво выложены слова «СЪЕШЬ МЕНЯ».",
               "words": []
-            },
+            }
+          ]
+        },
+        {
+          "id": "alice-ch1-p25-2",
+          "type": "thought",
+          "sentences": [
             {
               "id": "alice-ch1-p25-s2",
               "text": "“Well, I’ll eat it,” said Alice, “and if it makes me grow larger, I can reach the key; and if it makes me grow smaller, I can creep under the door; so either way I’ll get into the garden, and I don’t care which happens!”",
@@ -602,7 +692,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch1-p26",
-          "type": "paragraph",
+          "type": "thought",
           "sentences": [
             {
               "id": "alice-ch1-p26-s1",
@@ -680,8 +770,8 @@ export const aliceInWonderlandBook: ReaderBook = {
       "title": "The Pool of Tears",
       "paragraphs": [
         {
-          "id": "alice-ch2-p1",
-          "type": "paragraph",
+          "id": "alice-ch2-p1-1",
+          "type": "thought",
           "sentences": [
             {
               "id": "alice-ch2-p1-s1",
@@ -690,11 +780,23 @@ export const aliceInWonderlandBook: ReaderBook = {
             {
               "id": "alice-ch2-p1-s2",
               "text": "Good-bye, feet!”"
-            },
+            }
+          ]
+        },
+        {
+          "id": "alice-ch2-p1-2",
+          "type": "paragraph",
+          "sentences": [
             {
               "id": "alice-ch2-p1-s3",
               "text": "(for when she looked down at her feet, they seemed to be almost out of sight, they were getting so far off)."
-            },
+            }
+          ]
+        },
+        {
+          "id": "alice-ch2-p1-3",
+          "type": "thought",
+          "sentences": [
             {
               "id": "alice-ch2-p1-s4",
               "text": "“Oh, my poor little feet, I wonder who will put on your shoes and stockings for you now, dears?"
@@ -714,13 +816,19 @@ export const aliceInWonderlandBook: ReaderBook = {
           ]
         },
         {
-          "id": "alice-ch2-p2",
+          "id": "alice-ch2-p2-1",
           "type": "paragraph",
           "sentences": [
             {
               "id": "alice-ch2-p2-s1",
               "text": "And she went on planning to herself how she would manage it."
-            },
+            }
+          ]
+        },
+        {
+          "id": "alice-ch2-p2-2",
+          "type": "thought",
+          "sentences": [
             {
               "id": "alice-ch2-p2-s2",
               "text": "“They must go by the carrier,” she thought; “and how funny it’ll seem, sending presents to one’s own feet!"
@@ -751,7 +859,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch2-p4",
-          "type": "paragraph",
+          "type": "thought",
           "sentences": [
             {
               "id": "alice-ch2-p4-s1",
@@ -784,8 +892,8 @@ export const aliceInWonderlandBook: ReaderBook = {
           ]
         },
         {
-          "id": "alice-ch2-p7",
-          "type": "paragraph",
+          "id": "alice-ch2-p7-1",
+          "type": "thought",
           "sentences": [
             {
               "id": "alice-ch2-p7-s1",
@@ -794,7 +902,13 @@ export const aliceInWonderlandBook: ReaderBook = {
             {
               "id": "alice-ch2-p7-s2",
               "text": "Stop this moment, I tell you!”"
-            },
+            }
+          ]
+        },
+        {
+          "id": "alice-ch2-p7-2",
+          "type": "paragraph",
+          "sentences": [
             {
               "id": "alice-ch2-p7-s3",
               "text": "But she went on all the same, shedding gallons of tears, until there was a large pool all round her, about four inches deep and reaching half down the hall."
@@ -802,13 +916,19 @@ export const aliceInWonderlandBook: ReaderBook = {
           ]
         },
         {
-          "id": "alice-ch2-p8",
+          "id": "alice-ch2-p8-1",
           "type": "paragraph",
           "sentences": [
             {
               "id": "alice-ch2-p8-s1",
               "text": "After a time she heard a little pattering of feet in the distance, and she hastily dried her eyes to see what was coming."
-            },
+            }
+          ]
+        },
+        {
+          "id": "alice-ch2-p8-2",
+          "type": "dialogue",
+          "sentences": [
             {
               "id": "alice-ch2-p8-s2",
               "text": "It was the White Rabbit returning, splendidly dressed, with a pair of white kid gloves in one hand and a large fan in the other: he came trotting along in a great hurry, muttering to himself as he came, “Oh! the Duchess, the Duchess!"
@@ -816,7 +936,13 @@ export const aliceInWonderlandBook: ReaderBook = {
             {
               "id": "alice-ch2-p8-s3",
               "text": "Oh! won’t she be savage if I’ve kept her waiting!”"
-            },
+            }
+          ]
+        },
+        {
+          "id": "alice-ch2-p8-3",
+          "type": "paragraph",
+          "sentences": [
             {
               "id": "alice-ch2-p8-s4",
               "text": "Alice felt so desperate that she was ready to ask help of any one; so, when the Rabbit came near her, she began, in a low, timid voice, “If you please, sir—” The Rabbit started violently, dropped the white kid gloves and the fan, and skurried away into the darkness as hard as he could go."
@@ -824,13 +950,19 @@ export const aliceInWonderlandBook: ReaderBook = {
           ]
         },
         {
-          "id": "alice-ch2-p9",
+          "id": "alice-ch2-p9-1",
           "type": "paragraph",
           "sentences": [
             {
               "id": "alice-ch2-p9-s1",
               "text": "Alice took up the fan and gloves, and, as the hall was very hot, she kept fanning herself all the time she went on talking: “Dear, dear!"
-            },
+            }
+          ]
+        },
+        {
+          "id": "alice-ch2-p9-2",
+          "type": "thought",
+          "sentences": [
             {
               "id": "alice-ch2-p9-s2",
               "text": "How queer everything is to-day!"
@@ -858,7 +990,13 @@ export const aliceInWonderlandBook: ReaderBook = {
             {
               "id": "alice-ch2-p9-s8",
               "text": "Ah, _that’s_ the great puzzle!”"
-            },
+            }
+          ]
+        },
+        {
+          "id": "alice-ch2-p9-3",
+          "type": "paragraph",
+          "sentences": [
             {
               "id": "alice-ch2-p9-s9",
               "text": "And she began thinking over all the children she knew that were of the same age as herself, to see if she could have been changed for any of them."
@@ -867,7 +1005,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch2-p10",
-          "type": "paragraph",
+          "type": "thought",
           "sentences": [
             {
               "id": "alice-ch2-p10-s1",
@@ -965,7 +1103,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch2-p13",
-          "type": "paragraph",
+          "type": "thought",
           "sentences": [
             {
               "id": "alice-ch2-p13-s1",
@@ -994,13 +1132,19 @@ export const aliceInWonderlandBook: ReaderBook = {
           ]
         },
         {
-          "id": "alice-ch2-p14",
+          "id": "alice-ch2-p14-1",
           "type": "paragraph",
           "sentences": [
             {
               "id": "alice-ch2-p14-s1",
               "text": "As she said this she looked down at her hands, and was surprised to see that she had put on one of the Rabbit’s little white kid gloves while she was talking."
-            },
+            }
+          ]
+        },
+        {
+          "id": "alice-ch2-p14-2",
+          "type": "thought",
+          "sentences": [
             {
               "id": "alice-ch2-p14-s2",
               "text": "“How _can_ I have done that?” she thought."
@@ -1008,7 +1152,13 @@ export const aliceInWonderlandBook: ReaderBook = {
             {
               "id": "alice-ch2-p14-s3",
               "text": "“I must be growing small again.”"
-            },
+            }
+          ]
+        },
+        {
+          "id": "alice-ch2-p14-3",
+          "type": "paragraph",
+          "sentences": [
             {
               "id": "alice-ch2-p14-s4",
               "text": "She got up and went to the table to measure herself by it, and found that, as nearly as she could guess, she was now about two feet high, and was going on shrinking rapidly: she soon found out that the cause of this was the fan she was holding, and she dropped it hastily, just in time to avoid shrinking away altogether."
@@ -1017,7 +1167,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch2-p15",
-          "type": "paragraph",
+          "type": "thought",
           "sentences": [
             {
               "id": "alice-ch2-p15-s1",
@@ -1030,17 +1180,29 @@ export const aliceInWonderlandBook: ReaderBook = {
           ]
         },
         {
-          "id": "alice-ch2-p16",
+          "id": "alice-ch2-p16-1",
           "type": "paragraph",
           "sentences": [
             {
               "id": "alice-ch2-p16-s1",
               "text": "As she said these words her foot slipped, and in another moment, splash! she was up to her chin in salt water."
-            },
+            }
+          ]
+        },
+        {
+          "id": "alice-ch2-p16-2",
+          "type": "thought",
+          "sentences": [
             {
               "id": "alice-ch2-p16-s2",
               "text": "Her first idea was that she had somehow fallen into the sea, “and in that case I can go back by railway,” she said to herself."
-            },
+            }
+          ]
+        },
+        {
+          "id": "alice-ch2-p16-3",
+          "type": "paragraph",
+          "sentences": [
             {
               "id": "alice-ch2-p16-s3",
               "text": "(Alice had been to the seaside once in her life, and had come to the general conclusion, that wherever you go to on the English coast you find a number of bathing machines in the sea, some children digging in the sand with wooden spades, then a row of lodging houses, and behind them a railway station.)"
@@ -1053,7 +1215,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch2-p17",
-          "type": "paragraph",
+          "type": "thought",
           "sentences": [
             {
               "id": "alice-ch2-p17-s1",
@@ -1084,8 +1246,8 @@ export const aliceInWonderlandBook: ReaderBook = {
           ]
         },
         {
-          "id": "alice-ch2-p19",
-          "type": "paragraph",
+          "id": "alice-ch2-p19-1",
+          "type": "thought",
           "sentences": [
             {
               "id": "alice-ch2-p19-s1",
@@ -1094,7 +1256,13 @@ export const aliceInWonderlandBook: ReaderBook = {
             {
               "id": "alice-ch2-p19-s2",
               "text": "Everything is so out-of-the-way down here, that I should think very likely it can talk: at any rate, there’s no harm in trying.”"
-            },
+            }
+          ]
+        },
+        {
+          "id": "alice-ch2-p19-2",
+          "type": "dialogue",
+          "sentences": [
             {
               "id": "alice-ch2-p19-s3",
               "text": "So she began: “O Mouse, do you know the way out of this pool?"
@@ -1102,7 +1270,13 @@ export const aliceInWonderlandBook: ReaderBook = {
             {
               "id": "alice-ch2-p19-s4",
               "text": "I am very tired of swimming about here, O Mouse!”"
-            },
+            }
+          ]
+        },
+        {
+          "id": "alice-ch2-p19-3",
+          "type": "paragraph",
+          "sentences": [
             {
               "id": "alice-ch2-p19-s5",
               "text": "(Alice thought this must be the right way of speaking to a mouse: she had never done such a thing before, but she remembered having seen in her brother’s Latin Grammar, “A mouse—of a mouse—to a mouse—a mouse—O mouse!”)"
@@ -1114,25 +1288,49 @@ export const aliceInWonderlandBook: ReaderBook = {
           ]
         },
         {
-          "id": "alice-ch2-p20",
-          "type": "paragraph",
+          "id": "alice-ch2-p20-1",
+          "type": "thought",
           "sentences": [
             {
               "id": "alice-ch2-p20-s1",
               "text": "“Perhaps it doesn’t understand English,” thought Alice; “I daresay it’s a French mouse, come over with William the Conqueror.”"
-            },
+            }
+          ]
+        },
+        {
+          "id": "alice-ch2-p20-2",
+          "type": "paragraph",
+          "sentences": [
             {
               "id": "alice-ch2-p20-s2",
               "text": "(For, with all her knowledge of history, Alice had no very clear notion how long ago anything had happened.)"
-            },
+            }
+          ]
+        },
+        {
+          "id": "alice-ch2-p20-3",
+          "type": "dialogue",
+          "sentences": [
             {
               "id": "alice-ch2-p20-s3",
               "text": "So she began again: “Où est ma chatte?” which was the first sentence in her French lesson-book."
-            },
+            }
+          ]
+        },
+        {
+          "id": "alice-ch2-p20-4",
+          "type": "paragraph",
+          "sentences": [
             {
               "id": "alice-ch2-p20-s4",
               "text": "The Mouse gave a sudden leap out of the water, and seemed to quiver all over with fright."
-            },
+            }
+          ]
+        },
+        {
+          "id": "alice-ch2-p20-5",
+          "type": "dialogue",
+          "sentences": [
             {
               "id": "alice-ch2-p20-s5",
               "text": "“Oh, I beg your pardon!” cried Alice hastily, afraid that she had hurt the poor animal’s feelings."
@@ -1145,7 +1343,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch2-p21",
-          "type": "paragraph",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch2-p21-s1",
@@ -1159,7 +1357,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch2-p22",
-          "type": "paragraph",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch2-p22-s1",
@@ -1181,7 +1379,7 @@ export const aliceInWonderlandBook: ReaderBook = {
         },
         {
           "id": "alice-ch2-p23",
-          "type": "paragraph",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch2-p23-s1",
@@ -1202,8 +1400,8 @@ export const aliceInWonderlandBook: ReaderBook = {
           ]
         },
         {
-          "id": "alice-ch2-p24",
-          "type": "paragraph",
+          "id": "alice-ch2-p24-1",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch2-p24-s1",
@@ -1212,7 +1410,13 @@ export const aliceInWonderlandBook: ReaderBook = {
             {
               "id": "alice-ch2-p24-s2",
               "text": "“Are you—are you fond—of—of dogs?”"
-            },
+            }
+          ]
+        },
+        {
+          "id": "alice-ch2-p24-2",
+          "type": "dialogue",
+          "sentences": [
             {
               "id": "alice-ch2-p24-s3",
               "text": "The Mouse did not answer, so Alice went on eagerly: “There is such a nice little dog near our house I should like to show you!"
@@ -1228,7 +1432,13 @@ export const aliceInWonderlandBook: ReaderBook = {
             {
               "id": "alice-ch2-p24-s6",
               "text": "He says it kills all the rats and—oh dear!” cried Alice in a sorrowful tone, “I’m afraid I’ve offended it again!”"
-            },
+            }
+          ]
+        },
+        {
+          "id": "alice-ch2-p24-3",
+          "type": "paragraph",
+          "sentences": [
             {
               "id": "alice-ch2-p24-s7",
               "text": "For the Mouse was swimming away from her as hard as it could go, and making quite a commotion in the pool as it went."
@@ -1236,8 +1446,8 @@ export const aliceInWonderlandBook: ReaderBook = {
           ]
         },
         {
-          "id": "alice-ch2-p25",
-          "type": "paragraph",
+          "id": "alice-ch2-p25-1",
+          "type": "dialogue",
           "sentences": [
             {
               "id": "alice-ch2-p25-s1",
@@ -1246,7 +1456,13 @@ export const aliceInWonderlandBook: ReaderBook = {
             {
               "id": "alice-ch2-p25-s2",
               "text": "Do come back again, and we won’t talk about cats or dogs either, if you don’t like them!”"
-            },
+            }
+          ]
+        },
+        {
+          "id": "alice-ch2-p25-2",
+          "type": "dialogue",
+          "sentences": [
             {
               "id": "alice-ch2-p25-s3",
               "text": "When the Mouse heard this, it turned round and swam slowly back to her: its face was quite pale (with passion, Alice thought), and it said in a low trembling voice, “Let us get to the shore, and then I’ll tell you my history, and you’ll understand why it is I hate cats and dogs.”"
@@ -11449,7 +11665,6 @@ export const aliceInWonderlandBook: ReaderBook = {
     }
   ]
 };
-
 export const aliceInWonderlandChapterStats = [
   {
     "chapterId": "chapter-1",

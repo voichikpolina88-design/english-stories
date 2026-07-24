@@ -2377,6 +2377,19 @@ p {
   margin: 0 0 0.95em;
 }
 
+.reader-dialogue,
+.reader-thought {
+  margin-top: 0.45em;
+  margin-bottom: 0.55em;
+}
+
+.reader-dialogue + .reader-dialogue,
+.reader-thought + .reader-thought,
+.reader-dialogue + .reader-thought,
+.reader-thought + .reader-dialogue {
+  margin-top: 0.25em;
+}
+
 .reader-poem {
   margin-left: clamp(12px, 4vw, 34px);
 }

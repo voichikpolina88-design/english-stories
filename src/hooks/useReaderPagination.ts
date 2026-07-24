@@ -3,6 +3,7 @@ import type { ReaderChapter, ReaderSentence, ReaderWord, ReadingSettings } from 
 
 export type ReaderPageWord = ReaderWord & {
   paragraphId: string;
+  paragraphType?: "paragraph" | "dialogue" | "thought" | "poem";
   sentenceId: string;
   sentenceText: string;
   sentenceTranslation?: string;
@@ -36,6 +37,7 @@ export function flattenChapterWords(chapter: ReaderChapter): ReaderPageWord[] {
         words.push({
           ...word,
           paragraphId: paragraph.id,
+          paragraphType: paragraph.type,
           sentenceId: sentence.id,
           sentenceText: sentence.text,
           sentenceTranslation: sentence.translation,
@@ -168,7 +170,7 @@ function paginateChapterContent({
 
   chapter.paragraphs.forEach((paragraph) => {
     const paragraphNode = document.createElement("p");
-    paragraphNode.className = paragraph.type === "poem" ? "reader-paragraph reader-poem" : "reader-paragraph";
+    paragraphNode.className = readerParagraphClassName(paragraph.type);
     paragraph.sentences.forEach((sentence) => appendSentenceMeasure(sentence, paragraph.id, paragraphNode, settings));
     textRoot.appendChild(paragraphNode);
   });
@@ -206,6 +208,13 @@ function paginateChapterContent({
   measureRoot.remove();
   verifyPaginationIntegrity(words, pages);
   return pages.length > 0 ? pages : [createPage(words, 0, words.length)];
+}
+
+function readerParagraphClassName(type?: ReaderPageWord["paragraphType"]) {
+  if (type === "poem") return "reader-paragraph reader-poem";
+  if (type === "dialogue") return "reader-paragraph reader-dialogue";
+  if (type === "thought") return "reader-paragraph reader-thought";
+  return "reader-paragraph";
 }
 
 function appendSentenceMeasure(sentence: ReaderSentence, paragraphId: string, paragraphNode: HTMLElement, settings: ReadingSettings) {
