@@ -4,6 +4,8 @@ import type { ReaderChapter, ReaderSentence, ReaderWord, ReadingSettings } from 
 export type ReaderPageWord = ReaderWord & {
   paragraphId: string;
   paragraphType?: "narrative" | "paragraph" | "dialogue" | "thought" | "poem";
+  paragraphText: string;
+  paragraphTranslation?: string;
   sentenceId: string;
   sentenceText: string;
   sentenceTranslation?: string;
@@ -33,6 +35,9 @@ export function flattenChapterWords(chapter: ReaderChapter): ReaderPageWord[] {
   const words: ReaderPageWord[] = [];
 
   chapter.paragraphs.forEach((paragraph) => {
+    const paragraphText = getBlockText(paragraph.sentences);
+    const paragraphTranslation = getBlockTranslation(paragraph.type, paragraph.sentences);
+
     paragraph.sentences.forEach((sentence, sentenceIndex) => {
       const sentenceWords = getSentenceWords(sentence);
       sentenceWords.forEach((word, sentenceWordIndex) => {
@@ -42,6 +47,8 @@ export function flattenChapterWords(chapter: ReaderChapter): ReaderPageWord[] {
           ...word,
           paragraphId: paragraph.id,
           paragraphType: paragraph.type,
+          paragraphText,
+          paragraphTranslation,
           sentenceId: sentence.id,
           sentenceText: sentence.text,
           sentenceTranslation: sentence.translation,
@@ -186,6 +193,7 @@ function paginateChapterContent({
       sentenceIndex,
       settings,
     }));
+    appendBlockActionsMeasure(paragraphNode, Boolean(getBlockTranslation(paragraph.type, paragraph.sentences)));
     textRoot.appendChild(paragraphNode);
   });
 
@@ -235,6 +243,23 @@ export function isQuotedReaderBlock(type?: ReaderPageWord["paragraphType"]) {
   return type === "dialogue" || type === "thought";
 }
 
+export function getBlockText(sentences: ReaderSentence[]) {
+  return sentences.map((sentence) => sentence.text).join(" ").replace(/\s+/g, " ").trim();
+}
+
+export function getBlockTranslation(type: ReaderPageWord["paragraphType"] | undefined, sentences: ReaderSentence[]) {
+  const translation = sentences
+    .map((sentence) => sentence.translation?.trim())
+    .filter(Boolean)
+    .join(" ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  if (!translation) return undefined;
+  if (!isQuotedReaderBlock(type)) return translation;
+  return translation.replace(/^«/, "— ").replace(/([.!?…])»$/u, "$1").replace(/([.!?…])»(?=\S)/gu, "$1 —");
+}
+
 export function readerDisplayWordText(word: ReaderPageWord) {
   let text = word.text;
   if (isQuotedReaderBlock(word.paragraphType)) {
@@ -280,6 +305,8 @@ function appendSentenceMeasure({
       isSentenceEnd: sentenceWordIndex === sentenceWords.length - 1,
       paragraphId,
       paragraphType,
+      paragraphText: "",
+      paragraphTranslation: undefined,
       sentenceId: sentence.id,
       sentenceText: sentence.text,
       sentenceTranslation: sentence.translation,
@@ -303,16 +330,25 @@ function appendSentenceMeasure({
     sentenceNode.appendChild(document.createTextNode(" "));
   });
 
-  const audioPlaceholder = document.createElement("span");
-  audioPlaceholder.className = "sentence-audio-button measure-audio-placeholder";
-  sentenceNode.appendChild(audioPlaceholder);
-  if (settings.showSentenceTranslation && sentence.translation) {
-    const translationPlaceholder = document.createElement("span");
-    translationPlaceholder.className = "sentence-translation-trigger measure-translation-placeholder";
-    translationPlaceholder.textContent = "RU";
-    sentenceNode.appendChild(translationPlaceholder);
-  }
   paragraphNode.appendChild(sentenceNode);
+}
+
+function appendBlockActionsMeasure(paragraphNode: HTMLElement, hasTranslation: boolean) {
+  const actionsNode = document.createElement("span");
+  actionsNode.className = "block-actions measure-block-actions";
+
+  const audioPlaceholder = document.createElement("span");
+  audioPlaceholder.className = "block-audio-button measure-audio-placeholder";
+  actionsNode.appendChild(audioPlaceholder);
+
+  if (hasTranslation) {
+    const translationPlaceholder = document.createElement("span");
+    translationPlaceholder.className = "block-translation-trigger measure-translation-placeholder";
+    translationPlaceholder.textContent = "RU";
+    actionsNode.appendChild(translationPlaceholder);
+  }
+
+  paragraphNode.appendChild(actionsNode);
 }
 
 function appendMeasuredWordText(parent: HTMLElement, text: string, accented: boolean) {

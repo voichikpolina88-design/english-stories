@@ -2456,7 +2456,7 @@ p {
   font-weight: 600;
 }
 
-.sentence-actions {
+.block-actions {
   display: inline-flex;
   align-items: center;
   gap: 0.18em;
@@ -2465,7 +2465,7 @@ p {
   vertical-align: baseline;
 }
 
-.sentence-audio-button {
+.block-audio-button {
   display: inline-grid;
   width: 22px;
   height: 22px;
@@ -2477,7 +2477,7 @@ p {
   color: var(--purple);
 }
 
-.sentence-translation-trigger {
+.block-translation-trigger {
   display: inline-flex;
   min-height: 22px;
   gap: 2px;
@@ -3160,13 +3160,13 @@ blockquote {
     grid-template-columns: 1fr;
   }
 
-  .sentence-actions {
+  .block-actions {
     gap: 3px;
     margin-left: 0.12em;
   }
 
-  .sentence-audio-button,
-  .sentence-translation-trigger {
+  .block-audio-button,
+  .block-translation-trigger {
     min-width: 22px;
   }
 

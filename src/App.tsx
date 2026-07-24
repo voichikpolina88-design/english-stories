@@ -2083,11 +2083,38 @@ function ReaderPageView({
               key={`${paragraph.paragraphId}-${sentence.sentenceId}`}
               sentenceWords={sentence.words}
               settings={settings}
-              onSelectSentence={onSelectSentence}
               onSelectWord={onSelectWord}
-              onSpeak={onSpeak}
             />
           ))}
+          {paragraph.lastWord?.isParagraphEnd ? (
+            <span className="block-actions" data-reader-interactive="true">
+              <button
+                className="block-audio-button"
+                type="button"
+                aria-label="Прослушать абзац"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onSpeak(paragraph.lastWord?.paragraphText ?? paragraph.words.map((word) => word.text).join(" "));
+                }}
+              >
+                <Volume2 size={14} aria-hidden="true" />
+              </button>
+              {settings.showSentenceTranslation && paragraph.lastWord?.paragraphTranslation ? (
+                <button
+                  className="block-translation-trigger"
+                  type="button"
+                  aria-label="Показать перевод абзаца"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    if (paragraph.lastWord) onSelectSentence(paragraph.lastWord);
+                  }}
+                >
+                  <Languages size={13} aria-hidden="true" />
+                  <span>RU</span>
+                </button>
+              ) : null}
+            </span>
+          ) : null}
         </p>
       ))}
     </div>
@@ -2097,19 +2124,13 @@ function ReaderPageView({
 function ReaderSentenceView({
   sentenceWords,
   settings,
-  onSpeak,
-  onSelectSentence,
   onSelectWord,
 }: {
   sentenceWords: ReaderPageWord[];
   settings: ReadingSettings;
-  onSpeak: (sentenceText: string) => void;
-  onSelectSentence: (word: ReaderPageWord) => void;
   onSelectWord: (word: ReaderPageWord) => void;
 }) {
   const firstWord = sentenceWords[0];
-  const lastWord = sentenceWords.at(-1);
-  const showSentenceActions = Boolean(lastWord?.isSentenceEnd);
 
   return (
     <span className="reader-sentence" data-sentence-id={firstWord?.sentenceId}>
@@ -2124,25 +2145,6 @@ function ReaderSentenceView({
           />
         ))}
       </span>
-      {showSentenceActions ? (
-        <span className="sentence-actions" data-reader-interactive="true">
-          <button className="sentence-audio-button" type="button" aria-label="Прослушать предложение" onClick={(event) => {
-            event.stopPropagation();
-            onSpeak(firstWord?.sentenceText ?? sentenceWords.map((word) => word.text).join(" "));
-          }}>
-            <Volume2 size={14} aria-hidden="true" />
-          </button>
-          {settings.showSentenceTranslation && firstWord?.sentenceTranslation ? (
-            <button className="sentence-translation-trigger" type="button" aria-label="Показать перевод предложения" onClick={(event) => {
-              event.stopPropagation();
-              onSelectSentence(firstWord);
-            }}>
-              <Languages size={13} aria-hidden="true" />
-              <span>RU</span>
-            </button>
-          ) : null}
-        </span>
-      ) : null}
     </span>
   );
 }
@@ -2299,10 +2301,10 @@ function toggleReaderSavedWord(nextWord: SavedReaderWord) {
 
 function ReaderSentencePopover({ sentence, onClose }: { sentence: ReaderPageWord; onClose: () => void }) {
   return (
-    <aside className="reader-translation-popover sentence-popover" role="dialog" aria-label="Перевод предложения" onClick={(event) => event.stopPropagation()}>
+    <aside className="reader-translation-popover sentence-popover" role="dialog" aria-label="Перевод абзаца" onClick={(event) => event.stopPropagation()}>
       <button className="popover-close" type="button" aria-label="Закрыть перевод" onClick={onClose}>×</button>
-      <strong>Перевод предложения</strong>
-      <p>{sentence.sentenceTranslation ?? "Перевод предложения будет подключён на следующем этапе."}</p>
+      <strong>Перевод абзаца</strong>
+      <p>{sentence.paragraphTranslation ?? sentence.sentenceTranslation ?? "Перевод абзаца будет подключён на следующем этапе."}</p>
     </aside>
   );
 }
@@ -2311,15 +2313,19 @@ function groupPageWords(words: ReaderPageWord[]) {
   const paragraphs: Array<{
     paragraphId: string;
     paragraphType?: ReaderPageWord["paragraphType"];
+    lastWord?: ReaderPageWord;
     sentences: Array<{ sentenceId: string; words: ReaderPageWord[] }>;
+    words: ReaderPageWord[];
   }> = [];
 
   words.forEach((word) => {
     let paragraph = paragraphs.find((item) => item.paragraphId === word.paragraphId);
     if (!paragraph) {
-      paragraph = { paragraphId: word.paragraphId, paragraphType: word.paragraphType, sentences: [] };
+      paragraph = { paragraphId: word.paragraphId, paragraphType: word.paragraphType, sentences: [], words: [] };
       paragraphs.push(paragraph);
     }
+    paragraph.words.push(word);
+    paragraph.lastWord = word;
 
     let sentence = paragraph.sentences.find((item) => item.sentenceId === word.sentenceId);
     if (!sentence) {
@@ -2386,7 +2392,7 @@ function isReaderInteractive(target: EventTarget | null) {
   if (!(target instanceof Element)) return false;
   return Boolean(
     target.closest(
-      "button, input, select, textarea, a, [role='button'], [data-reader-interactive], .reader-word, .word, .audio-button, .sentence-audio-button, .sentence-translation-trigger, .reading-settings-panel, .reading-timer-widget, .reading-timer-layer, .reader-translation-popover",
+      "button, input, select, textarea, a, [role='button'], [data-reader-interactive], .reader-word, .word, .audio-button, .block-audio-button, .block-translation-trigger, .sentence-audio-button, .sentence-translation-trigger, .reading-settings-panel, .reading-timer-widget, .reading-timer-layer, .reader-translation-popover",
     ),
   );
 }
