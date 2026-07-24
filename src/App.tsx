@@ -4,7 +4,7 @@ import { getCatalogBook, getCategoryBooks, homeShelfBooks, libraryCategories, ty
 import { getReaderBook, getReaderChapter } from "./data/aliceReader";
 import { getAllVocabulary, type VocabularyEntry } from "./data/vocabulary";
 import { useLearnerProgress } from "./hooks/useLearnerProgress";
-import { emptyPaginationSize, type ReaderPage, type ReaderPageWord, useReaderPagination } from "./hooks/useReaderPagination";
+import { emptyPaginationSize, readerDisplayWordText, type ReaderPage, type ReaderPageWord, useReaderPagination } from "./hooks/useReaderPagination";
 import { useReadingTimer } from "./hooks/useReadingTimer";
 import type { LastOpenedContent, NativeLanguage, ReaderChapter, ReaderPosition, ReadingSettings } from "./types";
 
@@ -2145,7 +2145,8 @@ function ReaderWordView({
   showTranslation: boolean;
   onSelect: (word: ReaderPageWord) => void;
 }) {
-  const accentParts = splitWordForAccent(word.text);
+  const displayText = readerDisplayWordText(word);
+  const accentParts = splitWordForAccent(displayText);
 
   return (
     <span
@@ -2172,7 +2173,7 @@ function ReaderWordView({
             <span>{accentParts.rest}</span>
           </>
         ) : (
-          word.text
+          displayText
         )}
       </span>
       {showTranslation && word.translation ? <small>{word.translation}</small> : null}

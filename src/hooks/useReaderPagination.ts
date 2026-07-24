@@ -3,11 +3,13 @@ import type { ReaderChapter, ReaderSentence, ReaderWord, ReadingSettings } from 
 
 export type ReaderPageWord = ReaderWord & {
   paragraphId: string;
-  paragraphType?: "paragraph" | "dialogue" | "thought" | "poem";
+  paragraphType?: "narrative" | "paragraph" | "dialogue" | "thought" | "poem";
   sentenceId: string;
   sentenceText: string;
   sentenceTranslation?: string;
   sentenceAudioSrc?: string;
+  isParagraphStart: boolean;
+  isParagraphEnd: boolean;
   isSentenceEnd: boolean;
   absoluteIndex: number;
 };
@@ -31,9 +33,11 @@ export function flattenChapterWords(chapter: ReaderChapter): ReaderPageWord[] {
   const words: ReaderPageWord[] = [];
 
   chapter.paragraphs.forEach((paragraph) => {
-    paragraph.sentences.forEach((sentence) => {
+    paragraph.sentences.forEach((sentence, sentenceIndex) => {
       const sentenceWords = getSentenceWords(sentence);
       sentenceWords.forEach((word, sentenceWordIndex) => {
+        const isFirstSentence = sentenceIndex === 0;
+        const isLastSentence = sentenceIndex === paragraph.sentences.length - 1;
         words.push({
           ...word,
           paragraphId: paragraph.id,
@@ -42,6 +46,8 @@ export function flattenChapterWords(chapter: ReaderChapter): ReaderPageWord[] {
           sentenceText: sentence.text,
           sentenceTranslation: sentence.translation,
           sentenceAudioSrc: sentence.audioSrc,
+          isParagraphStart: isFirstSentence && sentenceWordIndex === 0,
+          isParagraphEnd: isLastSentence && sentenceWordIndex === sentenceWords.length - 1,
           isSentenceEnd: sentenceWordIndex === sentenceWords.length - 1,
           absoluteIndex: words.length,
         });
@@ -171,7 +177,15 @@ function paginateChapterContent({
   chapter.paragraphs.forEach((paragraph) => {
     const paragraphNode = document.createElement("p");
     paragraphNode.className = readerParagraphClassName(paragraph.type);
-    paragraph.sentences.forEach((sentence) => appendSentenceMeasure(sentence, paragraph.id, paragraphNode, settings));
+    paragraph.sentences.forEach((sentence, sentenceIndex) => appendSentenceMeasure({
+      paragraphId: paragraph.id,
+      paragraphNode,
+      paragraphType: paragraph.type,
+      sentence,
+      sentenceCount: paragraph.sentences.length,
+      sentenceIndex,
+      settings,
+    }));
     textRoot.appendChild(paragraphNode);
   });
 
@@ -217,17 +231,63 @@ function readerParagraphClassName(type?: ReaderPageWord["paragraphType"]) {
   return "reader-paragraph";
 }
 
-function appendSentenceMeasure(sentence: ReaderSentence, paragraphId: string, paragraphNode: HTMLElement, settings: ReadingSettings) {
+export function isQuotedReaderBlock(type?: ReaderPageWord["paragraphType"]) {
+  return type === "dialogue" || type === "thought";
+}
+
+export function readerDisplayWordText(word: ReaderPageWord) {
+  if (!isQuotedReaderBlock(word.paragraphType)) return word.text;
+
+  let text = word.text;
+  if (word.isParagraphStart || text.startsWith("“")) {
+    text = text.replace(/^“/, "— ");
+  }
+  text = text.replace(/([,;:.!?])”(?=\S)/g, "$1 —");
+  text = text.replace(/([,;:.!?])”$/g, word.isParagraphEnd ? "$1" : "$1 —");
+  return text;
+}
+
+function appendSentenceMeasure({
+  paragraphId,
+  paragraphNode,
+  paragraphType,
+  sentence,
+  sentenceCount,
+  sentenceIndex,
+  settings,
+}: {
+  paragraphId: string;
+  paragraphNode: HTMLElement;
+  paragraphType?: ReaderPageWord["paragraphType"];
+  sentence: ReaderSentence;
+  sentenceCount: number;
+  sentenceIndex: number;
+  settings: ReadingSettings;
+}) {
   const sentenceNode = document.createElement("span");
   sentenceNode.className = "reader-sentence";
-  getSentenceWords(sentence).forEach((word) => {
+  const sentenceWords = getSentenceWords(sentence);
+  sentenceWords.forEach((word, sentenceWordIndex) => {
+    const measureWord: ReaderPageWord = {
+      ...word,
+      absoluteIndex: 0,
+      isParagraphEnd: sentenceIndex === sentenceCount - 1 && sentenceWordIndex === sentenceWords.length - 1,
+      isParagraphStart: sentenceIndex === 0 && sentenceWordIndex === 0,
+      isSentenceEnd: sentenceWordIndex === sentenceWords.length - 1,
+      paragraphId,
+      paragraphType,
+      sentenceId: sentence.id,
+      sentenceText: sentence.text,
+      sentenceTranslation: sentence.translation,
+      sentenceAudioSrc: sentence.audioSrc,
+    };
     const wordNode = document.createElement("span");
     wordNode.className = "reader-word";
     wordNode.dataset.measureWordId = word.id;
     wordNode.dataset.measureSentenceId = sentence.id;
     wordNode.dataset.measureParagraphId = paragraphId;
 
-    appendMeasuredWordText(wordNode, word.text, settings.accentedReading);
+    appendMeasuredWordText(wordNode, readerDisplayWordText(measureWord), settings.accentedReading);
 
     if (settings.showWordTranslation && word.translation) {
       const translationNode = document.createElement("small");

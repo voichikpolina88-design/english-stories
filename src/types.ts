@@ -145,7 +145,7 @@ export type ReaderSentence = {
 
 export type ReaderParagraph = {
   id: string;
-  type?: "paragraph" | "dialogue" | "thought" | "poem";
+  type?: "narrative" | "paragraph" | "dialogue" | "thought" | "poem";
   lines?: string[];
   sentences: ReaderSentence[];
 };
