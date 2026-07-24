@@ -129,10 +129,20 @@ export type ReadingStats = {
 export type ReaderWord = {
   id: string;
   text: string;
+  normalized?: string;
   lemma?: string;
   translation?: string;
+  contextualTranslation?: string;
+  commonTranslations?: string[];
   transcription?: string;
+  partOfSpeech?: string;
   audioSrc?: string;
+  sentenceId?: string;
+  paragraphId?: string;
+  chapterId?: string;
+  lexicalEntryId?: string;
+  isProperNoun?: boolean;
+  isPunctuation?: boolean;
 };
 
 export type ReaderSentence = {

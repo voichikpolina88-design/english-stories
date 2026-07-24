@@ -42,6 +42,7 @@ type OpenContentOptions = {
 const READING_SETTINGS_KEY = "storylingo-reading-settings";
 const READER_POSITION_KEY = "storylingo-reader-positions";
 const READER_SWIPE_HINT_KEY = "storylingo-reader-swipe-hint-seen";
+const READER_SAVED_WORDS_KEY = "storylingo-reader-saved-words";
 
 const defaultReadingSettings: ReadingSettings = {
   theme: "cream",
@@ -1879,7 +1880,12 @@ function ReaderPreview({
             )}
           </div>
           {selectedWord ? (
-            <ReaderWordPopover word={selectedWord} onClose={() => setSelectedWord(null)} />
+            <ReaderWordPopover
+              bookTitle={book.title}
+              onClose={() => setSelectedWord(null)}
+              onSpeak={(wordText) => speech.toggle(wordText)}
+              word={selectedWord}
+            />
           ) : null}
           {selectedSentence ? (
             <ReaderSentencePopover sentence={selectedSentence} onClose={() => setSelectedSentence(null)} />
@@ -2154,19 +2160,20 @@ function ReaderWordView({
 }) {
   const displayText = readerDisplayWordText(word);
   const accentParts = splitWordForAccent(displayText);
+  const isInteractiveWord = !word.isPunctuation;
 
   return (
     <span
       className={readerWordHasEmphasis(word) ? "reader-word reader-emphasis-word" : "reader-word"}
       data-word-id={word.id}
-      role="button"
-      tabIndex={0}
+      role={isInteractiveWord ? "button" : undefined}
+      tabIndex={isInteractiveWord ? 0 : undefined}
       onClick={(event) => {
         event.stopPropagation();
-        onSelect(word);
+        if (isInteractiveWord) onSelect(word);
       }}
       onKeyDown={(event) => {
-        if (event.key === "Enter" || event.key === " ") {
+        if (isInteractiveWord && (event.key === "Enter" || event.key === " ")) {
           event.preventDefault();
           event.stopPropagation();
           onSelect(word);
@@ -2201,15 +2208,93 @@ function splitWordForAccent(text: string): { accent: string; rest: string } | nu
     rest: `${core.slice(accentLength)}${suffix}`,
   };
 }
-function ReaderWordPopover({ word, onClose }: { word: ReaderPageWord; onClose: () => void }) {
+type SavedReaderWord = {
+  lexicalEntryId: string;
+  word: string;
+  translation: string;
+  transcription?: string;
+  partOfSpeech?: string;
+  sentenceText: string;
+  bookTitle: string;
+  chapterId?: string;
+  sentenceId: string;
+  createdAt: string;
+};
+
+function ReaderWordPopover({
+  bookTitle,
+  word,
+  onClose,
+  onSpeak,
+}: {
+  bookTitle: string;
+  word: ReaderPageWord;
+  onClose: () => void;
+  onSpeak: (wordText: string) => void;
+}) {
+  const [isSaved, setIsSaved] = useState(() => isReaderWordSaved(word));
+  const cleanWord = (word.normalized || word.text).replace(/_/g, "");
+  const lexicalEntryId = word.lexicalEntryId ?? `${word.normalized || word.id}-reader-word`;
+
+  function toggleSavedWord() {
+    const nextSaved = toggleReaderSavedWord({
+      lexicalEntryId,
+      word: cleanWord,
+      translation: word.translation ?? "",
+      transcription: word.transcription,
+      partOfSpeech: word.partOfSpeech,
+      sentenceText: word.sentenceText,
+      bookTitle,
+      chapterId: word.chapterId,
+      sentenceId: word.sentenceId,
+      createdAt: new Date().toISOString(),
+    });
+    setIsSaved(nextSaved);
+  }
+
   return (
     <aside className="reader-translation-popover word-popover" role="dialog" aria-label={`Перевод слова ${word.text}`} onClick={(event) => event.stopPropagation()}>
       <button className="popover-close" type="button" aria-label="Закрыть перевод" onClick={onClose}>×</button>
-      <strong>{word.text}</strong>
+      <strong>{cleanWord}</strong>
       {word.transcription ? <span>{word.transcription}</span> : null}
-      <p>{word.translation ?? "Перевод слова будет подключён на следующем этапе."}</p>
+      {word.partOfSpeech ? <span className="word-popover-meta">{word.partOfSpeech}</span> : null}
+      <p>{word.contextualTranslation ?? word.translation ?? "Перевод слова будет подключён на следующем этапе."}</p>
+      {word.commonTranslations?.length ? <small>Также: {word.commonTranslations.slice(0, 2).join(", ")}</small> : null}
+      <div className="word-popover-actions">
+        <button type="button" onClick={() => onSpeak(cleanWord)} aria-label={`Прослушать ${cleanWord}`}>
+          <Volume2 size={14} aria-hidden="true" />
+          Audio
+        </button>
+        <button type="button" onClick={toggleSavedWord}>
+          {isSaved ? "Удалить из словаря" : "Добавить в словарь"}
+        </button>
+      </div>
     </aside>
   );
+}
+
+function readReaderSavedWords(): SavedReaderWord[] {
+  try {
+    const raw = window.localStorage.getItem(READER_SAVED_WORDS_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function isReaderWordSaved(word: ReaderPageWord) {
+  const lexicalEntryId = word.lexicalEntryId ?? `${word.normalized || word.id}-reader-word`;
+  return readReaderSavedWords().some((item) => item.lexicalEntryId === lexicalEntryId);
+}
+
+function toggleReaderSavedWord(nextWord: SavedReaderWord) {
+  const savedWords = readReaderSavedWords();
+  const exists = savedWords.some((item) => item.lexicalEntryId === nextWord.lexicalEntryId);
+  const nextWords = exists ? savedWords.filter((item) => item.lexicalEntryId !== nextWord.lexicalEntryId) : [...savedWords, nextWord];
+  window.localStorage.setItem(READER_SAVED_WORDS_KEY, JSON.stringify(nextWords));
+  return !exists;
 }
 
 function ReaderSentencePopover({ sentence, onClose }: { sentence: ReaderPageWord; onClose: () => void }) {

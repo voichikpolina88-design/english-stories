@@ -2427,6 +2427,31 @@ p {
   line-height: 1.1;
 }
 
+.word-popover-meta {
+  color: var(--muted);
+  font-size: 0.78rem;
+  text-transform: lowercase;
+}
+
+.word-popover-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.65rem;
+}
+
+.word-popover-actions button {
+  align-items: center;
+  background: rgba(20, 49, 82, 0.08);
+  border: 1px solid rgba(20, 49, 82, 0.14);
+  border-radius: 999px;
+  color: var(--ink);
+  display: inline-flex;
+  font: 700 0.75rem Inter, system-ui, sans-serif;
+  gap: 0.3rem;
+  padding: 0.42rem 0.65rem;
+}
+
 .word-accent {
   font-weight: 600;
 }
