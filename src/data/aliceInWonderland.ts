@@ -1,5 +1,5 @@
 import type { ReaderBook } from "../types";
-import { buildAliceChapterOneSentenceWords } from "./books/aliceChapterOneWords";
+import { buildAliceSentenceWords } from "./books/aliceChapterOneWords";
 
 export const aliceInWonderlandBook: ReaderBook = {
   "id": "alice-in-wonderland",
@@ -11667,12 +11667,14 @@ export const aliceInWonderlandBook: ReaderBook = {
   ]
 };
 
-aliceInWonderlandBook.chapters[0].paragraphs.forEach((paragraph) => {
-  paragraph.sentences.forEach((sentence) => {
-    sentence.words = buildAliceChapterOneSentenceWords({
-      chapterId: "chapter-1",
-      paragraphId: paragraph.id,
-      sentence,
+aliceInWonderlandBook.chapters.forEach((chapter) => {
+  chapter.paragraphs.forEach((paragraph) => {
+    paragraph.sentences.forEach((sentence) => {
+      sentence.words = buildAliceSentenceWords({
+        chapterId: chapter.id,
+        paragraphId: paragraph.id,
+        sentence,
+      });
     });
   });
 });

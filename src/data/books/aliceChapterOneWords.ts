@@ -19,6 +19,7 @@ type LexicalEntry = {
   partOfSpeech: PartOfSpeech;
   commonTranslations?: string[];
   isProperNoun?: boolean;
+  isArchaic?: boolean;
 };
 
 type PhraseContext = {
@@ -119,6 +120,92 @@ const lexicalOverrides: Record<string, LexicalEntry> = {
   "cherry-tart": entry("cherry-tart", "вишнёвый тарт", "/ˈtʃeri tɑːt/", "noun"),
   "tea-time": entry("tea-time", "время чая", "/ˈtiː taɪm/", "noun"),
   "to-night": entry("tonight", "сегодня вечером", "/təˈnaɪt/", "adverb"),
+  "caucus-race": entry("caucus-race", "бег по кругу без правил", "/ˈkɔːkəs reɪs/", "noun", ["состязание без ясных правил"]),
+  comfits: entry("comfit", "засахаренные сладости", "/ˈkʌmfɪts/", "noun", ["драже"], false, true),
+  thimble: entry("thimble", "наперсток", "/ˈθɪmbl/", "noun"),
+  caterpillar: entry("caterpillar", "гусеница", "/ˈkætəpɪlə/", "noun"),
+  hookah: entry("hookah", "кальян", "/ˈhʊkə/", "noun"),
+  chrysalis: entry("chrysalis", "куколка", "/ˈkrɪsəlɪs/", "noun"),
+  footman: entry("footman", "лакей", "/ˈfʊtmən/", "noun"),
+  duchess: entry("Duchess", "Герцогиня", "/ˈdʌtʃəs/", "proper noun", undefined, true),
+  pepper: entry("pepper", "перец", "/ˈpepə/", "noun"),
+  cheshire: entry("Cheshire", "Чеширский", "/ˈtʃeʃə/", "proper noun", undefined, true),
+  grin: entry("grin", "широкая улыбка", "/ɡrɪn/", "noun", ["ухмылка"]),
+  treacle: entry("treacle", "патока", "/ˈtriːkl/", "noun"),
+  dormouse: entry("Dormouse", "Соня", "/ˈdɔːmaʊs/", "proper noun", undefined, true),
+  croquet: entry("croquet", "крокет", "/ˈkrəʊkeɪ/", "noun"),
+  flamingo: entry("flamingo", "фламинго", "/fləˈmɪŋɡəʊ/", "noun"),
+  hedgehog: entry("hedgehog", "ёж", "/ˈhedʒhɒɡ/", "noun"),
+  executioner: entry("executioner", "палач", "/ˌeksɪˈkjuːʃənə/", "noun"),
+  mock: entry("Mock", "Фальшивый", "/mɒk/", "adjective", ["притворный"]),
+  turtle: entry("Turtle", "Черепаха", "/ˈtɜːtl/", "noun"),
+  gryphon: entry("Gryphon", "Грифон", "/ˈɡrɪfən/", "proper noun", undefined, true),
+  quadrille: entry("quadrille", "кадриль", "/kwəˈdrɪl/", "noun"),
+  whiting: entry("whiting", "мерланг", "/ˈwaɪtɪŋ/", "noun"),
+  porpoise: entry("porpoise", "морская свинья", "/ˈpɔːpəs/", "noun"),
+  juror: entry("juror", "присяжный", "/ˈdʒʊərə/", "noun"),
+  slate: entry("slate", "грифельная доска", "/sleɪt/", "noun"),
+  suppressed: entry("suppress", "подавленные", "/səˈprest/", "verb", ["сдержанные"]),
+  verdict: entry("verdict", "вердикт", "/ˈvɜːdɪkt/", "noun"),
+  evidence: entry("evidence", "показания", "/ˈevɪdəns/", "noun", ["доказательства"]),
+  the: entry("the", "определённый артикль", "/ðə/", "determiner"),
+  and: entry("and", "и", "/ænd/", "conjunction"),
+  to: entry("to", "к / частица инфинитива", "/tə/", "preposition", ["в", "чтобы"]),
+  a: entry("a", "неопределённый артикль", "/ə/", "determiner"),
+  an: entry("an", "неопределённый артикль", "/ən/", "determiner"),
+  she: entry("she", "она", "/ʃiː/", "pronoun"),
+  he: entry("he", "он", "/hiː/", "pronoun"),
+  i: entry("I", "я", "/aɪ/", "pronoun"),
+  you: entry("you", "ты / вы", "/juː/", "pronoun"),
+  of: entry("of", "предлог, значение зависит от контекста", "/əv/", "preposition"),
+  in: entry("in", "в", "/ɪn/", "preposition"),
+  was: entry("be", "был / была", "/wɒz/", "verb"),
+  were: entry("be", "были", "/wɜː/", "verb"),
+  is: entry("be", "есть / является", "/ɪz/", "verb"),
+  am: entry("be", "есть / являюсь", "/æm/", "verb"),
+  be: entry("be", "быть", "/biː/", "verb"),
+  been: entry("be", "был / была / было", "/biːn/", "verb"),
+  that: entry("that", "что / тот", "/ðæt/", "pronoun", ["который"]),
+  this: entry("this", "это / этот", "/ðɪs/", "pronoun"),
+  her: entry("her", "её / ей", "/hɜː/", "pronoun"),
+  his: entry("his", "его", "/hɪz/", "pronoun"),
+  their: entry("their", "их", "/ðeə/", "pronoun"),
+  my: entry("my", "мой", "/maɪ/", "pronoun"),
+  your: entry("your", "твой / ваш", "/jɔː/", "pronoun"),
+  me: entry("me", "меня / мне", "/miː/", "pronoun"),
+  him: entry("him", "его / ему", "/hɪm/", "pronoun"),
+  them: entry("them", "их / им", "/ðem/", "pronoun"),
+  they: entry("they", "они", "/ðeɪ/", "pronoun"),
+  we: entry("we", "мы", "/wiː/", "pronoun"),
+  us: entry("us", "нас / нам", "/ʌs/", "pronoun"),
+  on: entry("on", "на", "/ɒn/", "preposition"),
+  with: entry("with", "с", "/wɪð/", "preposition"),
+  for: entry("for", "для / за", "/fə/", "preposition"),
+  from: entry("from", "из / от", "/frɒm/", "preposition"),
+  by: entry("by", "у / рядом / посредством", "/baɪ/", "preposition"),
+  at: entry("at", "у / в / на", "/æt/", "preposition"),
+  as: entry("as", "как / поскольку", "/æz/", "conjunction"),
+  if: entry("if", "если", "/ɪf/", "conjunction"),
+  or: entry("or", "или", "/ɔː/", "conjunction"),
+  but: entry("but", "но", "/bʌt/", "conjunction"),
+  when: entry("when", "когда", "/wen/", "conjunction"),
+  who: entry("who", "кто / который", "/huː/", "pronoun"),
+  what: entry("what", "что / какой", "/wɒt/", "pronoun"),
+  why: entry("why", "почему", "/waɪ/", "adverb"),
+  which: entry("which", "который / какой", "/wɪtʃ/", "pronoun"),
+  then: entry("then", "затем / тогда", "/ðen/", "adverb"),
+  there: entry("there", "там", "/ðeə/", "adverb"),
+  out: entry("out", "наружу / из", "/aʊt/", "adverb"),
+  up: entry("up", "вверх", "/ʌp/", "adverb"),
+  very: entry("very", "очень", "/ˈveri/", "adverb"),
+  nothing: entry("nothing", "ничего", "/ˈnʌθɪŋ/", "pronoun"),
+  time: entry("time", "время", "/taɪm/", "noun"),
+  queen: entry("Queen", "Королева", "/kwiːn/", "proper noun", undefined, true),
+  king: entry("King", "Король", "/kɪŋ/", "proper noun", undefined, true),
+  hatter: entry("Hatter", "Шляпник", "/ˈhætə/", "proper noun", undefined, true),
+  march: entry("March", "Мартовский", "/mɑːtʃ/", "proper noun", undefined, true),
+  hare: entry("Hare", "Заяц", "/heə/", "proper noun", undefined, true),
+  dodo: entry("Dodo", "Додо", "/ˈdəʊdəʊ/", "proper noun", undefined, true),
   antipathies: entry("antipathy", "антипатии", "/ænˈtɪpəθiz/", "noun", ["неприязнь", "отвращение"]),
   bank: entry("bank", "берег", "/bæŋk/", "noun", ["банк"]),
   cupboard: entry("cupboard", "буфет", "/ˈkʌbəd/", "noun", ["шкаф"]),
@@ -887,7 +974,7 @@ const phraseOverrides: Record<string, Record<string, PhraseContext>> = {
   },
 };
 
-export function buildAliceChapterOneSentenceWords({ sentence, paragraphId, chapterId }: BuildWordsOptions): ReaderWord[] {
+export function buildAliceSentenceWords({ sentence, paragraphId, chapterId }: BuildWordsOptions): ReaderWord[] {
   return sentence.text.split(/\s+/).filter(Boolean).map((text, index) => {
     const normalized = normalizeReaderToken(text);
     const isPunctuation = normalized.length === 0;
@@ -912,10 +999,13 @@ export function buildAliceChapterOneSentenceWords({ sentence, paragraphId, chapt
       chapterId,
       lexicalEntryId: isPunctuation ? undefined : lexicalEntryId(lexical),
       isProperNoun: lexical.isProperNoun,
+      isArchaic: lexical.isArchaic,
       isPunctuation,
     };
   });
 }
+
+export const buildAliceChapterOneSentenceWords = buildAliceSentenceWords;
 
 function entry(
   lemma: string,
@@ -924,8 +1014,9 @@ function entry(
   partOfSpeech: PartOfSpeech,
   commonTranslations?: string[],
   isProperNoun = false,
+  isArchaic = false,
 ): LexicalEntry {
-  return { lemma, translation, transcription, partOfSpeech, commonTranslations, isProperNoun };
+  return { lemma, translation, transcription, partOfSpeech, commonTranslations, isProperNoun, isArchaic };
 }
 
 function getLexicalEntry(normalized: string): LexicalEntry {

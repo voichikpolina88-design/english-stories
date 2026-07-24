@@ -1847,6 +1847,29 @@ p {
   padding: 14px;
 }
 
+.word-row-meta,
+.word-row-context small {
+  color: var(--purple);
+  display: block;
+  font-size: 0.76rem;
+  font-weight: 760;
+  margin-top: 0.25rem;
+}
+
+.word-row-context {
+  border-top: 1px solid rgba(20, 49, 82, 0.08);
+  margin-top: 0.65rem;
+  padding-top: 0.65rem;
+}
+
+.word-row-context p {
+  margin-top: 0.35rem;
+}
+
+.word-remove-button {
+  margin-top: 0.55rem;
+}
+
 .audio-button {
   width: 38px;
   min-height: 38px;

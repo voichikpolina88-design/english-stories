@@ -144,7 +144,32 @@ export type ReaderWord = {
   chapterId?: string;
   lexicalEntryId?: string;
   isProperNoun?: boolean;
+  isArchaic?: boolean;
   isPunctuation?: boolean;
+};
+
+export type VocabularyContext = {
+  sentenceId: string;
+  sentenceText: string;
+  sentenceTranslation?: string;
+  bookId: string;
+  bookTitle: string;
+  chapterId: string;
+  chapterTitle: string;
+  contextualPhrase?: string;
+  contextualPhraseTranslation?: string;
+};
+
+export type SavedVocabularyWord = {
+  id: string;
+  lexicalEntryId: string;
+  word: string;
+  lemma: string;
+  translation: string;
+  transcription?: string;
+  partOfSpeech?: string;
+  contexts: VocabularyContext[];
+  createdAt: string;
 };
 
 export type ReaderSentence = {

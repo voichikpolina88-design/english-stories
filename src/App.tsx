@@ -2,7 +2,6 @@ import { ArrowLeft, BookOpen, Bookmark, Clock, Home, Languages, Library, Pause, 
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type Dispatch, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode, type RefObject, type SetStateAction } from "react";
 import { getCatalogBook, getCategoryBooks, homeShelfBooks, libraryCategories, type HomeShelfBook } from "./data/homeShelves";
 import { getReaderBook, getReaderChapter } from "./data/aliceReader";
-import { getAllVocabulary, type VocabularyEntry } from "./data/vocabulary";
 import { useLearnerProgress } from "./hooks/useLearnerProgress";
 import {
   emptyPaginationSize,
@@ -13,7 +12,8 @@ import {
   useReaderPagination,
 } from "./hooks/useReaderPagination";
 import { useReadingTimer } from "./hooks/useReadingTimer";
-import type { LastOpenedContent, NativeLanguage, ReaderChapter, ReaderPosition, ReadingSettings } from "./types";
+import { useSavedVocabulary } from "./services/vocabularyStorage";
+import type { LastOpenedContent, NativeLanguage, ReaderChapter, ReaderPosition, ReadingSettings, SavedVocabularyWord } from "./types";
 
 type Page = "home" | "library" | "dictionary" | "profile";
 
@@ -42,7 +42,6 @@ type OpenContentOptions = {
 const READING_SETTINGS_KEY = "storylingo-reading-settings";
 const READER_POSITION_KEY = "storylingo-reader-positions";
 const READER_SWIPE_HINT_KEY = "storylingo-reader-swipe-hint-seen";
-const READER_SAVED_WORDS_KEY = "storylingo-reader-saved-words";
 
 const defaultReadingSettings: ReadingSettings = {
   theme: "cream",
@@ -1281,12 +1280,12 @@ function DictionaryPage() {
   const [query, setQuery] = useState("");
   const [practiceOpen, setPracticeOpen] = useState(false);
   const speech = useSpeech();
-  const words = useMemo(() => getAllVocabulary(), []);
-  const visibleWords = words
+  const { savedWords, removeWord } = useSavedVocabulary();
+  const visibleWords = savedWords
     .filter((word) => {
       const value = query.trim().toLowerCase();
       if (!value) return true;
-      return word.word.toLowerCase().includes(value) || word.translation.toLowerCase().includes(value);
+      return word.word.toLowerCase().includes(value) || word.translation.toLowerCase().includes(value) || word.lemma.toLowerCase().includes(value);
     })
     .slice(0, 36);
 
@@ -1308,11 +1307,18 @@ function DictionaryPage() {
           <p>Кнопка уже находится внутри словаря. Отдельный раздел тренировки удалён.</p>
         </section>
       ) : null}
-      <section className="word-grid">
-        {visibleWords.map((word) => (
-          <WordRow key={word.id} word={word} onSpeak={speech.toggle} />
-        ))}
-      </section>
+      {visibleWords.length ? (
+        <section className="word-grid">
+          {visibleWords.map((word) => (
+            <WordRow key={word.id} word={word} onRemove={removeWord} onSpeak={speech.toggle} />
+          ))}
+        </section>
+      ) : (
+        <section className="practice-placeholder">
+          <strong>Пока слов нет</strong>
+          <p>Нажимайте на слова во время чтения и добавляйте их сюда.</p>
+        </section>
+      )}
     </main>
   );
 }
@@ -1881,7 +1887,9 @@ function ReaderPreview({
           </div>
           {selectedWord ? (
             <ReaderWordPopover
+              bookId={book.id}
               bookTitle={book.title}
+              chapterTitle={chapter.title}
               onClose={() => setSelectedWord(null)}
               onSpeak={(wordText) => speech.toggle(wordText)}
               word={selectedWord}
@@ -2217,52 +2225,46 @@ function splitWordForAccent(text: string): { accent: string; rest: string } | nu
     rest: `${core.slice(accentLength)}${suffix}`,
   };
 }
-type SavedReaderWord = {
-  lexicalEntryId: string;
-  word: string;
-  translation: string;
-  phrase?: string;
-  phraseTranslation?: string;
-  transcription?: string;
-  partOfSpeech?: string;
-  sentenceText: string;
-  bookTitle: string;
-  chapterId?: string;
-  sentenceId: string;
-  createdAt: string;
-};
-
 function ReaderWordPopover({
+  bookId,
   bookTitle,
+  chapterTitle,
   word,
   onClose,
   onSpeak,
 }: {
+  bookId: string;
   bookTitle: string;
+  chapterTitle: string;
   word: ReaderPageWord;
   onClose: () => void;
   onSpeak: (wordText: string) => void;
 }) {
-  const [isSaved, setIsSaved] = useState(() => isReaderWordSaved(word));
   const cleanWord = (word.normalized || word.text).replace(/_/g, "");
   const lexicalEntryId = word.lexicalEntryId ?? `${word.normalized || word.id}-reader-word`;
+  const { isWordSaved: isSavedVocabularyWord, toggleWord } = useSavedVocabulary();
+  const isSaved = isSavedVocabularyWord(lexicalEntryId);
 
   function toggleSavedWord() {
-    const nextSaved = toggleReaderSavedWord({
+    toggleWord({
       lexicalEntryId,
       word: cleanWord,
+      lemma: word.lemma || cleanWord,
       translation: word.translation ?? "",
-      phrase: word.phrase,
-      phraseTranslation: word.phraseTranslation,
       transcription: word.transcription,
       partOfSpeech: word.partOfSpeech,
-      sentenceText: word.sentenceText,
-      bookTitle,
-      chapterId: word.chapterId,
-      sentenceId: word.sentenceId,
-      createdAt: new Date().toISOString(),
+      context: {
+        sentenceId: word.sentenceId,
+        sentenceText: word.sentenceText,
+        sentenceTranslation: word.sentenceTranslation,
+        bookId,
+        bookTitle,
+        chapterId: word.chapterId || "chapter-1",
+        chapterTitle,
+        contextualPhrase: word.phrase,
+        contextualPhraseTranslation: word.phraseTranslation,
+      },
     });
-    setIsSaved(nextSaved);
   }
 
   return (
@@ -2290,30 +2292,6 @@ function ReaderWordPopover({
       </div>
     </aside>
   );
-}
-
-function readReaderSavedWords(): SavedReaderWord[] {
-  try {
-    const raw = window.localStorage.getItem(READER_SAVED_WORDS_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-}
-
-function isReaderWordSaved(word: ReaderPageWord) {
-  const lexicalEntryId = word.lexicalEntryId ?? `${word.normalized || word.id}-reader-word`;
-  return readReaderSavedWords().some((item) => item.lexicalEntryId === lexicalEntryId);
-}
-
-function toggleReaderSavedWord(nextWord: SavedReaderWord) {
-  const savedWords = readReaderSavedWords();
-  const exists = savedWords.some((item) => item.lexicalEntryId === nextWord.lexicalEntryId);
-  const nextWords = exists ? savedWords.filter((item) => item.lexicalEntryId !== nextWord.lexicalEntryId) : [...savedWords, nextWord];
-  window.localStorage.setItem(READER_SAVED_WORDS_KEY, JSON.stringify(nextWords));
-  return !exists;
 }
 
 function ReaderSentencePopover({ sentence, onClose }: { sentence: ReaderPageWord; onClose: () => void }) {
@@ -2655,7 +2633,17 @@ function StoryCard({ story, onOpen }: { story: HomeShelfBook; onOpen: (bookId: s
   );
 }
 
-function WordRow({ word, onSpeak }: { word: VocabularyEntry; onSpeak: (text: string) => void }) {
+function WordRow({
+  word,
+  onRemove,
+  onSpeak,
+}: {
+  word: SavedVocabularyWord;
+  onRemove: (lexicalEntryId: string) => void;
+  onSpeak: (text: string) => void;
+}) {
+  const primaryContext = word.contexts[0];
+
   return (
     <article className="word-row">
       <button className="audio-button" type="button" aria-label={`Прослушать ${word.word}`} onClick={() => onSpeak(word.word)}>
@@ -2663,8 +2651,30 @@ function WordRow({ word, onSpeak }: { word: VocabularyEntry; onSpeak: (text: str
       </button>
       <div>
         <h3>{word.word}</h3>
-        <span>{word.ipa}</span>
+        {word.transcription ? <span>{word.transcription}</span> : null}
         <p>{word.translation}</p>
+        {word.partOfSpeech || word.lemma ? (
+          <small className="word-row-meta">
+            {[word.lemma, word.partOfSpeech].filter(Boolean).join(" · ")}
+          </small>
+        ) : null}
+        {primaryContext ? (
+          <div className="word-row-context">
+            <small>
+              {primaryContext.bookTitle} · {primaryContext.chapterTitle}
+            </small>
+            <p>{primaryContext.sentenceText}</p>
+            {primaryContext.sentenceTranslation ? <p>{primaryContext.sentenceTranslation}</p> : null}
+            {primaryContext.contextualPhrase && primaryContext.contextualPhraseTranslation ? (
+              <small>
+                {primaryContext.contextualPhrase}: {primaryContext.contextualPhraseTranslation}
+              </small>
+            ) : null}
+          </div>
+        ) : null}
+        <button className="text-button word-remove-button" type="button" onClick={() => onRemove(word.lexicalEntryId)}>
+          Удалить
+        </button>
       </div>
     </article>
   );
