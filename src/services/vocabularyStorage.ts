@@ -1,10 +1,11 @@
 import { useSyncExternalStore } from "react";
-import type { SavedVocabularyWord, VocabularyContext } from "../types";
+import type { SavedVocabularyWord, VocabularyContext, VocabularyProgress } from "../types";
 
 export const SAVED_VOCABULARY_STORAGE_KEY = "storylingo-reader-saved-words";
 const SAVED_VOCABULARY_EVENT = "storylingo-saved-vocabulary-change";
-const SCHEMA_VERSION = 2;
+const SCHEMA_VERSION = 3;
 let vocabularyCache: SavedVocabularyStorage | null = null;
+const trainingSessionCorrectWords = new Map<string, Set<string>>();
 
 type SavedVocabularyStorage = {
   version: number;
@@ -30,6 +31,11 @@ export function useSavedVocabulary() {
     removeWord: removeSavedVocabularyWord,
     toggleWord: toggleSavedVocabularyWord,
     isWordSaved,
+    startTrainingSession,
+    recordAnswer: recordTrainingAnswer,
+    finishTrainingSession,
+    getWordsWithErrors,
+    clearResolvedErrors,
   };
 }
 
@@ -64,6 +70,7 @@ export function addSavedVocabularyWord(input: SaveVocabularyInput) {
           partOfSpeech: input.partOfSpeech,
           contexts: [nextContext],
           createdAt: new Date().toISOString(),
+          progress: createDefaultVocabularyProgress(),
         },
       ];
 
@@ -90,6 +97,67 @@ export function toggleSavedVocabularyWord(input: SaveVocabularyInput) {
 
 export function isWordSaved(lexicalEntryId: string) {
   return readSavedVocabularySnapshot().some((item) => item.lexicalEntryId === lexicalEntryId);
+}
+
+export function startTrainingSession() {
+  const sessionId = `vocab-session-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  trainingSessionCorrectWords.set(sessionId, new Set());
+  return sessionId;
+}
+
+export function recordTrainingAnswer(lexicalEntryId: string, isCorrect: boolean, sessionId: string) {
+  const storage = readSavedVocabularyStorage();
+  const reviewedAt = new Date().toISOString();
+  const words = storage.words.map((word) => {
+    if (word.lexicalEntryId !== lexicalEntryId) return word;
+
+    const progress = normalizeProgress(word.progress);
+    const sessionCorrectWords = trainingSessionCorrectWords.get(sessionId) ?? new Set<string>();
+    const alreadyCorrectInSession = sessionCorrectWords.has(lexicalEntryId);
+    if (isCorrect) sessionCorrectWords.add(lexicalEntryId);
+    trainingSessionCorrectWords.set(sessionId, sessionCorrectWords);
+    const sessionsCorrect = isCorrect && !alreadyCorrectInSession
+      ? progress.sessionsCorrect + 1
+      : progress.sessionsCorrect;
+    const unresolvedIncorrectCount = isCorrect
+      ? Math.max(0, (progress.unresolvedIncorrectCount ?? 0) - 1)
+      : (progress.unresolvedIncorrectCount ?? 0) + 1;
+    const nextProgress: VocabularyProgress = {
+      correctCount: progress.correctCount + (isCorrect ? 1 : 0),
+      incorrectCount: progress.incorrectCount + (isCorrect ? 0 : 1),
+      sessionsCorrect,
+      lastReviewedAt: reviewedAt,
+      status: sessionsCorrect >= 3 ? "learned" : "learning",
+      unresolvedIncorrectCount,
+    };
+
+    return {
+      ...word,
+      progress: nextProgress,
+    };
+  });
+
+  writeSavedVocabularyStorage({ version: SCHEMA_VERSION, words });
+}
+
+export function finishTrainingSession(sessionId: string) {
+  trainingSessionCorrectWords.delete(sessionId);
+}
+
+export function getWordsWithErrors() {
+  return readSavedVocabularySnapshot().filter((word) => (normalizeProgress(word.progress).unresolvedIncorrectCount ?? 0) > 0);
+}
+
+export function clearResolvedErrors() {
+  const storage = readSavedVocabularyStorage();
+  const words = storage.words.map((word) => ({
+    ...word,
+    progress: {
+      ...normalizeProgress(word.progress),
+      unresolvedIncorrectCount: 0,
+    },
+  }));
+  writeSavedVocabularyStorage({ version: SCHEMA_VERSION, words });
 }
 
 function subscribeSavedVocabulary(callback: () => void) {
@@ -177,6 +245,7 @@ function migrateLegacyWord(value: unknown): SavedVocabularyWord | null {
       partOfSpeech: item.partOfSpeech,
       contexts: item.contexts.map(normalizeContext),
       createdAt: item.createdAt || new Date().toISOString(),
+      progress: normalizeProgress(item.progress),
     };
   }
 
@@ -202,6 +271,37 @@ function migrateLegacyWord(value: unknown): SavedVocabularyWord | null {
       }),
     ],
     createdAt: item.createdAt || new Date().toISOString(),
+    progress: normalizeProgress(item.progress),
+  };
+}
+
+function createDefaultVocabularyProgress(): VocabularyProgress {
+  return {
+    correctCount: 0,
+    incorrectCount: 0,
+    sessionsCorrect: 0,
+    status: "new",
+    unresolvedIncorrectCount: 0,
+  };
+}
+
+function normalizeProgress(progress: Partial<VocabularyProgress> | undefined): VocabularyProgress {
+  const correctCount = Math.max(0, Number(progress?.correctCount) || 0);
+  const incorrectCount = Math.max(0, Number(progress?.incorrectCount) || 0);
+  const sessionsCorrect = Math.max(0, Number(progress?.sessionsCorrect) || 0);
+  return {
+    correctCount,
+    incorrectCount,
+    sessionsCorrect,
+    lastReviewedAt: progress?.lastReviewedAt,
+    status: progress?.status === "learned" || progress?.status === "learning" || progress?.status === "new"
+      ? progress.status
+      : sessionsCorrect >= 3
+        ? "learned"
+        : correctCount || incorrectCount
+          ? "learning"
+          : "new",
+    unresolvedIncorrectCount: Math.max(0, Number(progress?.unresolvedIncorrectCount) || 0),
   };
 }
 

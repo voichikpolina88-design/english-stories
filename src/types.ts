@@ -160,6 +160,15 @@ export type VocabularyContext = {
   contextualPhraseTranslation?: string;
 };
 
+export type VocabularyProgress = {
+  correctCount: number;
+  incorrectCount: number;
+  sessionsCorrect: number;
+  lastReviewedAt?: string;
+  status: "new" | "learning" | "learned";
+  unresolvedIncorrectCount?: number;
+};
+
 export type SavedVocabularyWord = {
   id: string;
   lexicalEntryId: string;
@@ -170,6 +179,7 @@ export type SavedVocabularyWord = {
   partOfSpeech?: string;
   contexts: VocabularyContext[];
   createdAt: string;
+  progress: VocabularyProgress;
 };
 
 export type ReaderSentence = {

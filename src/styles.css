@@ -1835,6 +1835,28 @@ p {
   color: var(--muted);
 }
 
+.dictionary-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.dictionary-filters button {
+  min-height: 36px;
+  padding: 0 13px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--muted);
+  font-weight: 760;
+}
+
+.dictionary-filters button.active {
+  border-color: rgba(94, 73, 214, 0.28);
+  background: var(--purple-soft);
+  color: var(--purple);
+}
+
 .word-grid {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
@@ -1845,6 +1867,33 @@ p {
   gap: 12px;
   align-items: start;
   padding: 14px;
+}
+
+.word-row-heading {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.word-status {
+  width: fit-content;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(20, 49, 82, 0.06);
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 820;
+}
+
+.word-status.status-learning {
+  background: rgba(94, 73, 214, 0.1);
+  color: var(--purple);
+}
+
+.word-status.status-learned {
+  background: rgba(22, 163, 74, 0.11);
+  color: #15803d;
 }
 
 .word-row-meta,
@@ -1876,6 +1925,159 @@ p {
   border: 0;
   background: var(--purple-soft);
   color: var(--purple);
+}
+
+.vocabulary-training-page {
+  padding-bottom: 96px;
+}
+
+.training-card {
+  display: grid;
+  gap: 18px;
+  padding: clamp(18px, 4vw, 30px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: #fff;
+  box-shadow: var(--soft-shadow);
+}
+
+.training-intro h1,
+.training-result h1 {
+  color: var(--ink);
+  font-size: clamp(2rem, 5vw, 3.4rem);
+  line-height: 1;
+}
+
+.training-intro p,
+.training-success-note,
+.training-hard-words p {
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.training-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.training-topline,
+.training-result-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.training-topline span {
+  color: var(--ink);
+  font-weight: 860;
+}
+
+.training-topline small {
+  color: var(--muted);
+  font-weight: 760;
+}
+
+.training-task {
+  position: relative;
+  display: grid;
+  gap: 14px;
+}
+
+.training-task h2 {
+  max-width: 760px;
+  color: var(--ink);
+  font-size: clamp(1.8rem, 5vw, 3.1rem);
+  line-height: 1.08;
+}
+
+.training-audio {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.training-context {
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: var(--cream);
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.training-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.training-options button {
+  min-height: 58px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: #fff;
+  color: var(--ink);
+  font-size: 1rem;
+  font-weight: 780;
+  text-align: left;
+}
+
+.training-options button:hover {
+  border-color: rgba(94, 73, 214, 0.24);
+  background: var(--purple-soft);
+}
+
+.typed-answer-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+}
+
+.typed-answer-form input {
+  min-height: 52px;
+  min-width: 0;
+  padding: 0 16px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  outline: 0;
+  color: var(--ink);
+}
+
+.training-feedback {
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+  border-radius: 18px;
+  background: var(--cream);
+}
+
+.training-feedback.correct {
+  background: rgba(22, 163, 74, 0.1);
+}
+
+.training-feedback.incorrect {
+  background: rgba(220, 38, 38, 0.08);
+}
+
+.training-feedback strong {
+  color: var(--ink);
+}
+
+.training-feedback p,
+.training-feedback small {
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.training-hard-words {
+  display: grid;
+  gap: 6px;
+  padding: 14px;
+  border-radius: 16px;
+  background: var(--cream);
 }
 
 .profile-panel {
@@ -2973,12 +3175,33 @@ blockquote {
   .story-grid,
   .word-grid,
   .profile-stats,
+  .training-summary,
+  .training-options,
+  .typed-answer-form,
   .dictionary-toolbar,
   .library-controls,
   .reader-card,
   .content-detail-card,
   .profile-panel {
     grid-template-columns: 1fr;
+  }
+
+  .dictionary-toolbar .primary-button {
+    width: 100%;
+  }
+
+  .training-card {
+    gap: 14px;
+    padding: 16px;
+  }
+
+  .training-audio {
+    position: static;
+    justify-self: end;
+  }
+
+  .training-task h2 {
+    font-size: 2rem;
   }
 
   .reading-topbar {

@@ -1276,16 +1276,37 @@ function LibraryPage({
 
 function DictionaryPage() {
   const [query, setQuery] = useState("");
+  const [filter, setFilter] = useState<"all" | "new" | "errors" | "learned">("all");
   const [practiceOpen, setPracticeOpen] = useState(false);
   const speech = useSpeech();
-  const { savedWords, removeWord } = useSavedVocabulary();
+  const { savedWords, removeWord, startTrainingSession, recordAnswer, finishTrainingSession } = useSavedVocabulary();
   const visibleWords = savedWords
     .filter((word) => {
       const value = query.trim().toLowerCase();
       if (!value) return true;
       return word.word.toLowerCase().includes(value) || word.translation.toLowerCase().includes(value) || word.lemma.toLowerCase().includes(value);
     })
+    .filter((word) => {
+      const progress = getVocabularyProgress(word);
+      if (filter === "new") return progress.status === "new";
+      if (filter === "learned") return progress.status === "learned";
+      if (filter === "errors") return (progress.unresolvedIncorrectCount ?? 0) > 0;
+      return true;
+    })
     .slice(0, 36);
+
+  if (practiceOpen) {
+    return (
+      <VocabularyTrainingScreen
+        words={savedWords}
+        onBack={() => setPracticeOpen(false)}
+        onFinishSession={finishTrainingSession}
+        onRecordAnswer={recordAnswer}
+        onSpeak={speech.toggle}
+        onStartSession={startTrainingSession}
+      />
+    );
+  }
 
   return (
     <main className="page-stack">
@@ -1295,15 +1316,30 @@ function DictionaryPage() {
           <Search size={18} aria-hidden="true" />
           <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Найти слово или перевод" />
         </label>
-        <button className="primary-button" type="button" onClick={() => setPracticeOpen((current) => !current)}>
-          Тренировать слова
-        </button>
+        {savedWords.length ? (
+          <button className="primary-button" type="button" onClick={() => setPracticeOpen(true)}>
+            Тренировать {savedWords.length} {pluralizeRussian(savedWords.length, "слово", "слова", "слов")}
+          </button>
+        ) : null}
       </section>
-      {practiceOpen ? (
-        <section className="practice-placeholder">
-          <strong>Тренировка слов скоро</strong>
-          <p>Кнопка уже находится внутри словаря. Отдельный раздел тренировки удалён.</p>
-        </section>
+      {savedWords.length ? (
+        <div className="dictionary-filters" role="group" aria-label="Фильтр словаря">
+          {[
+            ["all", "Все"],
+            ["new", "Новые"],
+            ["errors", "С ошибками"],
+            ["learned", "Изученные"],
+          ].map(([id, label]) => (
+            <button
+              className={filter === id ? "active" : ""}
+              key={id}
+              type="button"
+              onClick={() => setFilter(id as typeof filter)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
       ) : null}
       {visibleWords.length ? (
         <section className="word-grid">
@@ -1313,12 +1349,402 @@ function DictionaryPage() {
         </section>
       ) : (
         <section className="practice-placeholder">
-          <strong>Пока слов нет</strong>
-          <p>Нажимайте на слова во время чтения и добавляйте их сюда.</p>
+          <strong>{savedWords.length ? "В этом фильтре пока пусто" : "Пока слов нет"}</strong>
+          <p>{savedWords.length ? "Попробуйте выбрать другой фильтр или продолжить тренировку." : "Нажимайте на слова во время чтения и добавляйте их сюда."}</p>
         </section>
       )}
     </main>
   );
+}
+
+type VocabularyTaskType = "translation-choice" | "word-choice" | "context-choice" | "typed-translation";
+
+type VocabularyTrainingTask = {
+  id: string;
+  type: VocabularyTaskType;
+  word: SavedVocabularyWord;
+  prompt: string;
+  context?: string;
+  options: string[];
+  correctAnswer: string;
+};
+
+type VocabularyFeedback = {
+  task: VocabularyTrainingTask;
+  answer: string;
+  isCorrect: boolean;
+};
+
+const reserveVocabularyOptions: Array<Pick<SavedVocabularyWord, "word" | "translation" | "partOfSpeech">> = [
+  { word: "rabbit", translation: "кролик", partOfSpeech: "noun" },
+  { word: "bank", translation: "берег", partOfSpeech: "noun" },
+  { word: "watch", translation: "часы", partOfSpeech: "noun" },
+  { word: "cupboard", translation: "шкаф", partOfSpeech: "noun" },
+  { word: "curious", translation: "любопытный", partOfSpeech: "adjective" },
+  { word: "suddenly", translation: "внезапно", partOfSpeech: "adverb" },
+  { word: "fall", translation: "падать", partOfSpeech: "verb" },
+  { word: "garden", translation: "сад", partOfSpeech: "noun" },
+  { word: "door", translation: "дверь", partOfSpeech: "noun" },
+  { word: "little", translation: "маленький", partOfSpeech: "adjective" },
+  { word: "drink", translation: "пить", partOfSpeech: "verb" },
+  { word: "think", translation: "думать", partOfSpeech: "verb" },
+];
+
+function VocabularyTrainingScreen({
+  words,
+  onBack,
+  onFinishSession,
+  onRecordAnswer,
+  onSpeak,
+  onStartSession,
+}: {
+  words: SavedVocabularyWord[];
+  onBack: () => void;
+  onFinishSession: (sessionId: string) => void;
+  onRecordAnswer: (wordId: string, isCorrect: boolean, sessionId: string) => void;
+  onSpeak: (text: string) => void;
+  onStartSession: () => string;
+}) {
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [tasks, setTasks] = useState<VocabularyTrainingTask[]>([]);
+  const [index, setIndex] = useState(0);
+  const [feedback, setFeedback] = useState<VocabularyFeedback | null>(null);
+  const [typedAnswer, setTypedAnswer] = useState("");
+  const [correctCount, setCorrectCount] = useState(0);
+  const [mistakes, setMistakes] = useState<SavedVocabularyWord[]>([]);
+  const [retrySession, setRetrySession] = useState(false);
+  const [phase, setPhase] = useState<"intro" | "training" | "result">("intro");
+  const availableWords = words.slice(0, 10);
+  const taskCount = Math.min(15, Math.max(availableWords.length, Math.min(availableWords.length * 2, 15)));
+  const currentTask = tasks[index];
+  const progressValue = tasks.length ? Math.round((index / tasks.length) * 100) : 0;
+
+  useEffect(() => {
+    return () => {
+      if (sessionId) onFinishSession(sessionId);
+    };
+  }, [onFinishSession, sessionId]);
+
+  function start(wordsForSession = availableWords, retry = false) {
+    const nextSessionId = onStartSession();
+    const nextTasks = buildVocabularyTrainingTasks(wordsForSession, words, retry);
+    setSessionId(nextSessionId);
+    setTasks(nextTasks);
+    setIndex(0);
+    setFeedback(null);
+    setTypedAnswer("");
+    setCorrectCount(0);
+    setMistakes([]);
+    setRetrySession(retry);
+    setPhase("training");
+  }
+
+  function submitAnswer(answer: string) {
+    if (!currentTask || !sessionId || feedback) return;
+    const isCorrect = isVocabularyAnswerCorrect(currentTask, answer);
+    onRecordAnswer(currentTask.word.lexicalEntryId, isCorrect, sessionId);
+    setFeedback({ task: currentTask, answer, isCorrect });
+    if (isCorrect) {
+      setCorrectCount((current) => current + 1);
+    } else {
+      setMistakes((current) => (
+        current.some((word) => word.lexicalEntryId === currentTask.word.lexicalEntryId)
+          ? current
+          : [...current, currentTask.word]
+      ));
+    }
+  }
+
+  function continueTraining() {
+    if (!feedback) return;
+    setFeedback(null);
+    setTypedAnswer("");
+    if (index >= tasks.length - 1) {
+      if (sessionId) onFinishSession(sessionId);
+      setSessionId(null);
+      setPhase("result");
+      return;
+    }
+    setIndex((current) => current + 1);
+  }
+
+  function retryMistakes() {
+    if (!mistakes.length) return;
+    start(mistakes, true);
+  }
+
+  if (phase === "intro") {
+    return (
+      <main className="page-stack vocabulary-training-page">
+        <button className="text-button" type="button" onClick={onBack}>← Вернуться в словарь</button>
+        <section className="training-card training-intro">
+          <span className="eyebrow">Личный словарь</span>
+          <h1>Тренировка слов</h1>
+          <p>В тренировку попадут только слова, которые вы сами сохранили во время чтения.</p>
+          <div className="training-summary">
+            <Metric label="Слов" value={availableWords.length.toString()} />
+            <Metric label="Заданий" value={taskCount.toString()} />
+            <Metric label="Время" value={`${Math.max(1, Math.ceil(taskCount * 0.35))} мин`} />
+          </div>
+          <button className="primary-button" type="button" onClick={() => start()}>
+            Начать тренировку
+          </button>
+        </section>
+      </main>
+    );
+  }
+
+  if (phase === "result") {
+    const incorrectCount = tasks.length - correctCount;
+    const percent = tasks.length ? Math.round((correctCount / tasks.length) * 100) : 0;
+    return (
+      <main className="page-stack vocabulary-training-page">
+        <section className="training-card training-result">
+          <span className="eyebrow">{mistakes.length ? "Итог" : "Отлично"}</span>
+          <h1>{retrySession && !mistakes.length ? "Все ошибки исправлены" : "Тренировка завершена"}</h1>
+          <div className="training-summary">
+            <Metric label="Правильно" value={correctCount.toString()} />
+            <Metric label="Ошибок" value={incorrectCount.toString()} />
+            <Metric label="Результат" value={`${percent}%`} />
+          </div>
+          {mistakes.length ? (
+            <div className="training-hard-words">
+              <strong>Сложные слова</strong>
+              <p>{mistakes.map((word) => word.word).join(", ")}</p>
+            </div>
+          ) : (
+            <p className="training-success-note">Все ответы правильные.</p>
+          )}
+          <div className="training-result-actions">
+            {mistakes.length ? (
+              <button className="secondary-button" type="button" onClick={retryMistakes}>
+                Повторить ошибки
+              </button>
+            ) : null}
+            <button className="primary-button" type="button" onClick={onBack}>
+              Вернуться в словарь
+            </button>
+          </div>
+        </section>
+      </main>
+    );
+  }
+
+  return (
+    <main className="page-stack vocabulary-training-page">
+      <section className="training-card training-task-card">
+        <div className="training-topline">
+          <button className="text-button" type="button" onClick={onBack}>← Словарь</button>
+          <span>{Math.min(index + 1, tasks.length)} / {tasks.length}</span>
+          <small>Ошибок: {mistakes.length}</small>
+        </div>
+        <Progress value={progressValue} />
+        {currentTask ? (
+          <article className="training-task">
+            <span className="eyebrow">{trainingTaskLabel(currentTask.type)}</span>
+            <button className="audio-button training-audio" type="button" aria-label={`Прослушать ${currentTask.word.word}`} onClick={() => onSpeak(currentTask.word.word)}>
+              <Volume2 size={17} aria-hidden="true" />
+            </button>
+            <h2>{currentTask.prompt}</h2>
+            {currentTask.context ? <p className="training-context">{currentTask.context}</p> : null}
+            {currentTask.type === "typed-translation" ? (
+              <form
+                className="typed-answer-form"
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  submitAnswer(typedAnswer);
+                }}
+              >
+                <input
+                  value={typedAnswer}
+                  onChange={(event) => setTypedAnswer(event.target.value)}
+                  placeholder="Введите перевод"
+                  aria-label="Введите перевод"
+                />
+                <button className="primary-button" type="submit" disabled={!typedAnswer.trim()}>
+                  Проверить
+                </button>
+              </form>
+            ) : (
+              <div className="training-options">
+                {currentTask.options.map((option) => (
+                  <button key={option} type="button" onClick={() => submitAnswer(option)}>
+                    {option}
+                  </button>
+                ))}
+              </div>
+            )}
+          </article>
+        ) : null}
+        {feedback ? (
+          <section className={feedback.isCorrect ? "training-feedback correct" : "training-feedback incorrect"} aria-live="polite">
+            <strong>{feedback.isCorrect ? "Правильно" : "Нужно повторить"}</strong>
+            {!feedback.isCorrect ? <p>Ваш ответ: {feedback.answer || "—"}</p> : null}
+            <p>Правильно: {feedback.task.correctAnswer}</p>
+            <small>{feedback.task.word.word} — {feedback.task.word.translation}</small>
+            {feedback.task.word.contexts[0]?.sentenceText ? <p>{feedback.task.word.contexts[0].sentenceText}</p> : null}
+            <button className="primary-button" type="button" onClick={continueTraining}>
+              Продолжить
+            </button>
+          </section>
+        ) : null}
+      </section>
+    </main>
+  );
+}
+
+function buildVocabularyTrainingTasks(words: SavedVocabularyWord[], allWords: SavedVocabularyWord[], retry = false) {
+  const sessionWords = shuffleArray(words).slice(0, 10);
+  const types: VocabularyTaskType[] = retry
+    ? ["context-choice", "typed-translation", "translation-choice", "word-choice"]
+    : ["translation-choice", "word-choice", "context-choice", "typed-translation"];
+  const targetCount = Math.min(15, Math.max(sessionWords.length, Math.min(sessionWords.length * 2, 15)));
+  const tasks: VocabularyTrainingTask[] = [];
+  let cursor = 0;
+
+  while (tasks.length < targetCount && sessionWords.length) {
+    const word = sessionWords[cursor % sessionWords.length];
+    const previous = tasks.at(-1)?.word.lexicalEntryId;
+    const nextWord = previous === word.lexicalEntryId && sessionWords.length > 1
+      ? sessionWords[(cursor + 1) % sessionWords.length]
+      : word;
+    const type = types[(tasks.length + (retry ? 1 : 0)) % types.length];
+    tasks.push(createVocabularyTask(nextWord, type, allWords, tasks.length));
+    cursor++;
+  }
+
+  return tasks;
+}
+
+function createVocabularyTask(word: SavedVocabularyWord, type: VocabularyTaskType, allWords: SavedVocabularyWord[], index: number): VocabularyTrainingTask {
+  const distractors = getVocabularyDistractors(word, allWords, type);
+  const context = word.contexts[0]?.sentenceText;
+  if (type === "word-choice") {
+    return {
+      id: `${word.lexicalEntryId}-${type}-${index}`,
+      type,
+      word,
+      prompt: word.translation,
+      options: shuffleArray([word.word, ...distractors.map((item) => item.word)]).slice(0, 4),
+      correctAnswer: word.word,
+    };
+  }
+
+  if (type === "context-choice") {
+    return {
+      id: `${word.lexicalEntryId}-${type}-${index}`,
+      type,
+      word,
+      prompt: "Вставьте слово в контекст",
+      context: makeVocabularyContextGap(context ?? word.contexts[0]?.contextualPhrase ?? word.word, word),
+      options: shuffleArray([word.word, ...distractors.map((item) => item.word)]).slice(0, 4),
+      correctAnswer: word.word,
+    };
+  }
+
+  if (type === "typed-translation") {
+    return {
+      id: `${word.lexicalEntryId}-${type}-${index}`,
+      type,
+      word,
+      prompt: word.word,
+      options: [],
+      correctAnswer: word.translation,
+    };
+  }
+
+  return {
+    id: `${word.lexicalEntryId}-${type}-${index}`,
+    type,
+    word,
+    prompt: word.word,
+    options: shuffleArray([word.translation, ...distractors.map((item) => item.translation)]).slice(0, 4),
+    correctAnswer: word.translation,
+  };
+}
+
+function getVocabularyDistractors(word: SavedVocabularyWord, allWords: SavedVocabularyWord[], type: VocabularyTaskType) {
+  const source = [
+    ...allWords.filter((item) => item.lexicalEntryId !== word.lexicalEntryId),
+    ...reserveVocabularyOptions.map((item, index) => ({
+      id: `reserve-${index}`,
+      lexicalEntryId: `reserve-${index}`,
+      lemma: item.word,
+      contexts: [],
+      createdAt: "",
+      progress: { correctCount: 0, incorrectCount: 0, sessionsCorrect: 0, status: "new" as const, unresolvedIncorrectCount: 0 },
+      ...item,
+    })),
+  ];
+  const preferred = source.filter((item) => item.partOfSpeech && item.partOfSpeech === word.partOfSpeech);
+  const candidates = preferred.length >= 3 ? preferred : source;
+  const seen = new Set<string>([type === "translation-choice" ? word.translation : word.word]);
+  const distractors: Array<Pick<SavedVocabularyWord, "word" | "translation" | "partOfSpeech">> = [];
+
+  shuffleArray(candidates).forEach((item) => {
+    const value = type === "translation-choice" ? item.translation : item.word;
+    if (!value || seen.has(value)) return;
+    seen.add(value);
+    distractors.push(item);
+  });
+
+  return distractors.slice(0, 3);
+}
+
+function isVocabularyAnswerCorrect(task: VocabularyTrainingTask, answer: string) {
+  const normalizedAnswer = normalizeVocabularyAnswer(answer);
+  if (!normalizedAnswer) return false;
+  if (task.type !== "typed-translation") return normalizedAnswer === normalizeVocabularyAnswer(task.correctAnswer);
+  return getAcceptedVocabularyTranslations(task.word).some((item) => normalizeVocabularyAnswer(item) === normalizedAnswer);
+}
+
+function getAcceptedVocabularyTranslations(word: SavedVocabularyWord) {
+  return Array.from(new Set([
+    word.translation,
+    ...word.translation.split(/[,;]+/).map((item) => item.trim()),
+    ...word.contexts.map((context) => context.contextualPhraseTranslation).filter((item): item is string => Boolean(item)),
+  ].filter(Boolean)));
+}
+
+function normalizeVocabularyAnswer(value: string) {
+  return value.trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+function makeVocabularyContextGap(context: string, word: SavedVocabularyWord) {
+  const target = word.word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const regex = new RegExp(`\\b${target}\\b`, "i");
+  if (regex.test(context)) return context.replace(regex, "______");
+  return `${context}  ______`;
+}
+
+function trainingTaskLabel(type: VocabularyTaskType) {
+  if (type === "word-choice") return "Выберите английское слово";
+  if (type === "context-choice") return "Контекст";
+  if (type === "typed-translation") return "Введите перевод";
+  return "Выберите перевод";
+}
+
+function getVocabularyProgress(word: SavedVocabularyWord) {
+  return word.progress ?? { correctCount: 0, incorrectCount: 0, sessionsCorrect: 0, status: "new" as const, unresolvedIncorrectCount: 0 };
+}
+
+function vocabularyStatusLabel(word: SavedVocabularyWord) {
+  const status = getVocabularyProgress(word).status;
+  if (status === "learned") return "Изучено";
+  if (status === "learning") return "Изучается";
+  return "Новое";
+}
+
+function pluralizeRussian(count: number, one: string, few: string, many: string) {
+  const mod10 = count % 10;
+  const mod100 = count % 100;
+  if (mod10 === 1 && mod100 !== 11) return one;
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return few;
+  return many;
+}
+
+function shuffleArray<T>(items: T[]) {
+  return [...items].sort(() => Math.random() - 0.5);
 }
 
 function ContentDetailPage({
@@ -2672,6 +3098,7 @@ function WordRow({
   const primaryContext = word.contexts[0];
   const partOfSpeechLabel = getPartOfSpeechLabel(word.partOfSpeech);
   const lemma = word.lemma && word.lemma.toLowerCase() !== word.word.toLowerCase() ? word.lemma : null;
+  const progress = getVocabularyProgress(word);
 
   return (
     <article className="word-row">
@@ -2679,7 +3106,10 @@ function WordRow({
         <Volume2 size={16} aria-hidden="true" />
       </button>
       <div>
-        <h3>{word.word}</h3>
+        <div className="word-row-heading">
+          <h3>{word.word}</h3>
+          <span className={`word-status status-${progress.status}`}>{vocabularyStatusLabel(word)}</span>
+        </div>
         {word.transcription ? <span>{word.transcription}</span> : null}
         <p>{word.translation}</p>
         {partOfSpeechLabel || lemma ? (
