@@ -51,7 +51,6 @@ const defaultReadingSettings: ReadingSettings = {
   textWidth: 720,
   textAlign: "left",
   accentedReading: false,
-  showSentenceTranslation: true,
   showWordTranslation: false,
 };
 
@@ -120,7 +119,6 @@ function normalizeReadingSettings(settings: ReadingSettings): ReadingSettings {
     textWidth: Math.min(760, Math.max(600, Number(settings.textWidth) || defaultReadingSettings.textWidth)),
     textAlign: settings.textAlign === "justify" ? "justify" : "left",
     accentedReading: Boolean(settings.accentedReading),
-    showSentenceTranslation: true,
     showWordTranslation: false,
   };
 }
@@ -2328,7 +2326,7 @@ function ReaderParagraphTranslationPopover({ word, onClose }: { word: ReaderPage
     <aside className="reader-translation-popover sentence-popover" role="dialog" aria-label="Перевод абзаца" onClick={(event) => event.stopPropagation()}>
       <button className="popover-close" type="button" aria-label="Закрыть перевод" onClick={onClose}>×</button>
       <strong>Перевод абзаца</strong>
-      <p>{word.paragraphTranslation ?? "Перевод этого абзаца пока недоступен."}</p>
+      <p>{word.paragraphTranslation ?? ""}</p>
     </aside>
   );
 }
@@ -2416,7 +2414,7 @@ function isReaderInteractive(target: EventTarget | null) {
   if (!(target instanceof Element)) return false;
   return Boolean(
     target.closest(
-      "button, input, select, textarea, a, [role='button'], [data-reader-interactive], .reader-word, .word, .audio-button, .block-audio-button, .block-translation-trigger, .sentence-audio-button, .sentence-translation-trigger, .reading-settings-panel, .reading-timer-widget, .reading-timer-layer, .reader-translation-popover",
+      "button, input, select, textarea, a, [role='button'], [data-reader-interactive], .reader-word, .word, .audio-button, .block-audio-button, .block-translation-trigger, .reading-settings-panel, .reading-timer-widget, .reading-timer-layer, .reader-translation-popover",
     ),
   );
 }

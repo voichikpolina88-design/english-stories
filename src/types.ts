@@ -221,7 +221,6 @@ export type ReadingSettings = {
   textWidth: number;
   textAlign: ReadingTextAlign;
   accentedReading: boolean;
-  showSentenceTranslation: boolean;
   showWordTranslation: boolean;
 };
 
