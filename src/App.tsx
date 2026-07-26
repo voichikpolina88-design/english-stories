@@ -1434,7 +1434,7 @@ function ReaderPreview({
   const [isPageTurning, setIsPageTurning] = useState(false);
   const [restrictionOpen, setRestrictionOpen] = useState(false);
   const [selectedWord, setSelectedWord] = useState<ReaderPageWord | null>(null);
-  const [selectedSentence, setSelectedSentence] = useState<ReaderPageWord | null>(null);
+  const [selectedParagraph, setSelectedParagraph] = useState<ReaderPageWord | null>(null);
   const [showSwipeHint, setShowSwipeHint] = useState(() => {
     try {
       return window.localStorage.getItem(READER_SWIPE_HINT_KEY) !== "true";
@@ -1648,6 +1648,10 @@ function ReaderPreview({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [timerOpen]);
 
+  useEffect(() => {
+    setSelectedParagraph(null);
+  }, [chapter.id]);
+
   function rememberCurrentWord() {
     visibleWordIdBeforeRepaginate.current = activePage?.firstWordId ?? null;
   }
@@ -1661,7 +1665,7 @@ function ReaderPreview({
     if (pages.length === 0 || isPageTurning) return;
     readingTimer.recordActivity();
     setSelectedWord(null);
-    setSelectedSentence(null);
+    setSelectedParagraph(null);
     setShowSwipeHint(false);
     try {
       window.localStorage.setItem(READER_SWIPE_HINT_KEY, "true");
@@ -1880,7 +1884,11 @@ function ReaderPreview({
                 page={activePage}
                 settings={settings}
                 onSpeak={(sentenceText) => speech.toggle(sentenceText)}
-                onSelectSentence={setSelectedSentence}
+                onSelectParagraph={(word) => {
+                  setSelectedParagraph((current) => (
+                    current?.paragraphId === word.paragraphId ? null : word
+                  ));
+                }}
                 onSelectWord={setSelectedWord}
               />
             )}
@@ -1895,8 +1903,8 @@ function ReaderPreview({
               word={selectedWord}
             />
           ) : null}
-          {selectedSentence ? (
-            <ReaderSentencePopover sentence={selectedSentence} onClose={() => setSelectedSentence(null)} />
+          {selectedParagraph ? (
+            <ReaderParagraphTranslationPopover word={selectedParagraph} onClose={() => setSelectedParagraph(null)} />
           ) : null}
         </article>
         <button
@@ -2071,13 +2079,13 @@ function ReaderPageView({
   page,
   settings,
   onSpeak,
-  onSelectSentence,
+  onSelectParagraph,
   onSelectWord,
 }: {
   page: ReaderPage;
   settings: ReadingSettings;
   onSpeak: (sentenceText: string) => void;
-  onSelectSentence: (word: ReaderPageWord) => void;
+  onSelectParagraph: (word: ReaderPageWord) => void;
   onSelectWord: (word: ReaderPageWord) => void;
 }) {
   const paragraphs = groupPageWords(page.words);
@@ -2107,14 +2115,15 @@ function ReaderPageView({
               >
                 <Volume2 size={14} aria-hidden="true" />
               </button>
-              {settings.showSentenceTranslation && paragraph.lastWord?.paragraphTranslation ? (
+              {paragraph.lastWord?.paragraphTranslation ? (
                 <button
                   className="block-translation-trigger"
                   type="button"
-                  aria-label="Показать перевод абзаца"
+                  aria-label="Перевести абзац"
+                  title="Перевести абзац"
                   onClick={(event) => {
                     event.stopPropagation();
-                    if (paragraph.lastWord) onSelectSentence(paragraph.lastWord);
+                    if (paragraph.lastWord) onSelectParagraph(paragraph.lastWord);
                   }}
                 >
                   <Languages size={13} aria-hidden="true" />
@@ -2314,12 +2323,12 @@ function getPartOfSpeechLabel(partOfSpeech?: string) {
   return partOfSpeech ? labels[partOfSpeech] ?? partOfSpeech : "";
 }
 
-function ReaderSentencePopover({ sentence, onClose }: { sentence: ReaderPageWord; onClose: () => void }) {
+function ReaderParagraphTranslationPopover({ word, onClose }: { word: ReaderPageWord; onClose: () => void }) {
   return (
     <aside className="reader-translation-popover sentence-popover" role="dialog" aria-label="Перевод абзаца" onClick={(event) => event.stopPropagation()}>
       <button className="popover-close" type="button" aria-label="Закрыть перевод" onClick={onClose}>×</button>
       <strong>Перевод абзаца</strong>
-      <p>{sentence.paragraphTranslation ?? sentence.sentenceTranslation ?? "Перевод абзаца будет подключён на следующем этапе."}</p>
+      <p>{word.paragraphTranslation ?? "Перевод этого абзаца пока недоступен."}</p>
     </aside>
   );
 }

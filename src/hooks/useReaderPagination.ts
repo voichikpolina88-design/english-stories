@@ -248,11 +248,14 @@ export function getBlockText(sentences: ReaderSentence[]) {
 }
 
 export function getBlockTranslation(type: ReaderPageWord["paragraphType"] | undefined, sentences: ReaderSentence[]) {
-  const translation = sentences
-    .map((sentence) => sentence.translation?.trim())
-    .filter(Boolean)
-    .join(" ")
-    .replace(/\s+/g, " ")
+  const sentenceTranslations = sentences.map((sentence) => sentence.translation?.trim() ?? "");
+  if (sentenceTranslations.some((translation) => !translation)) return undefined;
+
+  const separator = type === "poem" ? "\n" : " ";
+  const translation = sentenceTranslations
+    .join(separator)
+    .replace(/[ \t]+/g, " ")
+    .replace(/\n /g, "\n")
     .trim();
 
   if (!translation) return undefined;

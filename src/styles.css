@@ -2534,8 +2534,8 @@ p {
   place-items: center;
   border: 0;
   border-radius: 999px;
-  background: rgba(37, 99, 235, 0.08);
-  color: var(--purple);
+  background: color-mix(in srgb, var(--purple-soft) 82%, transparent);
+  color: color-mix(in srgb, var(--purple) 82%, var(--reader-muted));
   font-size: 0.6em;
   font-weight: 820;
 }
@@ -2575,6 +2575,10 @@ p {
 .reader-translation-popover p {
   color: var(--reader-muted);
   line-height: 1.45;
+}
+
+.reader-translation-popover p {
+  white-space: pre-line;
 }
 
 .popover-close {
