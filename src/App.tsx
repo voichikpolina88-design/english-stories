@@ -2244,6 +2244,8 @@ function ReaderWordPopover({
   const lexicalEntryId = word.lexicalEntryId ?? `${word.normalized || word.id}-reader-word`;
   const { isWordSaved: isSavedVocabularyWord, toggleWord } = useSavedVocabulary();
   const isSaved = isSavedVocabularyWord(lexicalEntryId);
+  const lemma = word.lemma && word.lemma.toLowerCase() !== cleanWord.toLowerCase() ? word.lemma : null;
+  const partOfSpeechLabel = getPartOfSpeechLabel(word.partOfSpeech);
 
   function toggleSavedWord() {
     toggleWord({
@@ -2272,9 +2274,10 @@ function ReaderWordPopover({
       <button className="popover-close" type="button" aria-label="Закрыть перевод" onClick={onClose}>×</button>
       <strong>{cleanWord}</strong>
       {word.transcription ? <span>{word.transcription}</span> : null}
-      {word.lemma ? <span className="word-popover-meta">lemma: {word.lemma}</span> : null}
-      {word.partOfSpeech ? <span className="word-popover-meta">{word.partOfSpeech}</span> : null}
+      {partOfSpeechLabel ? <span className="word-popover-meta">{partOfSpeechLabel}</span> : null}
       <p>{word.contextualTranslation ?? word.translation ?? "Перевод слова будет подключён на следующем этапе."}</p>
+      {lemma ? <small className="word-popover-lemma">Начальная форма: {lemma}</small> : null}
+      {word.isArchaic ? <small className="word-popover-phrase">устаревшее слово</small> : null}
       {word.commonTranslations?.length ? <small>Также: {word.commonTranslations.slice(0, 2).join(", ")}</small> : null}
       {word.phrase && word.phraseTranslation ? (
         <small className="word-popover-phrase">
@@ -2292,6 +2295,23 @@ function ReaderWordPopover({
       </div>
     </aside>
   );
+}
+
+function getPartOfSpeechLabel(partOfSpeech?: string) {
+  const labels: Record<string, string> = {
+    noun: "существительное",
+    verb: "глагол",
+    adjective: "прилагательное",
+    adverb: "наречие",
+    pronoun: "местоимение",
+    preposition: "предлог",
+    conjunction: "союз",
+    determiner: "определитель",
+    interjection: "междометие",
+    "proper noun": "имя собственное",
+  };
+
+  return partOfSpeech ? labels[partOfSpeech] ?? partOfSpeech : "";
 }
 
 function ReaderSentencePopover({ sentence, onClose }: { sentence: ReaderPageWord; onClose: () => void }) {
@@ -2643,6 +2663,8 @@ function WordRow({
   onSpeak: (text: string) => void;
 }) {
   const primaryContext = word.contexts[0];
+  const partOfSpeechLabel = getPartOfSpeechLabel(word.partOfSpeech);
+  const lemma = word.lemma && word.lemma.toLowerCase() !== word.word.toLowerCase() ? word.lemma : null;
 
   return (
     <article className="word-row">
@@ -2653,9 +2675,9 @@ function WordRow({
         <h3>{word.word}</h3>
         {word.transcription ? <span>{word.transcription}</span> : null}
         <p>{word.translation}</p>
-        {word.partOfSpeech || word.lemma ? (
+        {partOfSpeechLabel || lemma ? (
           <small className="word-row-meta">
-            {[word.lemma, word.partOfSpeech].filter(Boolean).join(" · ")}
+            {[partOfSpeechLabel, lemma ? `Начальная форма: ${lemma}` : ""].filter(Boolean).join(" · ")}
           </small>
         ) : null}
         {primaryContext ? (

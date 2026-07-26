@@ -2472,6 +2472,14 @@ p {
   margin-top: 0.35rem;
 }
 
+.word-popover-lemma {
+  color: var(--muted);
+  display: block;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  margin-top: 0.35rem;
+}
+
 .word-popover-actions {
   display: flex;
   flex-wrap: wrap;

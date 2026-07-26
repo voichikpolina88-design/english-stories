@@ -206,6 +206,46 @@ const lexicalOverrides: Record<string, LexicalEntry> = {
   march: entry("March", "Мартовский", "/mɑːtʃ/", "proper noun", undefined, true),
   hare: entry("Hare", "Заяц", "/heə/", "proper noun", undefined, true),
   dodo: entry("Dodo", "Додо", "/ˈdəʊdəʊ/", "proper noun", undefined, true),
+  would: entry("would", "бы / хотел бы", "/wʊd/", "verb"),
+  went: entry("go", "пошёл / пошла", "/went/", "verb"),
+  herself: entry("herself", "сама себя", "/hɜːˈself/", "pronoun"),
+  "don’t": entry("do", "не / не надо", "/dəʊnt/", "verb"),
+  first: entry("first", "первый / сначала", "/fɜːst/", "adjective", ["сначала"]),
+  voice: entry("voice", "голос", "/vɔɪs/", "noun"),
+  tone: entry("tone", "тон", "/təʊn/", "noun"),
+  two: entry("two", "два", "/tuː/", "determiner"),
+  "that’s": entry("that is", "это", "/ðæts/", "pronoun"),
+  last: entry("last", "последний", "/lɑːst/", "adjective", ["прошлый"]),
+  put: entry("put", "положить / поставить", "/pʊt/", "verb"),
+  will: entry("will", "будет / буду", "/wɪl/", "verb"),
+  heard: entry("hear", "услышал / услышала", "/hɜːd/", "verb"),
+  moment: entry("moment", "мгновение", "/ˈməʊmənt/", "noun"),
+  replied: entry("reply", "ответил / ответила", "/rɪˈplaɪd/", "verb"),
+  "can’t": entry("can", "не может / не могу", "/kɑːnt/", "verb"),
+  should: entry("should", "следует / должен", "/ʃʊd/", "verb"),
+  without: entry("without", "без", "/wɪðˈaʊt/", "preposition"),
+  three: entry("three", "три", "/θriː/", "determiner"),
+  soon: entry("soon", "скоро", "/suːn/", "adverb"),
+  yet: entry("yet", "ещё / пока", "/jet/", "adverb"),
+  course: entry("course", "ход / конечно", "/kɔːs/", "noun"),
+  "there’s": entry("there is", "есть / имеется", "/ðeəz/", "verb"),
+  "won’t": entry("will", "не будет", "/wəʊnt/", "verb"),
+  "you’re": entry("you are", "ты / вы есть", "/jʊə/", "pronoun"),
+  felt: entry("feel", "почувствовала", "/felt/", "verb"),
+  added: entry("add", "добавил / добавила", "/ˈædɪd/", "verb"),
+  till: entry("till", "до / пока не", "/tɪl/", "preposition"),
+  however: entry("however", "однако", "/haʊˈevə/", "adverb"),
+  being: entry("be", "будучи", "/ˈbiːɪŋ/", "verb"),
+  old: entry("old", "старый", "/əʊld/", "adjective"),
+  wonder: entry("wonder", "удивляться / интересно", "/ˈwʌndə/", "verb"),
+  something: entry("something", "что-то", "/ˈsʌmθɪŋ/", "pronoun"),
+  soup: entry("soup", "суп", "/suːp/", "noun"),
+  court: entry("court", "суд / двор", "/kɔːt/", "noun"),
+  jury: entry("jury", "присяжные", "/ˈdʒʊəri/", "noun"),
+  under: entry("under", "под", "/ˈʌndə/", "preposition"),
+  hastily: entry("hastily", "поспешно", "/ˈheɪstɪli/", "adverb"),
+  "doesn’t": entry("do", "не делает / не", "/ˈdʌznt/", "verb"),
+  speak: entry("speak", "говорить", "/spiːk/", "verb"),
   antipathies: entry("antipathy", "антипатии", "/ænˈtɪpəθiz/", "noun", ["неприязнь", "отвращение"]),
   bank: entry("bank", "берег", "/bæŋk/", "noun", ["банк"]),
   cupboard: entry("cupboard", "буфет", "/ˈkʌbəd/", "noun", ["шкаф"]),
@@ -746,6 +786,267 @@ const translations: Record<string, string> = {
   yes: "да",
 };
 
+const supplementalTranslations: Record<string, string> = {
+  done: "сделано",
+  called: "назвал / назывался",
+  "didn’t": "не сделал / не",
+  trying: "пытаясь",
+  change: "изменение / менять",
+  these: "эти",
+  suppose: "полагать",
+  talk: "разговор / говорить",
+  better: "лучше",
+  silence: "тишина",
+  both: "оба",
+  mad: "безумный",
+  "wouldn’t": "не стал бы",
+  far: "далеко",
+  kept: "держал / продолжал",
+  used: "использовал / привык",
+  sea: "море",
+  whole: "весь / целый",
+  where: "где",
+  room: "место / комната",
+  gone: "ушёл / исчез",
+  may: "может",
+  "they’re": "они есть",
+  beautiful: "прекрасный",
+  baby: "младенец",
+  cook: "повар",
+  tea: "чай",
+  dance: "танец",
+  finished: "закончил",
+  deal: "много / сделка",
+  give: "дать",
+  try: "попробовать",
+  always: "всегда",
+  turning: "поворачивая / превращаясь",
+  arm: "рука",
+  pigeon: "голубка",
+  majesty: "величество",
+  gloves: "перчатки",
+  nearly: "почти",
+  "i’d": "я бы / я имел",
+  "wasn’t": "не был / не была",
+  bill: "Билл",
+  keep: "держать / продолжать",
+  foot: "ступня / нога",
+  yourself: "себя",
+  pool: "лужа / водоём",
+  fan: "веер",
+  everything: "всё",
+  "you’d": "ты бы / вы бы",
+  offended: "обиженный",
+  creatures: "существа",
+  explain: "объяснить",
+  rest: "остальное / отдых",
+  mouth: "рот",
+  turn: "повернуть / превратиться",
+  repeated: "повторил",
+  remarked: "заметил",
+  remark: "замечание",
+  soldiers: "солдаты",
+  witness: "свидетель",
+  "couldn’t": "не мог / не могла",
+  want: "хотеть",
+  help: "помочь",
+  different: "другой / различный",
+  mine: "мой / моя",
+  tail: "хвост",
+  conversation: "разговор",
+  birds: "птицы",
+  continued: "продолжил",
+  believe: "верить",
+  call: "звать / называть",
+  angrily: "сердито",
+  shook: "потряс",
+  does: "делает",
+  least: "наименьший",
+  reason: "причина",
+  together: "вместе",
+  shouted: "крикнул",
+  timidly: "робко",
+  serpent: "змея",
+  puzzled: "озадаченный",
+  interrupted: "прервал",
+  knave: "валет",
+  join: "присоединиться",
+  ready: "готовый",
+  hard: "трудный / твёрдый",
+  changed: "изменился",
+  five: "пять",
+  live: "жить",
+  play: "игра / играть",
+  "hadn’t": "не имел / не",
+  beg: "просить",
+  our: "наш",
+  eagerly: "с нетерпением",
+  sit: "сидеть",
+  party: "вечеринка / партия",
+  meaning: "значение",
+  running: "бегущий",
+  everybody: "все",
+  exactly: "точно",
+  nobody: "никто",
+  window: "окно",
+  place: "место",
+  appeared: "появился",
+  wood: "лес / дерево",
+  each: "каждый",
+  mushroom: "гриб",
+  "haven’t": "не имею / не",
+  most: "самый / большинство",
+  nose: "нос",
+  asleep: "спящий",
+  hearts: "червы / сердца",
+  twinkle: "мерцать",
+  gardeners: "садовники",
+  moral: "мораль",
+  shoes: "туфли",
+  myself: "себя",
+  kind: "вид / добрый",
+  nonsense: "чепуха",
+  sir: "сэр",
+  hair: "волосы",
+  goes: "идёт",
+  "she’s": "она есть",
+  repeat: "повторить",
+  learn: "учить",
+  frightened: "испуганный",
+  chin: "подбородок",
+  william: "Уильям",
+  history: "история",
+  fetch: "принести",
+  lory: "лори",
+  has: "имеет",
+  trial: "судебный процесс",
+  story: "история",
+  stood: "стоял",
+  grown: "выросший",
+  business: "дело",
+  trees: "деревья",
+  "isn’t": "не является",
+  draw: "тянуть / рисовать",
+  silent: "молчаливый",
+  pig: "поросёнок",
+  pleased: "довольный",
+  song: "песня",
+  lobsters: "омары",
+  slates: "грифельные доски",
+  forgotten: "забытый",
+  english: "английский",
+  "shan’t": "не буду",
+  stop: "остановиться",
+  himself: "сам себя",
+  times: "разы / времена",
+  seven: "семь",
+  understand: "понимать",
+  pardon: "простите",
+  trembling: "дрожащий",
+  subject: "тема / предмет",
+  "you’ll": "ты будешь / вы будете",
+  soo: "так",
+  important: "важный",
+  politely: "вежливо",
+  melancholy: "меланхоличный / печальный",
+  liked: "понравился",
+  chorus: "хор",
+  executed: "казнённый",
+  broken: "сломанный",
+  chimney: "дымоход",
+  full: "полный",
+  write: "писать",
+  loud: "громкий",
+  sharp: "резкий",
+  puppy: "щенок",
+  father: "отец",
+  stand: "стоять",
+  youth: "юность / юноша",
+  sleep: "сон / спать",
+  "you’ve": "ты / вы уже",
+  sneezing: "чихание",
+  between: "между",
+  told: "сказал / рассказанный",
+  ear: "ухо",
+  wow: "ух ты",
+  dreadfully: "ужасно",
+  sing: "петь",
+  exclaimed: "воскликнул",
+  "bread-and-butter": "хлеб с маслом",
+  "queen’s": "королевы",
+  lobster: "омар",
+  adventures: "приключения",
+  tarts: "пирожки",
+  across: "через / поперёк",
+  pair: "пара",
+  nine: "девять",
+  until: "до тех пор пока",
+  kid: "козлёнок / лайка",
+  dropped: "уронил / упал",
+  usual: "обычный",
+  morning: "утро",
+  ah: "ах",
+  "let’s": "давай / давайте",
+  wrong: "неправильный",
+  strange: "странный",
+  stay: "оставаться",
+  sudden: "внезапный",
+  case: "случай / дело",
+  number: "число / номер",
+  swam: "плыл",
+  nearer: "ближе",
+  speaking: "говоря",
+  shrill: "пронзительный",
+  angry: "сердитый",
+  crowded: "столпившийся",
+  notice: "замечать / внимание",
+  "what’s": "что есть / что",
+  prizes: "призы",
+  pocket: "карман",
+  dare: "осмелиться",
+  confusion: "замешательство",
+  reply: "ответ",
+  finish: "закончить",
+  impatiently: "нетерпеливо",
+  sighed: "вздохнул",
+  temper: "нрав / самообладание",
+  young: "молодой",
+  moved: "двинулся",
+  swim: "плыть",
+  doing: "делая",
+  direction: "направление",
+  interesting: "интересный",
+  become: "стать",
+  "shouldn’t": "не следует",
+  taking: "беря / принимая",
+  shriek: "визг",
+  drew: "потянул / нарисовал",
+  instantly: "мгновенно",
+  surprise: "удивление",
+  lizard: "ящерица",
+  height: "рост / высота",
+  quietly: "тихо",
+  man: "человек",
+  often: "часто",
+  eggs: "яйца",
+  tree: "дерево",
+  ground: "земля / площадка",
+  waving: "размахивая",
+  piece: "кусочек",
+  procession: "процессия",
+  rule: "правило",
+  pack: "колода / стая",
+  knee: "колено",
+  whispered: "прошептал",
+  tis: "это есть",
+  school: "школа",
+  "they’ll": "они будут",
+  boots: "ботинки",
+  savage: "дикий / свирепый",
+  violently: "яростно",
+  age: "возраст",
+};
+
 const lemmaOverrides: Record<string, string> = {
   ate: "eat",
   bats: "bat",
@@ -971,6 +1272,146 @@ const phraseOverrides: Record<string, Record<string, PhraseContext>> = {
       phrase: "make out",
       phraseTranslation: "разобрать / понять",
     },
+    "alice-ch2-p18-s1": {
+      phrase: "make out",
+      phraseTranslation: "разобрать / понять",
+    },
+    "alice-ch5-p51-s1": {
+      phrase: "make out",
+      phraseTranslation: "разобрать / понять",
+    },
+    "alice-ch8-p65-s1": {
+      phrase: "make out",
+      phraseTranslation: "разобрать / понять",
+    },
+    "alice-ch11-p7-s4": {
+      phrase: "make out",
+      phraseTranslation: "разобрать / понять",
+    },
+    "alice-ch11-p8-s1": {
+      phrase: "make out",
+      phraseTranslation: "разобрать / понять",
+    },
+    "alice-ch11-p9-s3": {
+      phrase: "make out",
+      phraseTranslation: "разобрать / понять",
+    },
+  },
+  set: {
+    "alice-ch1-p27-s1": {
+      phrase: "set to work",
+      phraseTranslation: "приняться за дело",
+    },
+    "alice-ch5-p53-s1": {
+      phrase: "set to work",
+      phraseTranslation: "приняться за дело",
+    },
+    "alice-ch5-p77-s3": {
+      phrase: "set to work",
+      phraseTranslation: "приняться за дело",
+    },
+    "alice-ch6-p29-s2": {
+      phrase: "set to work",
+      phraseTranslation: "приняться за дело",
+    },
+    "alice-ch10-p1-s3": {
+      phrase: "set to work",
+      phraseTranslation: "приняться за дело",
+    },
+    "alice-ch12-p5-s1": {
+      phrase: "set to work",
+      phraseTranslation: "приняться за дело",
+    },
+  },
+  lose: {
+    "alice-ch3-p43-s2": {
+      phrase: "lose one's temper",
+      phraseTranslation: "выйти из себя",
+    },
+  },
+  losing: {
+    "alice-ch5-p42-s1": {
+      phrase: "lose one's temper",
+      phraseTranslation: "выходить из себя",
+    },
+  },
+  hold: {
+    "alice-ch3-p43-s3": {
+      phrase: "hold one's tongue",
+      phraseTranslation: "помолчать / придержать язык",
+    },
+    "alice-ch9-p62-s1": {
+      phrase: "hold one's tongue",
+      phraseTranslation: "помолчать / придержать язык",
+    },
+    "alice-ch12-p60-s1": {
+      phrase: "hold one's tongue",
+      phraseTranslation: "помолчать / придержать язык",
+    },
+  },
+  no: {
+    "alice-ch4-p9-s6": {
+      phrase: "no room",
+      phraseTranslation: "нет места",
+    },
+    "alice-ch4-p11-s3": {
+      phrase: "no room",
+      phraseTranslation: "нет места",
+    },
+    "alice-ch7-p2-s1": {
+      phrase: "no room",
+      phraseTranslation: "нет места",
+    },
+    "alice-ch7-p2-s2": {
+      phrase: "no room",
+      phraseTranslation: "нет места",
+    },
+  },
+  turn: {
+    "alice-ch5-p9-s1": {
+      phrase: "turn into",
+      phraseTranslation: "превратиться в",
+    },
+    "alice-ch6-p47-s2": {
+      phrase: "turn into",
+      phraseTranslation: "превратиться в",
+    },
+  },
+  take: {
+    "alice-ch9-p11-s2": {
+      phrase: "take care of",
+      phraseTranslation: "позаботиться о",
+    },
+    "alice-ch12-p70-s1": {
+      phrase: "take the place of",
+      phraseTranslation: "занять место / заменить",
+    },
+  },
+  keep: {
+    "alice-ch10-p44-s2": {
+      phrase: "keep back",
+      phraseTranslation: "держаться позади / не приближаться",
+    },
+    "alice-ch12-p68-s1": {
+      phrase: "keep back",
+      phraseTranslation: "сдерживать / не подпускать",
+    },
+  },
+  off: {
+    "alice-ch8-p18-s1": {
+      phrase: "off with her head",
+      phraseTranslation: "голову ей с плеч",
+    },
+    "alice-ch12-p62-s1": {
+      phrase: "off with her head",
+      phraseTranslation: "голову ей с плеч",
+    },
+  },
+  sentence: {
+    "alice-ch12-p58-s2": {
+      phrase: "sentence first, verdict afterwards",
+      phraseTranslation: "сначала приговор, потом вердикт",
+    },
   },
 };
 
@@ -979,7 +1420,7 @@ export function buildAliceSentenceWords({ sentence, paragraphId, chapterId }: Bu
     const normalized = normalizeReaderToken(text);
     const isPunctuation = normalized.length === 0;
     const lexical = isPunctuation ? punctuationEntry() : getLexicalEntry(normalized);
-    const contextualTranslation = normalized ? contextualOverrides[normalized]?.[sentence.id] : undefined;
+    const contextualTranslation = normalized ? getContextualTranslation(normalized, sentence) : undefined;
     const phraseContext = normalized ? phraseOverrides[normalized]?.[sentence.id] : undefined;
 
     return {
@@ -1024,9 +1465,44 @@ function getLexicalEntry(normalized: string): LexicalEntry {
   if (override) return override;
 
   const lemma = lemmaOverrides[normalized] ?? inferLemma(normalized);
-  const translation = translations[normalized] ?? translations[lemma] ?? "перевод по контексту";
+  const translation = translations[normalized] ?? translations[lemma] ?? supplementalTranslations[normalized] ?? supplementalTranslations[lemma] ?? "перевод по контексту";
   const partOfSpeech = partOfSpeechOverrides[normalized] ?? inferPartOfSpeech(normalized);
-  return entry(lemma, translation, ipaOverrides[normalized] ?? ipaOverrides[lemma] ?? fallbackTranscription(normalized), partOfSpeech);
+  return entry(lemma, translation, ipaOverrides[normalized] ?? ipaOverrides[lemma] ?? "", partOfSpeech);
+}
+
+function getContextualTranslation(normalized: string, sentence: ReaderSentence) {
+  const override = contextualOverrides[normalized]?.[sentence.id];
+  if (override) return override;
+
+  const text = sentence.text.toLowerCase();
+
+  if (normalized === "right") {
+    if (text.includes("right size") || text.includes("right way")) return "правильный";
+    if (text.includes("right through")) return "прямо";
+    return "как раз / правый";
+  }
+
+  if (normalized === "mean" || normalized === "means" || normalized === "meant") {
+    if (text.includes("what do you mean") || text.includes("what does it mean")) return "значить";
+    return "иметь в виду";
+  }
+
+  if (normalized === "sentence") {
+    if (text.includes("sentence first") || text.includes("execution")) return "приговор";
+    return "предложение";
+  }
+
+  if (normalized === "court") {
+    if (text.includes("king") || text.includes("queen") || text.includes("jury") || text.includes("trial")) return "суд";
+    return "двор";
+  }
+
+  if (normalized === "still") {
+    if (text.includes("stood still") || text.includes("quite still")) return "неподвижно";
+    return "всё ещё";
+  }
+
+  return undefined;
 }
 
 function punctuationEntry(): LexicalEntry {
@@ -1052,10 +1528,6 @@ function inferPartOfSpeech(normalized: string): PartOfSpeech {
   if (normalized.endsWith("ing") || normalized.endsWith("ed")) return "verb";
   if (["able", "al", "ful", "ic", "ive", "less", "ous"].some((suffix) => normalized.endsWith(suffix))) return "adjective";
   return "noun";
-}
-
-function fallbackTranscription(normalized: string) {
-  return `/${normalized.replace(/-/g, " ")}/`;
 }
 
 function lexicalEntryId(lexical: LexicalEntry) {
