@@ -1,5 +1,12 @@
 import { useSyncExternalStore } from "react";
+import { aliceInWonderlandBook } from "../data/aliceInWonderland";
 import type { SavedVocabularyWord, VocabularyContext, VocabularyProgress } from "../types";
+import {
+  cleanVocabularyContextText,
+  getVocabularyDisplayTranslation,
+  hasValidTranscription,
+  hasValidTranslation,
+} from "./vocabularyHelpers";
 
 export const SAVED_VOCABULARY_STORAGE_KEY = "storylingo-reader-saved-words";
 const SAVED_VOCABULARY_EVENT = "storylingo-saved-vocabulary-change";
@@ -17,6 +24,8 @@ type SaveVocabularyInput = {
   word: string;
   lemma: string;
   translation: string;
+  contextualTranslation?: string;
+  commonTranslations?: string[];
   transcription?: string;
   partOfSpeech?: string;
   context: VocabularyContext;
@@ -28,6 +37,7 @@ export function useSavedVocabulary() {
   return {
     savedWords,
     addWord: addSavedVocabularyWord,
+    restoreWord: restoreSavedVocabularyWord,
     removeWord: removeSavedVocabularyWord,
     toggleWord: toggleSavedVocabularyWord,
     isWordSaved,
@@ -48,33 +58,46 @@ export function addSavedVocabularyWord(input: SaveVocabularyInput) {
   const storage = readSavedVocabularyStorage();
   const existing = storage.words.find((item) => item.lexicalEntryId === input.lexicalEntryId);
   const nextContext = normalizeContext(input.context);
+  const repairedInputWord = repairSavedVocabularyWord({
+    id: input.lexicalEntryId,
+    lexicalEntryId: input.lexicalEntryId,
+    word: input.word,
+    lemma: input.lemma,
+    translation: input.translation,
+    contextualTranslation: input.contextualTranslation,
+    commonTranslations: input.commonTranslations,
+    transcription: input.transcription,
+    partOfSpeech: input.partOfSpeech,
+    contexts: [nextContext],
+    createdAt: new Date().toISOString(),
+    progress: createDefaultVocabularyProgress(),
+  });
+  if (!existing && repairedInputWord.isInvalid) return false;
 
   const words = existing
     ? storage.words.map((item) =>
         item.lexicalEntryId === input.lexicalEntryId
-          ? {
+          ? repairSavedVocabularyWord({
               ...item,
+              word: input.word,
+              lemma: input.lemma,
+              translation: hasValidTranslation(input.translation, input.word) ? input.translation : item.translation,
+              contextualTranslation: hasValidTranslation(input.contextualTranslation, input.word) ? input.contextualTranslation : item.contextualTranslation,
+              commonTranslations: input.commonTranslations ?? item.commonTranslations,
+              transcription: hasValidTranscription(input.transcription, input.word) ? input.transcription : item.transcription,
+              partOfSpeech: input.partOfSpeech || item.partOfSpeech,
               contexts: mergeContexts(item.contexts, nextContext),
-            }
+              isInvalid: false,
+            })
           : item,
       )
     : [
         ...storage.words,
-        {
-          id: input.lexicalEntryId,
-          lexicalEntryId: input.lexicalEntryId,
-          word: input.word,
-          lemma: input.lemma,
-          translation: input.translation,
-          transcription: input.transcription,
-          partOfSpeech: input.partOfSpeech,
-          contexts: [nextContext],
-          createdAt: new Date().toISOString(),
-          progress: createDefaultVocabularyProgress(),
-        },
+        repairedInputWord,
       ];
 
   writeSavedVocabularyStorage({ version: SCHEMA_VERSION, words });
+  return true;
 }
 
 export function removeSavedVocabularyWord(lexicalEntryId: string) {
@@ -85,14 +108,22 @@ export function removeSavedVocabularyWord(lexicalEntryId: string) {
   });
 }
 
+export function restoreSavedVocabularyWord(word: SavedVocabularyWord) {
+  const storage = readSavedVocabularyStorage();
+  if (storage.words.some((item) => item.lexicalEntryId === word.lexicalEntryId)) return;
+  writeSavedVocabularyStorage({
+    version: SCHEMA_VERSION,
+    words: [...storage.words, repairSavedVocabularyWord(word)],
+  });
+}
+
 export function toggleSavedVocabularyWord(input: SaveVocabularyInput) {
   if (isWordSaved(input.lexicalEntryId)) {
     removeSavedVocabularyWord(input.lexicalEntryId);
     return false;
   }
 
-  addSavedVocabularyWord(input);
-  return true;
+  return addSavedVocabularyWord(input);
 }
 
 export function isWordSaved(lexicalEntryId: string) {
@@ -187,19 +218,22 @@ function readSavedVocabularyStorage(): SavedVocabularyStorage {
       const words = parsed
         .map((item: unknown) => migrateLegacyWord(item))
         .filter((item: SavedVocabularyWord | null): item is SavedVocabularyWord => Boolean(item));
-      const storage = { version: SCHEMA_VERSION, words };
+      const storage = { version: SCHEMA_VERSION, words: dedupeSavedVocabularyWords(words) };
       window.localStorage.setItem(SAVED_VOCABULARY_STORAGE_KEY, JSON.stringify(storage));
       vocabularyCache = storage;
       return storage;
     }
 
     if (parsed && Array.isArray(parsed.words)) {
-      vocabularyCache = {
+      const storage = {
         version: Number(parsed.version) || SCHEMA_VERSION,
-        words: parsed.words
+        words: dedupeSavedVocabularyWords(parsed.words
           .map((item: unknown) => migrateLegacyWord(item))
-          .filter((item: SavedVocabularyWord | null): item is SavedVocabularyWord => Boolean(item)),
+          .filter((item: SavedVocabularyWord | null): item is SavedVocabularyWord => Boolean(item))),
       };
+      storage.version = SCHEMA_VERSION;
+      window.localStorage.setItem(SAVED_VOCABULARY_STORAGE_KEY, JSON.stringify(storage));
+      vocabularyCache = storage;
       return vocabularyCache;
     }
   } catch (error) {
@@ -235,26 +269,31 @@ function migrateLegacyWord(value: unknown): SavedVocabularyWord | null {
   if (!lexicalEntryId || !item.word || !item.translation) return null;
 
   if (Array.isArray(item.contexts)) {
-    return {
+    return repairSavedVocabularyWord({
       id: lexicalEntryId,
       lexicalEntryId,
       word: item.word,
       lemma: item.lemma || item.word,
       translation: item.translation,
+      contextualTranslation: item.contextualTranslation,
+      commonTranslations: item.commonTranslations,
       transcription: item.transcription,
       partOfSpeech: item.partOfSpeech,
       contexts: item.contexts.map(normalizeContext),
       createdAt: item.createdAt || new Date().toISOString(),
       progress: normalizeProgress(item.progress),
-    };
+      isInvalid: item.isInvalid,
+    });
   }
 
-  return {
+  return repairSavedVocabularyWord({
     id: lexicalEntryId,
     lexicalEntryId,
     word: item.word,
     lemma: item.lemma || item.word,
     translation: item.translation,
+    contextualTranslation: item.contextualTranslation,
+    commonTranslations: item.commonTranslations,
     transcription: item.transcription,
     partOfSpeech: item.partOfSpeech,
     contexts: [
@@ -272,7 +311,8 @@ function migrateLegacyWord(value: unknown): SavedVocabularyWord | null {
     ],
     createdAt: item.createdAt || new Date().toISOString(),
     progress: normalizeProgress(item.progress),
-  };
+    isInvalid: item.isInvalid,
+  });
 }
 
 function createDefaultVocabularyProgress(): VocabularyProgress {
@@ -305,17 +345,138 @@ function normalizeProgress(progress: Partial<VocabularyProgress> | undefined): V
   };
 }
 
+function repairSavedVocabularyWord(word: SavedVocabularyWord): SavedVocabularyWord {
+  const occurrence = findVocabularyOccurrence(word);
+  const contexts = word.contexts.map((context) => repairVocabularyContext(context));
+  const repaired: SavedVocabularyWord = {
+    ...word,
+    word: word.word || occurrence?.normalized || word.lemma,
+    lemma: occurrence?.lemma || word.lemma || word.word,
+    translation: hasValidTranslation(occurrence?.translation, occurrence?.normalized || word.word)
+      ? occurrence?.translation ?? word.translation
+      : hasValidTranslation(word.translation, word.word)
+        ? word.translation
+        : "",
+    contextualTranslation: hasValidTranslation(occurrence?.contextualTranslation, occurrence?.normalized || word.word)
+      ? occurrence?.contextualTranslation
+      : hasValidTranslation(word.contextualTranslation, word.word)
+        ? word.contextualTranslation
+        : undefined,
+    commonTranslations: occurrence?.commonTranslations ?? word.commonTranslations,
+    transcription: hasValidTranscription(occurrence?.transcription, occurrence?.normalized || word.word)
+      ? occurrence?.transcription
+      : hasValidTranscription(word.transcription, word.word)
+        ? word.transcription
+        : undefined,
+    partOfSpeech: occurrence?.partOfSpeech || word.partOfSpeech,
+    contexts,
+    progress: normalizeProgress(word.progress),
+  };
+
+  const displayTranslation = getVocabularyDisplayTranslation(repaired);
+  return {
+    ...repaired,
+    isInvalid: !hasValidTranslation(displayTranslation.primary, repaired.word),
+  };
+}
+
+function dedupeSavedVocabularyWords(words: SavedVocabularyWord[]) {
+  const byId = new Map<string, SavedVocabularyWord>();
+  words.forEach((word) => {
+    const existing = byId.get(word.lexicalEntryId);
+    if (!existing) {
+      byId.set(word.lexicalEntryId, word);
+      return;
+    }
+
+    byId.set(word.lexicalEntryId, {
+      ...existing,
+      contexts: [...existing.contexts, ...word.contexts.filter((context) => (
+        !existing.contexts.some((existingContext) => existingContext.sentenceId === context.sentenceId && existingContext.bookId === context.bookId)
+      ))],
+      progress: {
+        ...existing.progress,
+        correctCount: Math.max(existing.progress.correctCount, word.progress.correctCount),
+        incorrectCount: Math.max(existing.progress.incorrectCount, word.progress.incorrectCount),
+        sessionsCorrect: Math.max(existing.progress.sessionsCorrect, word.progress.sessionsCorrect),
+        unresolvedIncorrectCount: Math.max(existing.progress.unresolvedIncorrectCount ?? 0, word.progress.unresolvedIncorrectCount ?? 0),
+        status: existing.progress.status === "learned" || word.progress.status === "learned"
+          ? "learned"
+          : existing.progress.status === "learning" || word.progress.status === "learning"
+            ? "learning"
+            : "new",
+      },
+    });
+  });
+
+  return Array.from(byId.values());
+}
+
+function repairVocabularyContext(context: VocabularyContext): VocabularyContext {
+  const source = findSentenceById(context.sentenceId);
+  return normalizeContext({
+    ...context,
+    sentenceText: cleanVocabularyContextText(source?.text || context.sentenceText),
+    sentenceTranslation: cleanVocabularyContextText(source?.translation || context.sentenceTranslation),
+    chapterId: context.chapterId,
+    chapterTitle: getChapterTitle(context.chapterId) || context.chapterTitle,
+    contextualPhrase: cleanVocabularyContextText(context.contextualPhrase),
+    contextualPhraseTranslation: cleanVocabularyContextText(context.contextualPhraseTranslation),
+  });
+}
+
+function findVocabularyOccurrence(word: SavedVocabularyWord) {
+  const normalizedWord = normalizeVocabularyToken(word.word);
+  const normalizedLemma = normalizeVocabularyToken(word.lemma);
+  const contextSentenceIds = new Set(word.contexts.map((context) => context.sentenceId));
+  const contextMatches = getAliceWordOccurrences().filter((occurrence) => contextSentenceIds.has(occurrence.sentenceId || ""));
+  const candidates = contextMatches.length ? contextMatches : getAliceWordOccurrences();
+
+  return candidates.find((occurrence) => (
+    (word.lexicalEntryId && occurrence.lexicalEntryId === word.lexicalEntryId) ||
+    occurrence.normalized === normalizedWord ||
+    occurrence.lemma?.toLowerCase() === normalizedLemma
+  ));
+}
+
+function getAliceWordOccurrences() {
+  return aliceInWonderlandBook.chapters.flatMap((chapter) =>
+    chapter.paragraphs.flatMap((paragraph) =>
+      paragraph.sentences.flatMap((sentence) => sentence.words ?? []),
+    ),
+  );
+}
+
+function findSentenceById(sentenceId: string) {
+  for (const chapter of aliceInWonderlandBook.chapters) {
+    for (const paragraph of chapter.paragraphs) {
+      const sentence = paragraph.sentences.find((item) => item.id === sentenceId);
+      if (sentence) return sentence;
+    }
+  }
+
+  return null;
+}
+
+function getChapterTitle(chapterId: string) {
+  return aliceInWonderlandBook.chapters.find((chapter) => chapter.id === chapterId)?.title;
+}
+
+function normalizeVocabularyToken(value?: string) {
+  return (value ?? "").trim().toLowerCase().replace(/[^a-z’'-]+/g, "");
+}
+
 function normalizeContext(context: VocabularyContext): VocabularyContext {
   return {
     sentenceId: context.sentenceId,
-    sentenceText: context.sentenceText,
-    sentenceTranslation: context.sentenceTranslation,
+    sentenceText: cleanVocabularyContextText(context.sentenceText),
+    sentenceTranslation: cleanVocabularyContextText(context.sentenceTranslation),
     bookId: context.bookId,
     bookTitle: context.bookTitle,
     chapterId: context.chapterId,
     chapterTitle: context.chapterTitle,
-    contextualPhrase: context.contextualPhrase,
-    contextualPhraseTranslation: context.contextualPhraseTranslation,
+    contextualPhrase: cleanVocabularyContextText(context.contextualPhrase),
+    contextualPhraseTranslation: cleanVocabularyContextText(context.contextualPhraseTranslation),
   };
 }
 

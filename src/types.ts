@@ -175,11 +175,14 @@ export type SavedVocabularyWord = {
   word: string;
   lemma: string;
   translation: string;
+  contextualTranslation?: string;
+  commonTranslations?: string[];
   transcription?: string;
   partOfSpeech?: string;
   contexts: VocabularyContext[];
   createdAt: string;
   progress: VocabularyProgress;
+  isInvalid?: boolean;
 };
 
 export type ReaderSentence = {

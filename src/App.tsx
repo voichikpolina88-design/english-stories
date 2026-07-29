@@ -12,6 +12,15 @@ import {
   useReaderPagination,
 } from "./hooks/useReaderPagination";
 import { useReadingTimer } from "./hooks/useReadingTimer";
+import {
+  cleanVocabularyContextText,
+  getVocabularyAcceptedTranslations,
+  getVocabularyDisplayTranslation,
+  getVocabularySourceLabel,
+  hasValidTranscription,
+  hasValidTranslation,
+  normalizeVocabularyAnswer,
+} from "./services/vocabularyHelpers";
 import { useSavedVocabulary } from "./services/vocabularyStorage";
 import type { LastOpenedContent, NativeLanguage, ReaderChapter, ReaderPosition, ReadingSettings, SavedVocabularyWord } from "./types";
 
@@ -1278,9 +1287,12 @@ function DictionaryPage() {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<"all" | "new" | "errors" | "learned">("all");
   const [practiceOpen, setPracticeOpen] = useState(false);
+  const [removedWord, setRemovedWord] = useState<SavedVocabularyWord | null>(null);
   const speech = useSpeech();
-  const { savedWords, removeWord, startTrainingSession, recordAnswer, finishTrainingSession } = useSavedVocabulary();
-  const visibleWords = savedWords
+  const { savedWords, removeWord, restoreWord, startTrainingSession, recordAnswer, finishTrainingSession } = useSavedVocabulary();
+  const dictionaryWords = savedWords.filter(isDisplayableVocabularyWord);
+  const trainableWords = dictionaryWords.filter(isTrainableVocabularyWord);
+  const visibleWords = dictionaryWords
     .filter((word) => {
       const value = query.trim().toLowerCase();
       if (!value) return true;
@@ -1298,7 +1310,7 @@ function DictionaryPage() {
   if (practiceOpen) {
     return (
       <VocabularyTrainingScreen
-        words={savedWords}
+        words={trainableWords}
         onBack={() => setPracticeOpen(false)}
         onFinishSession={finishTrainingSession}
         onRecordAnswer={recordAnswer}
@@ -1306,6 +1318,17 @@ function DictionaryPage() {
         onStartSession={startTrainingSession}
       />
     );
+  }
+
+  function handleRemoveWord(word: SavedVocabularyWord) {
+    setRemovedWord(word);
+    removeWord(word.lexicalEntryId);
+  }
+
+  function undoRemoveWord() {
+    if (!removedWord) return;
+    restoreWord(removedWord);
+    setRemovedWord(null);
   }
 
   return (
@@ -1316,9 +1339,9 @@ function DictionaryPage() {
           <Search size={18} aria-hidden="true" />
           <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Найти слово или перевод" />
         </label>
-        {savedWords.length ? (
+        {trainableWords.length ? (
           <button className="primary-button" type="button" onClick={() => setPracticeOpen(true)}>
-            Тренировать {savedWords.length} {pluralizeRussian(savedWords.length, "слово", "слова", "слов")}
+            Тренировать {trainableWords.length} {pluralizeRussian(trainableWords.length, "слово", "слова", "слов")}
           </button>
         ) : null}
       </section>
@@ -1344,15 +1367,21 @@ function DictionaryPage() {
       {visibleWords.length ? (
         <section className="word-grid">
           {visibleWords.map((word) => (
-            <WordRow key={word.id} word={word} onRemove={removeWord} onSpeak={speech.toggle} />
+            <WordRow key={word.id} word={word} onRemove={handleRemoveWord} onSpeak={speech.toggle} />
           ))}
         </section>
       ) : (
         <section className="practice-placeholder">
-          <strong>{savedWords.length ? "В этом фильтре пока пусто" : "Пока слов нет"}</strong>
-          <p>{savedWords.length ? "Попробуйте выбрать другой фильтр или продолжить тренировку." : "Нажимайте на слова во время чтения и добавляйте их сюда."}</p>
+          <strong>{dictionaryWords.length ? "В этом фильтре пока пусто" : "Пока слов нет"}</strong>
+          <p>{dictionaryWords.length ? "Попробуйте выбрать другой фильтр или продолжить тренировку." : "Нажимайте на слова во время чтения и добавляйте их сюда."}</p>
         </section>
       )}
+      {removedWord ? (
+        <div className="dictionary-toast" role="status">
+          <span>Слово удалено</span>
+          <button type="button" onClick={undoRemoveWord}>Отменить</button>
+        </div>
+      ) : null}
     </main>
   );
 }
@@ -1619,12 +1648,13 @@ function buildVocabularyTrainingTasks(words: SavedVocabularyWord[], allWords: Sa
 function createVocabularyTask(word: SavedVocabularyWord, type: VocabularyTaskType, allWords: SavedVocabularyWord[], index: number): VocabularyTrainingTask {
   const distractors = getVocabularyDistractors(word, allWords, type);
   const context = word.contexts[0]?.sentenceText;
+  const displayTranslation = getVocabularyDisplayTranslation(word).primary;
   if (type === "word-choice") {
     return {
       id: `${word.lexicalEntryId}-${type}-${index}`,
       type,
       word,
-      prompt: word.translation,
+      prompt: displayTranslation,
       options: shuffleArray([word.word, ...distractors.map((item) => item.word)]).slice(0, 4),
       correctAnswer: word.word,
     };
@@ -1649,7 +1679,7 @@ function createVocabularyTask(word: SavedVocabularyWord, type: VocabularyTaskTyp
       word,
       prompt: word.word,
       options: [],
-      correctAnswer: word.translation,
+      correctAnswer: displayTranslation,
     };
   }
 
@@ -1658,8 +1688,8 @@ function createVocabularyTask(word: SavedVocabularyWord, type: VocabularyTaskTyp
     type,
     word,
     prompt: word.word,
-    options: shuffleArray([word.translation, ...distractors.map((item) => item.translation)]).slice(0, 4),
-    correctAnswer: word.translation,
+    options: shuffleArray([displayTranslation, ...distractors.map((item) => getVocabularyDisplayTranslation(item as SavedVocabularyWord).primary)]).slice(0, 4),
+    correctAnswer: displayTranslation,
   };
 }
 
@@ -1678,12 +1708,12 @@ function getVocabularyDistractors(word: SavedVocabularyWord, allWords: SavedVoca
   ];
   const preferred = source.filter((item) => item.partOfSpeech && item.partOfSpeech === word.partOfSpeech);
   const candidates = preferred.length >= 3 ? preferred : source;
-  const seen = new Set<string>([type === "translation-choice" ? word.translation : word.word]);
+  const seen = new Set<string>([type === "translation-choice" ? getVocabularyDisplayTranslation(word).primary : word.word]);
   const distractors: Array<Pick<SavedVocabularyWord, "word" | "translation" | "partOfSpeech">> = [];
 
   shuffleArray(candidates).forEach((item) => {
-    const value = type === "translation-choice" ? item.translation : item.word;
-    if (!value || seen.has(value)) return;
+    const value = type === "translation-choice" ? getVocabularyDisplayTranslation(item as SavedVocabularyWord).primary : item.word;
+    if (!value || seen.has(value) || (type === "translation-choice" && !hasValidTranslation(value, item.word))) return;
     seen.add(value);
     distractors.push(item);
   });
@@ -1695,19 +1725,7 @@ function isVocabularyAnswerCorrect(task: VocabularyTrainingTask, answer: string)
   const normalizedAnswer = normalizeVocabularyAnswer(answer);
   if (!normalizedAnswer) return false;
   if (task.type !== "typed-translation") return normalizedAnswer === normalizeVocabularyAnswer(task.correctAnswer);
-  return getAcceptedVocabularyTranslations(task.word).some((item) => normalizeVocabularyAnswer(item) === normalizedAnswer);
-}
-
-function getAcceptedVocabularyTranslations(word: SavedVocabularyWord) {
-  return Array.from(new Set([
-    word.translation,
-    ...word.translation.split(/[,;]+/).map((item) => item.trim()),
-    ...word.contexts.map((context) => context.contextualPhraseTranslation).filter((item): item is string => Boolean(item)),
-  ].filter(Boolean)));
-}
-
-function normalizeVocabularyAnswer(value: string) {
-  return value.trim().toLowerCase().replace(/\s+/g, " ");
+  return getVocabularyAcceptedTranslations(task.word).some((item) => normalizeVocabularyAnswer(item) === normalizedAnswer);
 }
 
 function makeVocabularyContextGap(context: string, word: SavedVocabularyWord) {
@@ -1726,6 +1744,14 @@ function trainingTaskLabel(type: VocabularyTaskType) {
 
 function getVocabularyProgress(word: SavedVocabularyWord) {
   return word.progress ?? { correctCount: 0, incorrectCount: 0, sessionsCorrect: 0, status: "new" as const, unresolvedIncorrectCount: 0 };
+}
+
+function isTrainableVocabularyWord(word: SavedVocabularyWord) {
+  return !word.isInvalid && hasValidTranslation(getVocabularyDisplayTranslation(word).primary, word.word);
+}
+
+function isDisplayableVocabularyWord(word: SavedVocabularyWord) {
+  return !word.isInvalid && hasValidTranslation(getVocabularyDisplayTranslation(word).primary, word.word);
 }
 
 function vocabularyStatusLabel(word: SavedVocabularyWord) {
@@ -2686,6 +2712,8 @@ function ReaderWordPopover({
       word: cleanWord,
       lemma: word.lemma || cleanWord,
       translation: word.translation ?? "",
+      contextualTranslation: word.contextualTranslation,
+      commonTranslations: word.commonTranslations,
       transcription: word.transcription,
       partOfSpeech: word.partOfSpeech,
       context: {
@@ -2742,9 +2770,11 @@ function getPartOfSpeechLabel(partOfSpeech?: string) {
     determiner: "определитель",
     interjection: "междометие",
     "proper noun": "имя собственное",
+    "auxiliary verb": "вспомогательный глагол",
+    "modal verb": "модальный глагол",
   };
 
-  return partOfSpeech ? labels[partOfSpeech] ?? partOfSpeech : "";
+  return partOfSpeech ? labels[partOfSpeech] ?? "" : "";
 }
 
 function ReaderParagraphTranslationPopover({ word, onClose }: { word: ReaderPageWord; onClose: () => void }) {
@@ -3092,48 +3122,85 @@ function WordRow({
   onSpeak,
 }: {
   word: SavedVocabularyWord;
-  onRemove: (lexicalEntryId: string) => void;
+  onRemove: (word: SavedVocabularyWord) => void;
   onSpeak: (text: string) => void;
 }) {
+  const [expanded, setExpanded] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const primaryContext = word.contexts[0];
   const partOfSpeechLabel = getPartOfSpeechLabel(word.partOfSpeech);
   const lemma = word.lemma && word.lemma.toLowerCase() !== word.word.toLowerCase() ? word.lemma : null;
   const progress = getVocabularyProgress(word);
+  const displayTranslation = getVocabularyDisplayTranslation(word);
+  const transcription = hasValidTranscription(word.transcription, word.word) ? word.transcription : "";
+  const sourceLabel = primaryContext ? getVocabularySourceLabel(primaryContext) : "StoryLingo";
+  const cleanSentenceText = cleanVocabularyContextText(primaryContext?.sentenceText);
+  const cleanSentenceTranslation = cleanVocabularyContextText(primaryContext?.sentenceTranslation);
 
   return (
     <article className="word-row">
-      <button className="audio-button" type="button" aria-label={`Прослушать ${word.word}`} onClick={() => onSpeak(word.word)}>
-        <Volume2 size={16} aria-hidden="true" />
-      </button>
-      <div>
+      <div className="word-row-main">
         <div className="word-row-heading">
-          <h3>{word.word}</h3>
+          <div className="word-row-title">
+            <button className="audio-button word-row-audio" type="button" aria-label={`Прослушать ${word.word}`} onClick={() => onSpeak(word.word)}>
+              <Volume2 size={16} aria-hidden="true" />
+            </button>
+            <h3>{word.word}</h3>
+          </div>
           <span className={`word-status status-${progress.status}`}>{vocabularyStatusLabel(word)}</span>
         </div>
-        {word.transcription ? <span>{word.transcription}</span> : null}
-        <p>{word.translation}</p>
-        {partOfSpeechLabel || lemma ? (
-          <small className="word-row-meta">
-            {[partOfSpeechLabel, lemma ? `Начальная форма: ${lemma}` : ""].filter(Boolean).join(" · ")}
-          </small>
+        {transcription || partOfSpeechLabel ? (
+          <span className="word-row-pronunciation">
+            {[transcription, partOfSpeechLabel].filter(Boolean).join(" · ")}
+          </span>
         ) : null}
-        {primaryContext ? (
+        <p className="word-row-translation">{displayTranslation.primary || "Перевод пока не добавлен"}</p>
+        {displayTranslation.contextual ? (
+          <small className="word-row-contextual">В контексте: {displayTranslation.contextual}</small>
+        ) : null}
+        <div className="word-row-footer">
+          <span title={primaryContext ? `${primaryContext.bookTitle} · ${primaryContext.chapterTitle}` : undefined}>{sourceLabel}</span>
+          <button className="text-button word-details-button" type="button" onClick={() => setExpanded((current) => !current)}>
+            {expanded ? "Скрыть" : "Подробнее"}
+          </button>
+          <div className="word-menu">
+            <button className="icon-text-button word-remove-button" type="button" aria-label={`Действия для ${word.word}`} title="Действия" onClick={() => setMenuOpen((current) => !current)}>
+              ⋯
+            </button>
+            {menuOpen ? (
+              <div className="word-menu-popover">
+                <button type="button" onClick={() => onRemove(word)}>
+                  Удалить из словаря
+                </button>
+              </div>
+            ) : null}
+          </div>
+        </div>
+        {expanded ? (
           <div className="word-row-context">
-            <small>
-              {primaryContext.bookTitle} · {primaryContext.chapterTitle}
-            </small>
-            <p>{primaryContext.sentenceText}</p>
-            {primaryContext.sentenceTranslation ? <p>{primaryContext.sentenceTranslation}</p> : null}
-            {primaryContext.contextualPhrase && primaryContext.contextualPhraseTranslation ? (
-              <small>
-                {primaryContext.contextualPhrase}: {primaryContext.contextualPhraseTranslation}
+            {lemma ? <small>Начальная форма: {lemma}</small> : null}
+            {primaryContext?.contextualPhrase && primaryContext.contextualPhraseTranslation ? (
+              <small>{cleanVocabularyContextText(primaryContext.contextualPhrase)}: {cleanVocabularyContextText(primaryContext.contextualPhraseTranslation)}</small>
+            ) : null}
+            {primaryContext ? (
+              <small className="word-row-full-source">
+                {primaryContext.bookTitle} · {primaryContext.chapterTitle}
               </small>
+            ) : null}
+            {cleanSentenceText ? (
+              <>
+                <strong>Контекст</strong>
+                <p>{cleanSentenceText}</p>
+              </>
+            ) : null}
+            {cleanSentenceTranslation ? (
+              <>
+                <strong>Перевод</strong>
+                <p>{cleanSentenceTranslation}</p>
+              </>
             ) : null}
           </div>
         ) : null}
-        <button className="text-button word-remove-button" type="button" onClick={() => onRemove(word.lexicalEntryId)}>
-          Удалить
-        </button>
       </div>
     </article>
   );

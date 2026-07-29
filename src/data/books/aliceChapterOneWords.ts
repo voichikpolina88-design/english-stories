@@ -237,7 +237,7 @@ const lexicalOverrides: Record<string, LexicalEntry> = {
   however: entry("however", "однако", "/haʊˈevə/", "adverb"),
   being: entry("be", "будучи", "/ˈbiːɪŋ/", "verb"),
   old: entry("old", "старый", "/əʊld/", "adjective"),
-  wonder: entry("wonder", "удивляться / интересно", "/ˈwʌndə/", "verb"),
+  wonder: entry("wonder", "интересоваться, задаваться вопросом", "/ˈwʌndə/", "verb", ["удивляться"]),
   something: entry("something", "что-то", "/ˈsʌmθɪŋ/", "pronoun"),
   soup: entry("soup", "суп", "/suːp/", "noun"),
   court: entry("court", "суд / двор", "/kɔːt/", "noun"),
@@ -1208,6 +1208,7 @@ const contextualOverrides: Record<string, Record<string, string>> = {
   shutting: { "alice-ch1-p15-s1": "сжимаясь, как телескоп" },
   toast: { "alice-ch1-p25-s2": "тост в выражении hot buttered toast" },
   watch: { "alice-ch1-p3-s4": "часы" },
+  wonder: { "alice-ch1-p9-s1": "интересно, не..." },
 };
 
 const phraseOverrides: Record<string, Record<string, PhraseContext>> = {
@@ -1237,6 +1238,12 @@ const phraseOverrides: Record<string, Record<string, PhraseContext>> = {
     "alice-ch1-p3-s4": {
       phrase: "pop down",
       phraseTranslation: "юркнуть вниз",
+    },
+  },
+  wonder: {
+    "alice-ch1-p9-s1": {
+      phrase: "I wonder if...",
+      phraseTranslation: "интересно, не... / интересно, ... ли",
     },
   },
   fall: {
@@ -1428,7 +1435,7 @@ export function buildAliceSentenceWords({ sentence, paragraphId, chapterId }: Bu
       text,
       normalized,
       lemma: lexical.lemma,
-      translation: contextualTranslation ?? lexical.translation,
+      translation: lexical.translation,
       contextualTranslation,
       commonTranslations: lexical.commonTranslations,
       phrase: phraseContext?.phrase,
@@ -1465,7 +1472,7 @@ function getLexicalEntry(normalized: string): LexicalEntry {
   if (override) return override;
 
   const lemma = lemmaOverrides[normalized] ?? inferLemma(normalized);
-  const translation = translations[normalized] ?? translations[lemma] ?? supplementalTranslations[normalized] ?? supplementalTranslations[lemma] ?? "перевод по контексту";
+  const translation = translations[normalized] ?? translations[lemma] ?? supplementalTranslations[normalized] ?? supplementalTranslations[lemma] ?? "";
   const partOfSpeech = partOfSpeechOverrides[normalized] ?? inferPartOfSpeech(normalized);
   return entry(lemma, translation, ipaOverrides[normalized] ?? ipaOverrides[lemma] ?? "", partOfSpeech);
 }
