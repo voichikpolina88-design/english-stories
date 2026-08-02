@@ -1270,6 +1270,11 @@ p {
   height: 100%;
   border-radius: inherit;
   background: #fff7d6;
+  transition: width 240ms ease;
+}
+
+.cover-progress.completed > span > span {
+  background: #7fb069;
 }
 
 .cover-progress small {
@@ -1361,6 +1366,17 @@ p {
   font-weight: 850;
 }
 
+.book-progress-location {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 760;
+  line-height: 1.35;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
 .book-info-popover p,
 .sheet-copy p {
   display: -webkit-box;
@@ -1389,6 +1405,11 @@ p {
   height: 100%;
   border-radius: inherit;
   background: linear-gradient(90deg, var(--accent-link), var(--purple-dark));
+  transition: width 240ms ease;
+}
+
+.details-progress.completed > span > span {
+  background: linear-gradient(90deg, #7fb069, #4f8f5b);
 }
 
 .details-progress small {
