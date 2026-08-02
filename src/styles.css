@@ -2338,6 +2338,16 @@ p {
   line-height: 1.55;
 }
 
+.account-benefits {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  color: var(--ink);
+  font-weight: 780;
+  list-style: none;
+}
+
 .auth-form {
   display: grid;
   width: min(360px, 100%);
@@ -2392,17 +2402,12 @@ p {
   box-shadow: 0 0 0 3px rgba(94, 73, 214, 0.1);
 }
 
-.auth-error,
-.auth-note {
+.auth-error {
   margin: 0;
   color: #b42318;
   font-size: 0.86rem;
   font-weight: 740;
   line-height: 1.45;
-}
-
-.auth-note {
-  color: var(--muted);
 }
 
 .language-actions button {

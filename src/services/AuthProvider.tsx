@@ -50,7 +50,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setCloudSnapshot(snapshot);
       })
       .catch(() => {
-        if (!cancelled) setError("Не удалось загрузить данные аккаунта. Локальные данные остались на месте.");
+        console.error("[StoryLingo auth] Failed to load account data");
+        if (!cancelled) setError("Не удалось подключиться. Попробуйте позже.");
       })
       .finally(() => {
         if (!cancelled) setIsLoading(false);
@@ -100,7 +101,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const snapshot = await migrateLocalDataToAccount(session, cloudSnapshot ?? {});
       setCloudSnapshot(snapshot);
     } catch {
-      setError("Не удалось синхронизировать данные. Они сохранены локально и будут доступны на этом устройстве.");
+      console.error("[StoryLingo auth] Failed to sync account data");
+      setError("Не удалось подключиться. Попробуйте позже.");
     }
   }
 
@@ -134,7 +136,8 @@ function getReadableAuthError(error: unknown) {
   const normalized = message.toLowerCase();
 
   if (message === "SUPABASE_NOT_CONFIGURED") {
-    return "Supabase ещё не настроен. Добавьте SUPABASE_URL и SUPABASE_ANON_KEY в окружение.";
+    console.error("[StoryLingo auth] Supabase environment variables are not configured");
+    return "Не удалось подключиться. Попробуйте позже.";
   }
   if (normalized.includes("already") || normalized.includes("registered")) {
     return "Этот email уже используется. Попробуйте войти.";

@@ -527,7 +527,7 @@ function App() {
               <ProfilePage
                 language={progress.selectedLanguage ?? "Russian"}
                 onSelectLanguage={selectLanguage}
-                progress={progress.readingProgress}
+                bookProgress={bookProgress}
                 readingTimer={readingTimer}
               />
             ) : null}
@@ -2287,12 +2287,12 @@ function ContentDetailPage({
 
 function ProfilePage({
   language,
-  progress,
+  bookProgress,
   onSelectLanguage,
   readingTimer,
 }: {
   language: NativeLanguage;
-  progress: Record<string, number>;
+  bookProgress: Record<string, BookReadingProgress>;
   onSelectLanguage: (language: NativeLanguage) => void;
   readingTimer: ReturnType<typeof useReadingTimer>;
 }) {
@@ -2301,11 +2301,10 @@ function ProfilePage({
   const [authMode, setAuthMode] = useState<"login" | "register">("register");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const startedCount = Object.values(progress).filter((value) => value > 0).length;
-  const averageProgress = startedCount
-    ? Math.round(Object.values(progress).reduce((total, value) => total + value, 0) / startedCount)
-    : 0;
   const totalReadingSeconds = readingTimer.sessions.reduce((sum, session) => sum + session.durationSeconds, 0);
+  const availableBookIds = new Set(homeShelfBooks.filter((book) => book.type === "book" && !book.comingSoon).map((book) => book.id));
+  const completedBookCount = Object.entries(bookProgress).filter(([bookId, item]) => availableBookIds.has(bookId) && item.isCompleted).length;
+  const inProgressBookCount = Object.entries(bookProgress).filter(([bookId, item]) => availableBookIds.has(bookId) && item.isStarted && !item.isCompleted).length;
 
   async function handleAuthSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -2326,7 +2325,7 @@ function ProfilePage({
             <div>
               <span className="eyebrow">Аккаунт</span>
               <h2>{auth.user?.email}</h2>
-              <p>Прогресс, словарь, настройки чтения и сессии подготовлены к синхронизации через Supabase.</p>
+              <p>Ваш прогресс, слова и настройки чтения сохраняются для продолжения обучения с любого устройства.</p>
             </div>
             <button className="secondary-button" type="button" disabled={auth.isLoading} onClick={auth.logout}>
               Выйти
@@ -2336,8 +2335,14 @@ function ProfilePage({
           <>
             <div className="account-copy">
               <span className="eyebrow">Аккаунт</span>
-              <h2>Сохраняйте свой прогресс, слова и настройки на всех устройствах</h2>
-              <p>Регистрация необязательна: можно продолжать читать локально, а при создании аккаунта текущие данные будут перенесены.</p>
+              <h2>Создайте аккаунт бесплатно</h2>
+              <p>Сохраняйте:</p>
+              <ul className="account-benefits">
+                <li>✓ прогресс книг</li>
+                <li>✓ изученные слова</li>
+                <li>✓ настройки чтения</li>
+              </ul>
+              <p>И продолжайте обучение с любого устройства.</p>
             </div>
             <form className="auth-form" onSubmit={handleAuthSubmit}>
               <div className="auth-tabs" role="tablist" aria-label="Вход или регистрация">
@@ -2353,7 +2358,6 @@ function ProfilePage({
                 <input type="password" value={password} autoComplete={authMode === "register" ? "new-password" : "current-password"} minLength={6} onChange={(event) => setPassword(event.target.value)} required />
               </label>
               {auth.error ? <p className="auth-error" role="alert">{auth.error}</p> : null}
-              {!auth.isConfigured ? <p className="auth-note">Supabase env ещё не задан, локальное чтение работает как раньше.</p> : null}
               <button className="primary-button" type="submit" disabled={auth.isLoading}>
                 {auth.isLoading ? "Подождите..." : authMode === "register" ? "Создать аккаунт" : "Войти"}
               </button>
@@ -2372,10 +2376,10 @@ function ProfilePage({
         </div>
       </section>
       <section className="profile-stats">
-        <Metric label="Книги" value={startedCount.toString()} />
+        <Metric label="Прочитано книг" value={completedBookCount.toString()} />
+        <Metric label="Книг в процессе" value={inProgressBookCount.toString()} />
         <Metric label="Слов в словаре" value={savedWords.length.toString()} />
         <Metric label="Время чтения" value={formatReadingDuration(totalReadingSeconds)} />
-        <Metric label="Средний прогресс" value={`${averageProgress}%`} />
       </section>
     </main>
   );
