@@ -1,16 +1,17 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   applyAccountSnapshotToLocalStorage,
-  getStoredSession,
   isSupabaseConfigured,
   loadCloudSnapshot,
   loginWithEmail,
   logoutFromSupabase,
   migrateLocalDataToAccount,
   registerWithEmail,
+  restoreStoredAuthSession,
   storeSession,
   type StoryLingoCloudSnapshot,
   type StoryLingoUser,
+  type SupabaseSession,
 } from "./accountSync";
 
 type AuthMode = "login" | "register";
@@ -32,10 +33,32 @@ type AuthContextValue = {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [session, setSession] = useState(() => getStoredSession());
+  const [session, setSession] = useState<SupabaseSession | null>(null);
   const [cloudSnapshot, setCloudSnapshot] = useState<StoryLingoCloudSnapshot | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    restoreStoredAuthSession()
+      .then((result) => {
+        if (cancelled) return;
+        if (result.status === "authenticated") {
+          setSession(result.session);
+        }
+      })
+      .catch((restoreError) => {
+        console.error("[StoryLingo auth] Failed to check current user", restoreError);
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     if (!session || !isSupabaseConfigured()) return;
@@ -49,9 +72,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         applyAccountSnapshotToLocalStorage(snapshot);
         setCloudSnapshot(snapshot);
       })
-      .catch(() => {
-        console.error("[StoryLingo auth] Failed to load account data");
-        if (!cancelled) setError("Не удалось подключиться. Попробуйте позже.");
+      .catch((loadError) => {
+        console.error("[StoryLingo auth] Failed to load account data", loadError);
+        if (!cancelled) setError("Сервис временно недоступен.");
       })
       .finally(() => {
         if (!cancelled) setIsLoading(false);
@@ -74,6 +97,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(result.session);
       setCloudSnapshot(merged);
     } catch (authError) {
+      console.error("[StoryLingo auth] Authorization failed", authError);
       setError(getReadableAuthError(authError));
     } finally {
       setIsLoading(false);
@@ -85,7 +109,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(true);
     try {
       await logoutFromSupabase(session);
-    } catch {
+    } catch (logoutError) {
+      console.error("[StoryLingo auth] Logout request failed", logoutError);
       // Local logout should still work if the network is unavailable.
     } finally {
       storeSession(null);
@@ -100,9 +125,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const snapshot = await migrateLocalDataToAccount(session, cloudSnapshot ?? {});
       setCloudSnapshot(snapshot);
-    } catch {
-      console.error("[StoryLingo auth] Failed to sync account data");
-      setError("Не удалось подключиться. Попробуйте позже.");
+    } catch (syncError) {
+      console.error("[StoryLingo auth] Failed to sync account data", syncError);
+      setError("Сервис временно недоступен.");
     }
   }
 
@@ -137,7 +162,10 @@ function getReadableAuthError(error: unknown) {
 
   if (message === "SUPABASE_NOT_CONFIGURED") {
     console.error("[StoryLingo auth] Supabase environment variables are not configured");
-    return "Не удалось подключиться. Попробуйте позже.";
+    return "Сервис временно недоступен.";
+  }
+  if (message === "EMAIL_CONFIRMATION_REQUIRED") {
+    return "Аккаунт создан. Проверьте email и подтвердите регистрацию.";
   }
   if (normalized.includes("already") || normalized.includes("registered")) {
     return "Этот email уже используется. Попробуйте войти.";
@@ -152,5 +180,5 @@ function getReadableAuthError(error: unknown) {
     return "Неверный email или пароль.";
   }
 
-  return "Не удалось выполнить вход. Проверьте данные и попробуйте ещё раз.";
+  return "Сервис временно недоступен.";
 }

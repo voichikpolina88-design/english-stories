@@ -6,7 +6,7 @@ const READING_TIMER_STORAGE_KEY = "storylingo-reading-timer";
 const READING_SETTINGS_KEY = "storylingo-reading-settings";
 const READER_POSITION_KEY = "storylingo-reader-positions";
 
-type SupabaseSession = {
+export type SupabaseSession = {
   access_token: string;
   refresh_token: string;
   expires_at?: number;
@@ -22,6 +22,15 @@ export type AccountAuthResult = {
   session: SupabaseSession;
   snapshot: StoryLingoCloudSnapshot;
 };
+
+export type StoredAuthSessionResult =
+  | {
+      status: "authenticated";
+      session: SupabaseSession;
+    }
+  | {
+      status: "signedOut";
+    };
 
 export type StoryLingoCloudSnapshot = {
   progress?: Partial<LearnerProgress>;
@@ -43,13 +52,17 @@ type SupabaseAuthResponse = {
   access_token?: string;
   refresh_token?: string;
   expires_in?: number;
+  expires_at?: number;
   user?: {
     id: string;
     email?: string;
   };
+  id?: string;
+  email?: string;
   error?: string;
   error_description?: string;
   msg?: string;
+  code?: string;
 };
 
 const AUTH_STORAGE_KEY = "storylingo-supabase-session";
@@ -98,6 +111,31 @@ export async function loginWithEmail(email: string, password: string): Promise<A
   const snapshot = await loadCloudSnapshot(session);
   await migrateLocalDataToAccount(session, snapshot);
   return { session, snapshot: await loadCloudSnapshot(session) };
+}
+
+export async function restoreStoredAuthSession(): Promise<StoredAuthSessionResult> {
+  const savedSession = getStoredSession();
+  if (!savedSession || !isSupabaseConfigured()) return { status: "signedOut" };
+
+  try {
+    const session = shouldRefreshSession(savedSession)
+      ? await refreshAuthSession(savedSession.refresh_token)
+      : savedSession;
+    const user = await getCurrentUser(session);
+    const nextSession = {
+      ...session,
+      user,
+    };
+    storeSession(nextSession);
+    return {
+      status: "authenticated",
+      session: nextSession,
+    };
+  } catch (error) {
+    console.error("[StoryLingo auth] Failed to restore Supabase session", error);
+    storeSession(null);
+    return { status: "signedOut" };
+  }
 }
 
 export async function logoutFromSupabase(session: SupabaseSession | null) {
@@ -206,19 +244,53 @@ async function requestAuthSession(path: string, email: string, password: string)
 }
 
 function normalizeAuthResponse(response: SupabaseAuthResponse): SupabaseSession {
-  if (!response.access_token || !response.refresh_token || !response.user?.id) {
+  const user = normalizeAuthUser(response);
+  if (user?.id && (!response.access_token || !response.refresh_token)) {
+    throw new Error("EMAIL_CONFIRMATION_REQUIRED");
+  }
+  if (!response.access_token || !response.refresh_token || !user?.id) {
     throw new Error(response.error_description || response.error || response.msg || "AUTH_FAILED");
   }
 
   return {
     access_token: response.access_token,
     refresh_token: response.refresh_token,
-    expires_at: response.expires_in ? Math.floor(Date.now() / 1000) + response.expires_in : undefined,
-    user: {
-      id: response.user.id,
-      email: response.user.email ?? "",
-    },
+    expires_at: response.expires_at ?? (response.expires_in ? Math.floor(Date.now() / 1000) + response.expires_in : undefined),
+    user,
   };
+}
+
+function normalizeAuthUser(response: SupabaseAuthResponse): StoryLingoUser | null {
+  const user = response.user ?? (response.id ? response : undefined);
+  if (!user?.id) return null;
+  return {
+    id: user.id,
+    email: user.email ?? "",
+  };
+}
+
+function shouldRefreshSession(session: SupabaseSession) {
+  if (!session.expires_at) return false;
+  return session.expires_at - Math.floor(Date.now() / 1000) < 60;
+}
+
+async function refreshAuthSession(refreshToken: string) {
+  const response = await supabaseFetch<SupabaseAuthResponse>("/auth/v1/token?grant_type=refresh_token", {
+    method: "POST",
+    body: {
+      refresh_token: refreshToken,
+    },
+  });
+  return normalizeAuthResponse(response);
+}
+
+async function getCurrentUser(session: SupabaseSession): Promise<StoryLingoUser> {
+  const response = await supabaseFetch<SupabaseAuthResponse>("/auth/v1/user", {
+    token: session.access_token,
+  });
+  const user = normalizeAuthUser(response);
+  if (!user) throw new Error("AUTH_SESSION_INVALID");
+  return user;
 }
 
 function normalizeSession(value: unknown): SupabaseSession | null {
