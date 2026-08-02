@@ -1,5 +1,5 @@
 import { ArrowLeft, BookOpen, Bookmark, CheckCircle2, Clock, Home, Languages, Library, Pause, Play, Search, User, Volume2, X } from "lucide-react";
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type Dispatch, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode, type RefObject, type SetStateAction } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type Dispatch, type FormEvent, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode, type RefObject, type SetStateAction } from "react";
 import { comingSoonBookIds, getCatalogBook, getCategoryBooks, homeShelfBooks, libraryCategories, type HomeShelfBook } from "./data/homeShelves";
 import { getReaderBook, getReaderChapter } from "./data/aliceReader";
 import { getChapterCompletionKey, useLearnerProgress } from "./hooks/useLearnerProgress";
@@ -21,7 +21,8 @@ import {
   hasValidTranslation,
   normalizeVocabularyAnswer,
 } from "./services/vocabularyHelpers";
-import { useSavedVocabulary } from "./services/vocabularyStorage";
+import { useAuth } from "./services/AuthProvider";
+import { replaceSavedVocabularyWords, useSavedVocabulary } from "./services/vocabularyStorage";
 import type { BookCompletion, ChapterCompletion, LastOpenedContent, NativeLanguage, ReaderChapter, ReaderPosition, ReadingSession, ReadingSettings, SavedVocabularyWord } from "./types";
 
 type Page = "home" | "library" | "dictionary" | "profile";
@@ -144,12 +145,31 @@ function useReadingSettings() {
   useEffect(() => {
     try {
       window.localStorage.setItem(READING_SETTINGS_KEY, JSON.stringify(settings));
+      window.dispatchEvent(new CustomEvent("storylingo-reading-settings-change"));
     } catch {
       // Reading should remain available when localStorage is blocked.
     }
   }, [settings]);
 
-  return { settings, setSettings };
+  useEffect(() => {
+    const handleAccountDataMerged = () => {
+      try {
+        const saved = window.localStorage.getItem(READING_SETTINGS_KEY);
+        if (saved) setSettings(normalizeReadingSettings({ ...defaultReadingSettings, ...JSON.parse(saved) }));
+      } catch {
+        // Keep current settings if stored cloud settings are unavailable.
+      }
+    };
+
+    window.addEventListener("storylingo-account-data-merged", handleAccountDataMerged);
+    return () => window.removeEventListener("storylingo-account-data-merged", handleAccountDataMerged);
+  }, []);
+
+  function replaceSettings(nextSettings: ReadingSettings) {
+    setSettings(normalizeReadingSettings({ ...defaultReadingSettings, ...nextSettings }));
+  }
+
+  return { settings, setSettings, replaceSettings };
 }
 
 function normalizeReadingSettings(settings: ReadingSettings): ReadingSettings {
@@ -221,9 +241,13 @@ function App() {
   const [bookInfo, setBookInfo] = useState<BookInfoState | null>(null);
   const [sheetInfo, setSheetInfo] = useState<{ book: HomeShelfBook; progressInfo: BookReadingProgress } | null>(null);
   const [goalDialogOpen, setGoalDialogOpen] = useState(false);
+  const [readingSettingsSyncTick, setReadingSettingsSyncTick] = useState(0);
   const closeInfoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pendingScrollPosition = useRef<number | null>(null);
-  const { completeChapterAndUpdateBook, progress, saveLastOpenedContent, saveReadingProgress, selectLanguage } = useLearnerProgress();
+  const lastAccountSyncSignature = useRef("");
+  const auth = useAuth();
+  const { savedWords: accountSavedWords } = useSavedVocabulary();
+  const { completeChapterAndUpdateBook, progress, replaceProgress, saveLastOpenedContent, saveReadingProgress, selectLanguage } = useLearnerProgress();
   const allItems = homeShelfBooks;
   const activeBook = allItems.find((book) => book.id === activeBookId) ?? null;
   const activeDetailBook = allItems.find((book) => book.id === activeDetailId) ?? null;
@@ -246,6 +270,45 @@ function App() {
   useEffect(() => {
     clearComingSoonReaderPositions();
   }, []);
+
+  useEffect(() => {
+    const handleReadingSettingsChange = () => setReadingSettingsSyncTick((value) => value + 1);
+    window.addEventListener("storylingo-reading-settings-change", handleReadingSettingsChange);
+    return () => window.removeEventListener("storylingo-reading-settings-change", handleReadingSettingsChange);
+  }, []);
+
+  useEffect(() => {
+    if (!auth.cloudSnapshot) return;
+    if (auth.cloudSnapshot.progress) replaceProgress(auth.cloudSnapshot.progress);
+    if (auth.cloudSnapshot.vocabulary) replaceSavedVocabularyWords(auth.cloudSnapshot.vocabulary);
+    if (auth.cloudSnapshot.readingSessions) readingTimer.replaceSessions(auth.cloudSnapshot.readingSessions);
+  }, [auth.cloudSnapshot]);
+
+  useEffect(() => {
+    if (!auth.isAuthenticated) return;
+    const signature = JSON.stringify({
+      readingProgress: progress.readingProgress,
+      chapterCompletions: progress.chapterCompletions,
+      bookCompletions: progress.bookCompletions,
+      lastOpenedContent: progress.lastOpenedContent,
+      savedWords: accountSavedWords.map((word) => ({
+        id: word.lexicalEntryId,
+        contexts: word.contexts.length,
+        status: word.progress.status,
+        correctCount: word.progress.correctCount,
+        incorrectCount: word.progress.incorrectCount,
+      })),
+      sessions: readingTimer.sessions.map((session) => `${session.id}:${session.durationSeconds}`),
+    });
+    if (signature === lastAccountSyncSignature.current) return;
+    lastAccountSyncSignature.current = signature;
+
+    const timer = window.setTimeout(() => {
+      void auth.syncLocalData();
+    }, 900);
+
+    return () => window.clearTimeout(timer);
+  }, [auth.isAuthenticated, progress, accountSavedWords, readingTimer.sessions, readingSettingsSyncTick]);
 
   function navigate(nextPage: Page) {
     setPage(nextPage);
@@ -460,7 +523,14 @@ function App() {
               />
             ) : null}
             {page === "dictionary" ? <DictionaryPage /> : null}
-            {page === "profile" ? <ProfilePage language={progress.selectedLanguage ?? "Russian"} onSelectLanguage={selectLanguage} progress={progress.readingProgress} /> : null}
+            {page === "profile" ? (
+              <ProfilePage
+                language={progress.selectedLanguage ?? "Russian"}
+                onSelectLanguage={selectLanguage}
+                progress={progress.readingProgress}
+                readingTimer={readingTimer}
+              />
+            ) : null}
           </>
         )}
       </div>
@@ -2160,19 +2230,78 @@ function ProfilePage({
   language,
   progress,
   onSelectLanguage,
+  readingTimer,
 }: {
   language: NativeLanguage;
   progress: Record<string, number>;
   onSelectLanguage: (language: NativeLanguage) => void;
+  readingTimer: ReturnType<typeof useReadingTimer>;
 }) {
+  const auth = useAuth();
+  const { savedWords } = useSavedVocabulary();
+  const [authMode, setAuthMode] = useState<"login" | "register">("register");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const startedCount = Object.values(progress).filter((value) => value > 0).length;
   const averageProgress = startedCount
     ? Math.round(Object.values(progress).reduce((total, value) => total + value, 0) / startedCount)
     : 0;
+  const totalReadingSeconds = readingTimer.sessions.reduce((sum, session) => sum + session.durationSeconds, 0);
+
+  async function handleAuthSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (auth.isLoading) return;
+    if (authMode === "register") {
+      await auth.register(email.trim(), password);
+    } else {
+      await auth.login(email.trim(), password);
+    }
+  }
 
   return (
     <main className="page-stack profile-page">
-      <PageTitle title="Профиль" text="Настройки чтения и локальный прогресс на этом устройстве." />
+      <PageTitle title="Профиль" text={auth.isAuthenticated ? "Аккаунт StoryLingo и синхронизация прогресса." : "Читайте без регистрации или сохраните прогресс в аккаунте."} />
+      <section className="profile-panel account-panel">
+        {auth.isAuthenticated ? (
+          <>
+            <div>
+              <span className="eyebrow">Аккаунт</span>
+              <h2>{auth.user?.email}</h2>
+              <p>Прогресс, словарь, настройки чтения и сессии подготовлены к синхронизации через Supabase.</p>
+            </div>
+            <button className="secondary-button" type="button" disabled={auth.isLoading} onClick={auth.logout}>
+              Выйти
+            </button>
+          </>
+        ) : (
+          <>
+            <div className="account-copy">
+              <span className="eyebrow">Аккаунт</span>
+              <h2>Сохраняйте свой прогресс, слова и настройки на всех устройствах</h2>
+              <p>Регистрация необязательна: можно продолжать читать локально, а при создании аккаунта текущие данные будут перенесены.</p>
+            </div>
+            <form className="auth-form" onSubmit={handleAuthSubmit}>
+              <div className="auth-tabs" role="tablist" aria-label="Вход или регистрация">
+                <button className={authMode === "register" ? "active" : ""} type="button" onClick={() => setAuthMode("register")}>Создать аккаунт</button>
+                <button className={authMode === "login" ? "active" : ""} type="button" onClick={() => setAuthMode("login")}>Войти</button>
+              </div>
+              <label>
+                Email
+                <input type="email" value={email} autoComplete="email" onChange={(event) => setEmail(event.target.value)} required />
+              </label>
+              <label>
+                Пароль
+                <input type="password" value={password} autoComplete={authMode === "register" ? "new-password" : "current-password"} minLength={6} onChange={(event) => setPassword(event.target.value)} required />
+              </label>
+              {auth.error ? <p className="auth-error" role="alert">{auth.error}</p> : null}
+              {!auth.isConfigured ? <p className="auth-note">Supabase env ещё не задан, локальное чтение работает как раньше.</p> : null}
+              <button className="primary-button" type="submit" disabled={auth.isLoading}>
+                {auth.isLoading ? "Подождите..." : authMode === "register" ? "Создать аккаунт" : "Войти"}
+              </button>
+            </form>
+          </>
+        )}
+      </section>
       <section className="profile-panel">
         <div>
           <span className="eyebrow">Язык интерфейса</span>
@@ -2184,7 +2313,9 @@ function ProfilePage({
         </div>
       </section>
       <section className="profile-stats">
-        <Metric label="Начато книг" value={startedCount.toString()} />
+        <Metric label="Книги" value={startedCount.toString()} />
+        <Metric label="Слов в словаре" value={savedWords.length.toString()} />
+        <Metric label="Время чтения" value={formatReadingDuration(totalReadingSeconds)} />
         <Metric label="Средний прогресс" value={`${averageProgress}%`} />
       </section>
     </main>

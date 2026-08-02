@@ -216,6 +216,13 @@ export function useReadingTimer(activeContent: ActiveReadingContent | null) {
     }));
   }, []);
 
+  const replaceSessions = useCallback((sessions: ReadingSession[]) => {
+    setStorage((current) => ({
+      ...current,
+      sessions: mergeReadingSessionsById(current.sessions, sessions),
+    }));
+  }, []);
+
   const currentSessionSeconds = getTimerSeconds(storage.timer, now);
   const stats = useMemo(() => getReadingStats(storage.sessions, storage.goal, storage.bestReadingStreak, storage.timer, now), [storage, now]);
 
@@ -238,11 +245,18 @@ export function useReadingTimer(activeContent: ActiveReadingContent | null) {
     lastContentId: storage.lastContentId,
     isGoalCompleteToday: stats.todaySeconds >= storage.goal.dailyGoalMinutes * 60,
     setDailyGoal,
+    replaceSessions,
     pauseTimer: () => pauseTimer("manual"),
     resumeTimer,
     finishSession: () => finishSession("leftReader"),
     recordActivity,
   };
+}
+
+function mergeReadingSessionsById(currentSessions: ReadingSession[], nextSessions: ReadingSession[]) {
+  const byId = new Map<string, ReadingSession>();
+  [...currentSessions, ...nextSessions].forEach((session) => byId.set(session.id, session));
+  return Array.from(byId.values()).sort((a, b) => a.startedAt.localeCompare(b.startedAt));
 }
 
 function pauseStorageTimer(storage: ReadingTimerStorage, reason: PauseReason): ReadingTimerStorage {

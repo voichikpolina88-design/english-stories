@@ -1,6 +1,7 @@
 import { Component, StrictMode, type ErrorInfo, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
+import { AuthProvider } from "./services/AuthProvider";
 import "./styles.css";
 
 type ErrorBoundaryState = {
@@ -44,7 +45,9 @@ try {
   createRoot(rootElement).render(
     <StrictMode>
       <AppErrorBoundary>
-        <App />
+        <AuthProvider>
+          <App />
+        </AuthProvider>
       </AppErrorBoundary>
     </StrictMode>,
   );

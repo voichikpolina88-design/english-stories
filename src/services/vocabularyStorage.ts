@@ -117,6 +117,13 @@ export function restoreSavedVocabularyWord(word: SavedVocabularyWord) {
   });
 }
 
+export function replaceSavedVocabularyWords(words: SavedVocabularyWord[]) {
+  writeSavedVocabularyStorage({
+    version: SCHEMA_VERSION,
+    words: dedupeSavedVocabularyWords(words.map(repairSavedVocabularyWord)),
+  });
+}
+
 export function toggleSavedVocabularyWord(input: SaveVocabularyInput) {
   if (isWordSaved(input.lexicalEntryId)) {
     removeSavedVocabularyWord(input.lexicalEntryId);

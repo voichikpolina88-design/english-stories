@@ -28,19 +28,7 @@ type CompleteChapterInput = {
 export function useLearnerProgress() {
   const [progress, setProgress] = useState<LearnerProgress>(() => {
     const saved = readProgressFromStorage();
-    return normalizeProgressForAvailability(repairCompletedBookState({
-      ...defaultProgress,
-      ...saved,
-      selectedLanguage: saved?.selectedLanguage ?? defaultProgress.selectedLanguage,
-      readingProgress: {
-        ...migrateLessonProgress(saved),
-        ...(saved?.readingProgress ?? {}),
-      },
-      chapterCompletions: saved?.chapterCompletions ?? {},
-      bookCompletions: saved?.bookCompletions ?? {},
-      lastOpenedContent: saved?.lastOpenedContent ?? null,
-      lastVisitDate: saved?.lastVisitDate ?? today(),
-    }));
+    return normalizeLoadedProgress(saved);
   });
 
   useEffect(() => {
@@ -168,6 +156,10 @@ export function useLearnerProgress() {
     setProgress((current) => ({ ...current, selectedLanguage: language }));
   }
 
+  function replaceProgress(nextProgress: Partial<LearnerProgress>) {
+    setProgress(normalizeLoadedProgress(nextProgress));
+  }
+
   return {
     progress,
     saveReadingProgress,
@@ -175,6 +167,7 @@ export function useLearnerProgress() {
     saveChapterCompletion,
     completeChapterAndUpdateBook,
     selectLanguage,
+    replaceProgress,
   };
 }
 
@@ -194,6 +187,22 @@ function readProgressFromStorage(): (Partial<LearnerProgress> & { lessonProgress
   } catch {
     return null;
   }
+}
+
+function normalizeLoadedProgress(saved: (Partial<LearnerProgress> & { lessonProgress?: Record<string, number> }) | null | undefined): LearnerProgress {
+  return normalizeProgressForAvailability(repairCompletedBookState({
+    ...defaultProgress,
+    ...saved,
+    selectedLanguage: saved?.selectedLanguage ?? defaultProgress.selectedLanguage,
+    readingProgress: {
+      ...migrateLessonProgress(saved ?? null),
+      ...(saved?.readingProgress ?? {}),
+    },
+    chapterCompletions: saved?.chapterCompletions ?? {},
+    bookCompletions: saved?.bookCompletions ?? {},
+    lastOpenedContent: saved?.lastOpenedContent ?? null,
+    lastVisitDate: saved?.lastVisitDate ?? today(),
+  }));
 }
 
 function repairCompletedBookState(progress: LearnerProgress): LearnerProgress {
