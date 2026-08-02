@@ -76,8 +76,18 @@ export type Story = {
 export type LearnerProgress = {
   selectedLanguage: NativeLanguage | null;
   readingProgress: Record<string, number>;
+  chapterCompletions?: Record<string, ChapterCompletion>;
   lastOpenedContent?: LastOpenedContent | null;
   lastVisitDate: string;
+};
+
+export type ChapterCompletion = {
+  bookId: string;
+  chapterId: string;
+  completed: boolean;
+  completedAt?: string;
+  totalReadingSeconds: number;
+  savedWordsCount: number;
 };
 
 export type LastOpenedContent = {

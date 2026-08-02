@@ -1,8 +1,8 @@
-import { ArrowLeft, BookOpen, Bookmark, Clock, Home, Languages, Library, Pause, Play, Search, User, Volume2, X } from "lucide-react";
+import { ArrowLeft, BookOpen, Bookmark, CheckCircle2, Clock, Home, Languages, Library, Pause, Play, Search, User, Volume2, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type Dispatch, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode, type RefObject, type SetStateAction } from "react";
 import { getCatalogBook, getCategoryBooks, homeShelfBooks, libraryCategories, type HomeShelfBook } from "./data/homeShelves";
 import { getReaderBook, getReaderChapter } from "./data/aliceReader";
-import { useLearnerProgress } from "./hooks/useLearnerProgress";
+import { getChapterCompletionKey, useLearnerProgress } from "./hooks/useLearnerProgress";
 import {
   emptyPaginationSize,
   readerDisplayWordText,
@@ -22,7 +22,7 @@ import {
   normalizeVocabularyAnswer,
 } from "./services/vocabularyHelpers";
 import { useSavedVocabulary } from "./services/vocabularyStorage";
-import type { LastOpenedContent, NativeLanguage, ReaderChapter, ReaderPosition, ReadingSettings, SavedVocabularyWord } from "./types";
+import type { ChapterCompletion, LastOpenedContent, NativeLanguage, ReaderChapter, ReaderPosition, ReadingSession, ReadingSettings, SavedVocabularyWord } from "./types";
 
 type Page = "home" | "library" | "dictionary" | "profile";
 
@@ -161,13 +161,14 @@ function getDefaultChapterId(book: HomeShelfBook) {
 function App() {
   const [page, setPage] = useState<Page>("home");
   const [activeBookId, setActiveBookId] = useState<string | null>(null);
+  const [activeReaderChapterId, setActiveReaderChapterId] = useState<string | null>(null);
   const [activeDetailId, setActiveDetailId] = useState<string | null>(null);
   const [bookInfo, setBookInfo] = useState<BookInfoState | null>(null);
   const [sheetInfo, setSheetInfo] = useState<{ book: HomeShelfBook; progressValue: number } | null>(null);
   const [goalDialogOpen, setGoalDialogOpen] = useState(false);
   const closeInfoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pendingScrollPosition = useRef<number | null>(null);
-  const { progress, saveLastOpenedContent, saveReadingProgress, selectLanguage } = useLearnerProgress();
+  const { progress, saveChapterCompletion, saveLastOpenedContent, saveReadingProgress, selectLanguage } = useLearnerProgress();
   const allItems = homeShelfBooks;
   const activeBook = allItems.find((book) => book.id === activeBookId) ?? null;
   const activeDetailBook = allItems.find((book) => book.id === activeDetailId) ?? null;
@@ -177,7 +178,7 @@ function App() {
       ? {
           contentType: activeBook.type,
           contentId: activeBook.id,
-          chapterId: getDefaultChapterId(activeBook),
+          chapterId: activeReaderChapterId ?? getDefaultChapterId(activeBook),
         }
       : null,
   );
@@ -185,6 +186,7 @@ function App() {
   function navigate(nextPage: Page) {
     setPage(nextPage);
     setActiveBookId(null);
+    setActiveReaderChapterId(null);
     setActiveDetailId(null);
     setBookInfo(null);
     setSheetInfo(null);
@@ -233,11 +235,13 @@ function App() {
 
     if (book.comingSoon) {
       setActiveBookId(null);
+      setActiveReaderChapterId(null);
       setActiveDetailId(book.id);
       return;
     }
 
     setActiveDetailId(null);
+    setActiveReaderChapterId(options.chapterId ?? getDefaultChapterId(book));
     setActiveBookId(book.id);
   }
 
@@ -254,6 +258,7 @@ function App() {
     }
 
     setActiveBookId(null);
+    setActiveReaderChapterId(null);
     setActiveDetailId(null);
   }
 
@@ -285,6 +290,7 @@ function App() {
     setBookInfo(null);
     setSheetInfo(null);
     setActiveBookId(null);
+    setActiveReaderChapterId(null);
     setActiveDetailId(book.id);
   }
 
@@ -321,6 +327,27 @@ function App() {
             }
             restoreScrollPosition={pendingScrollPosition.current}
             readingTimer={readingTimer}
+            chapterCompletions={progress.chapterCompletions ?? {}}
+            onChapterChange={setActiveReaderChapterId}
+            onChapterComplete={saveChapterCompletion}
+            onChapterOpen={(chapterId, readingProgress) =>
+              saveOpenedContent(activeBook, {
+                chapterId,
+                readingProgress,
+                scrollPosition: 0,
+              })
+            }
+            onReturnToBook={() => {
+              setActiveBookId(null);
+              setActiveReaderChapterId(null);
+              setActiveDetailId(activeBook.id);
+            }}
+            onReturnToLibrary={() => {
+              setActiveBookId(null);
+              setActiveReaderChapterId(null);
+              setActiveDetailId(null);
+              setPage("library");
+            }}
             onChangeGoal={() => setGoalDialogOpen(true)}
           />
         ) : activeDetailBook ? (
@@ -1421,18 +1448,30 @@ const reserveVocabularyOptions: Array<Pick<SavedVocabularyWord, "word" | "transl
 
 function VocabularyTrainingScreen({
   words,
+  allWords,
   onBack,
   onFinishSession,
   onRecordAnswer,
   onSpeak,
   onStartSession,
+  backLabel = "← Вернуться в словарь",
+  introEyebrow = "Личный словарь",
+  introTitle = "Тренировка слов",
+  introDescription = "В тренировку попадут только слова, которые вы сами сохранили во время чтения.",
+  resultReturnLabel = "Вернуться в словарь",
 }: {
   words: SavedVocabularyWord[];
+  allWords?: SavedVocabularyWord[];
   onBack: () => void;
   onFinishSession: (sessionId: string) => void;
   onRecordAnswer: (wordId: string, isCorrect: boolean, sessionId: string) => void;
   onSpeak: (text: string) => void;
   onStartSession: () => string;
+  backLabel?: string;
+  introEyebrow?: string;
+  introTitle?: string;
+  introDescription?: string;
+  resultReturnLabel?: string;
 }) {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [tasks, setTasks] = useState<VocabularyTrainingTask[]>([]);
@@ -1456,7 +1495,7 @@ function VocabularyTrainingScreen({
 
   function start(wordsForSession = availableWords, retry = false) {
     const nextSessionId = onStartSession();
-    const nextTasks = buildVocabularyTrainingTasks(wordsForSession, words, retry);
+    const nextTasks = buildVocabularyTrainingTasks(wordsForSession, allWords ?? words, retry);
     setSessionId(nextSessionId);
     setTasks(nextTasks);
     setIndex(0);
@@ -1505,11 +1544,11 @@ function VocabularyTrainingScreen({
   if (phase === "intro") {
     return (
       <main className="page-stack vocabulary-training-page">
-        <button className="text-button" type="button" onClick={onBack}>← Вернуться в словарь</button>
+        <button className="text-button" type="button" onClick={onBack}>{backLabel}</button>
         <section className="training-card training-intro">
-          <span className="eyebrow">Личный словарь</span>
-          <h1>Тренировка слов</h1>
-          <p>В тренировку попадут только слова, которые вы сами сохранили во время чтения.</p>
+          <span className="eyebrow">{introEyebrow}</span>
+          <h1>{introTitle}</h1>
+          <p>{introDescription}</p>
           <div className="training-summary">
             <Metric label="Слов" value={availableWords.length.toString()} />
             <Metric label="Заданий" value={taskCount.toString()} />
@@ -1551,7 +1590,7 @@ function VocabularyTrainingScreen({
               </button>
             ) : null}
             <button className="primary-button" type="button" onClick={onBack}>
-              Вернуться в словарь
+              {resultReturnLabel}
             </button>
           </div>
         </section>
@@ -1563,7 +1602,7 @@ function VocabularyTrainingScreen({
     <main className="page-stack vocabulary-training-page">
       <section className="training-card training-task-card">
         <div className="training-topline">
-          <button className="text-button" type="button" onClick={onBack}>← Словарь</button>
+          <button className="text-button" type="button" onClick={onBack}>{backLabel}</button>
           <span>{Math.min(index + 1, tasks.length)} / {tasks.length}</span>
           <small>Ошибок: {mistakes.length}</small>
         </div>
@@ -1754,6 +1793,60 @@ function isDisplayableVocabularyWord(word: SavedVocabularyWord) {
   return !word.isInvalid && hasValidTranslation(getVocabularyDisplayTranslation(word).primary, word.word);
 }
 
+function getSavedWordsForChapter(words: SavedVocabularyWord[], bookId: string, chapterId: string) {
+  return dedupeVocabularyWords(
+    words.filter((word) => (
+      isTrainableVocabularyWord(word) &&
+      word.contexts.some((context) => context.bookId === bookId && context.chapterId === chapterId)
+    )),
+  );
+}
+
+function getSavedWordsForBook(words: SavedVocabularyWord[], bookId: string) {
+  return dedupeVocabularyWords(
+    words.filter((word) => (
+      isTrainableVocabularyWord(word) &&
+      word.contexts.some((context) => context.bookId === bookId)
+    )),
+  );
+}
+
+function dedupeVocabularyWords(words: SavedVocabularyWord[]) {
+  const unique = new Map<string, SavedVocabularyWord>();
+  words.forEach((word) => {
+    if (!unique.has(word.lexicalEntryId)) unique.set(word.lexicalEntryId, word);
+  });
+  return Array.from(unique.values());
+}
+
+function getReadingSecondsForChapter(sessions: ReadingSession[], bookId: string, chapterId: string, currentSessionSeconds = 0) {
+  const savedSeconds = sessions
+    .filter((session) => session.contentId === bookId && session.chapterId === chapterId)
+    .reduce((total, session) => total + session.durationSeconds, 0);
+  return savedSeconds + currentSessionSeconds;
+}
+
+function getReadingSecondsForBook(sessions: ReadingSession[], bookId: string, currentSessionSeconds = 0) {
+  const savedSeconds = sessions
+    .filter((session) => session.contentId === bookId)
+    .reduce((total, session) => total + session.durationSeconds, 0);
+  return savedSeconds + currentSessionSeconds;
+}
+
+function formatReadingDuration(seconds: number) {
+  const safeSeconds = Math.max(0, Math.floor(seconds));
+  if (safeSeconds < 60) return "Меньше минуты";
+  const totalMinutes = Math.round(safeSeconds / 60);
+  if (totalMinutes < 60) {
+    return `${totalMinutes} ${pluralizeRussian(totalMinutes, "минута", "минуты", "минут")}`;
+  }
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  return minutes
+    ? `${hours} ч ${minutes} мин`
+    : `${hours} ч`;
+}
+
 function vocabularyStatusLabel(word: SavedVocabularyWord) {
   const status = getVocabularyProgress(word).status;
   if (status === "learned") return "Изучено";
@@ -1862,6 +1955,12 @@ function ReaderPreview({
   onSessionUpdate,
   restoreScrollPosition,
   readingTimer,
+  chapterCompletions,
+  onChapterChange,
+  onChapterComplete,
+  onChapterOpen,
+  onReturnToBook,
+  onReturnToLibrary,
   onChangeGoal,
 }: {
   book: HomeShelfBook;
@@ -1871,9 +1970,16 @@ function ReaderPreview({
   onSessionUpdate: (scrollPosition: number) => void;
   restoreScrollPosition: number | null;
   readingTimer: ReturnType<typeof useReadingTimer>;
+  chapterCompletions: Record<string, ChapterCompletion>;
+  onChapterChange: (chapterId: string) => void;
+  onChapterComplete: (completion: ChapterCompletion) => void;
+  onChapterOpen: (chapterId: string, readingProgress: number) => void;
+  onReturnToBook: () => void;
+  onReturnToLibrary: () => void;
   onChangeGoal: () => void;
 }) {
   const speech = useSpeech();
+  const { savedWords, startTrainingSession, recordAnswer, finishTrainingSession } = useSavedVocabulary();
   const { settings, setSettings } = useReadingSettings();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
@@ -1883,6 +1989,10 @@ function ReaderPreview({
   const [pageDirection, setPageDirection] = useState<"next" | "prev" | null>(null);
   const [isPageTurning, setIsPageTurning] = useState(false);
   const [restrictionOpen, setRestrictionOpen] = useState(false);
+  const [completionOpen, setCompletionOpen] = useState(false);
+  const [chapterTrainingOpen, setChapterTrainingOpen] = useState(false);
+  const [completionTrainingWords, setCompletionTrainingWords] = useState<SavedVocabularyWord[]>([]);
+  const [completionTrainingScope, setCompletionTrainingScope] = useState<"chapter" | "book">("chapter");
   const [selectedWord, setSelectedWord] = useState<ReaderPageWord | null>(null);
   const [selectedParagraph, setSelectedParagraph] = useState<ReaderPageWord | null>(null);
   const [showSwipeHint, setShowSwipeHint] = useState(() => {
@@ -1897,6 +2007,8 @@ function ReaderPreview({
   const settingsPanelRef = useRef<HTMLDivElement | null>(null);
   const readingPageRef = useRef<HTMLElement | null>(null);
   const readingTextFrameRef = useRef<HTMLDivElement | null>(null);
+  const onChapterChangeRef = useRef(onChapterChange);
+  const onChapterOpenRef = useRef(onChapterOpen);
   const onProgressRef = useRef(onProgress);
   const onSessionUpdateRef = useRef(onSessionUpdate);
   const touchStartRef = useRef<{
@@ -1940,15 +2052,42 @@ function ReaderPreview({
   const totalBookWords = readerBook?.wordCount ?? chapterWordOffsets.total ?? Math.max(1, flatWords.length);
   const currentGlobalWordIndex = chapterStartWordCount + (lastVisibleWord?.absoluteIndex ?? firstVisibleWord?.absoluteIndex ?? 0) + 1;
   const visibleBookPercent = Math.min(100, Math.max(bookPercent, Math.round((currentGlobalWordIndex / Math.max(1, totalBookWords)) * 100)));
+  const chapterIndex = readerBook?.chapters.findIndex((item) => item.id === chapter.id) ?? 0;
+  const nextChapter = readerBook?.chapters[chapterIndex + 1] ?? null;
+  const isFinalChapter = readerBook ? chapterIndex >= readerBook.chapters.length - 1 : true;
+  const completedChapterIds = useMemo(() => new Set(
+    readerBook?.chapters
+      .filter((item) => chapterCompletions[getChapterCompletionKey(book.id, item.id)]?.completed)
+      .map((item) => item.id) ?? [],
+  ), [book.id, chapterCompletions, readerBook]);
+  const completedChapterCount = completedChapterIds.size;
+  const completionProgressCount = completionOpen
+    ? new Set([...completedChapterIds, chapter.id]).size
+    : completedChapterCount;
+  const chapterSavedWords = getSavedWordsForChapter(savedWords, book.id, chapter.id);
+  const bookSavedWords = getSavedWordsForBook(savedWords, book.id);
+  const activeChapterSessionSeconds = readingTimer.timer.contentId === book.id && readingTimer.timer.chapterId === chapter.id
+    ? readingTimer.currentSessionSeconds
+    : 0;
+  const activeBookSessionSeconds = readingTimer.timer.contentId === book.id ? readingTimer.currentSessionSeconds : 0;
+  const chapterReadingSeconds = getReadingSecondsForChapter(readingTimer.sessions, book.id, chapter.id, activeChapterSessionSeconds);
+  const bookReadingSeconds = getReadingSecondsForBook(readingTimer.sessions, book.id, activeBookSessionSeconds);
   const closeTimer = () => {
     setTimerOpen(false);
     window.setTimeout(() => timerButtonRef.current?.focus(), 0);
   };
 
   useEffect(() => {
+    onChapterChangeRef.current = onChapterChange;
+    onChapterOpenRef.current = onChapterOpen;
     onProgressRef.current = onProgress;
     onSessionUpdateRef.current = onSessionUpdate;
-  }, [onProgress, onSessionUpdate]);
+  }, [onChapterChange, onChapterOpen, onProgress, onSessionUpdate]);
+
+  useEffect(() => {
+    onChapterChangeRef.current(chapter.id);
+    onChapterOpenRef.current(chapter.id, bookPercent);
+  }, [chapter.id]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "auto" });
@@ -2111,6 +2250,47 @@ function ReaderPreview({
     setSettings(nextSettings);
   }
 
+  function completeCurrentChapter() {
+    const completedAt = new Date().toISOString();
+    const nextCompletedChapterCount = readerBook
+      ? new Set([
+          ...readerBook.chapters
+            .filter((item) => chapterCompletions[getChapterCompletionKey(book.id, item.id)]?.completed)
+            .map((item) => item.id),
+          chapter.id,
+        ]).size
+      : 1;
+    const nextProgress = readerBook
+      ? Math.round((nextCompletedChapterCount / Math.max(1, readerBook.chapters.length)) * 100)
+      : 100;
+
+    onChapterComplete({
+      bookId: book.id,
+      chapterId: chapter.id,
+      completed: true,
+      completedAt,
+      totalReadingSeconds: chapterReadingSeconds,
+      savedWordsCount: chapterSavedWords.length,
+    });
+    onProgressRef.current(nextProgress);
+    saveOpenedContentForReader(chapter.id, nextProgress);
+    readingTimer.finishSession();
+    setCompletionOpen(true);
+  }
+
+  function saveOpenedContentForReader(chapterId: string, readingProgress: number) {
+    onSessionUpdateRef.current(0);
+    writeReaderPosition(book.id, {
+      chapterId,
+      paragraphId: firstVisibleWord?.paragraphId,
+      sentenceId: firstVisibleWord?.sentenceId ?? `${chapterId}-complete`,
+      wordId: firstVisibleWord?.id,
+      wordIndex: firstVisibleWord?.absoluteIndex ?? 0,
+      progressRatio: Math.min(1, Math.max(0, readingProgress / 100)),
+      updatedAt: new Date().toISOString(),
+    });
+  }
+
   function turnPage(direction: "next" | "prev") {
     if (pages.length === 0 || isPageTurning) return;
     readingTimer.recordActivity();
@@ -2127,15 +2307,10 @@ function ReaderPreview({
     const canTurnPrev = direction === "prev" && currentPageIndex > 0;
 
     if (!canTurnNext && !canTurnPrev) {
-      const chapterIndex = readerBook?.chapters.findIndex((item) => item.id === chapter.id) ?? -1;
-      const nextChapter = direction === "next" ? readerBook?.chapters[chapterIndex + 1] : null;
       const previousChapter = direction === "prev" ? readerBook?.chapters[chapterIndex - 1] : null;
 
-      if (nextChapter) {
-        pendingChapterEdgeRef.current = "first";
-        visibleWordIdBeforeRepaginate.current = null;
-        setActiveChapterId(nextChapter.id);
-        setCurrentPageIndex(0);
+      if (direction === "next") {
+        completeCurrentChapter();
         return;
       }
 
@@ -2147,7 +2322,6 @@ function ReaderPreview({
         return;
       }
 
-      if (direction === "next") setRestrictionOpen(true);
       return;
     }
 
@@ -2166,6 +2340,36 @@ function ReaderPreview({
 
   function goToPreviousPage() {
     turnPage("prev");
+  }
+
+  function returnToCompletedPage() {
+    setChapterTrainingOpen(false);
+    setCompletionTrainingWords([]);
+    setCompletionTrainingScope("chapter");
+    setCompletionOpen(false);
+    setCurrentPageIndex(Math.max(0, pages.length - 1));
+    readingTimer.resumeTimer();
+  }
+
+  function openNextChapterFromCompletion() {
+    if (!nextChapter) return;
+    setCompletionOpen(false);
+    setChapterTrainingOpen(false);
+    setCompletionTrainingWords([]);
+    setCompletionTrainingScope("chapter");
+    pendingChapterEdgeRef.current = "first";
+    visibleWordIdBeforeRepaginate.current = null;
+    setActiveChapterId(nextChapter.id);
+    setCurrentPageIndex(0);
+    readingTimer.resumeTimer();
+  }
+
+  function openChapterTraining(scope: "chapter" | "book" = "chapter") {
+    const words = scope === "book" ? bookSavedWords : chapterSavedWords;
+    if (!words.length) return;
+    setCompletionTrainingWords(words);
+    setCompletionTrainingScope(scope);
+    setChapterTrainingOpen(true);
   }
 
   function handleReaderKeyDown(event: KeyboardEvent) {
@@ -2225,6 +2429,46 @@ function ReaderPreview({
     touchStartRef.current = null;
   }
 
+  if (chapterTrainingOpen) {
+    return (
+      <VocabularyTrainingScreen
+        words={completionTrainingWords.length ? completionTrainingWords : chapterSavedWords}
+        allWords={savedWords.filter(isTrainableVocabularyWord)}
+        backLabel="← Вернуться к главе"
+        introEyebrow={completionTrainingScope === "book" ? book.title : `Глава ${chapter.number}`}
+        introTitle={completionTrainingScope === "book" ? "Повтор слов книги" : "Повтор слов главы"}
+        introDescription={completionTrainingScope === "book" ? "В тренировку попадут только слова, сохранённые из этой книги." : "В тренировку попадут только слова, сохранённые из этой главы."}
+        resultReturnLabel="Вернуться к завершению главы"
+        onBack={() => setChapterTrainingOpen(false)}
+        onFinishSession={finishTrainingSession}
+        onRecordAnswer={recordAnswer}
+        onSpeak={speech.toggle}
+        onStartSession={startTrainingSession}
+      />
+    );
+  }
+
+  if (completionOpen) {
+    return (
+      <ChapterCompletionScreen
+        book={book}
+        chapter={chapter}
+        chapterCount={chapterCount}
+        completedChapterCount={completionProgressCount}
+        readingSeconds={isFinalChapter ? bookReadingSeconds : chapterReadingSeconds}
+        savedWordsCount={isFinalChapter ? bookSavedWords.length : chapterSavedWords.length}
+        isBookComplete={isFinalChapter}
+        hasChapterWords={chapterSavedWords.length > 0}
+        hasBookWords={bookSavedWords.length > 0}
+        onBack={returnToCompletedPage}
+        onNextChapter={openNextChapterFromCompletion}
+        onReviewWords={openChapterTraining}
+        onReturnToBook={onReturnToBook}
+        onReturnToLibrary={onReturnToLibrary}
+      />
+    );
+  }
+
   return (
     <main
       className={`reader-preview reading-theme-${settings.theme}`}
@@ -2262,7 +2506,7 @@ function ReaderPreview({
             >
               {readerBook.chapters.map((item) => (
                 <option key={item.id} value={item.id}>
-                  {item.number}. {item.title}
+                  {chapterCompletions[getChapterCompletionKey(book.id, item.id)]?.completed ? "✓ " : ""}{item.number}. {item.title}
                 </option>
               ))}
             </select>
@@ -2361,7 +2605,7 @@ function ReaderPreview({
           className="reader-page-edge reader-page-edge-right"
           type="button"
           aria-label="Следующая страница"
-          disabled={isPageTurning || (currentPageIndex >= pages.length - 1 && book.id === "alice-in-wonderland")}
+          disabled={isPageTurning || pages.length === 0}
           onClick={(event) => {
             event.stopPropagation();
             goToNextPage();
@@ -2398,6 +2642,103 @@ function ReaderPreview({
         onToggle={() => setTimerOpen((current) => !current)}
         readingTimer={readingTimer}
       />
+    </main>
+  );
+}
+
+function ChapterCompletionScreen({
+  book,
+  chapter,
+  chapterCount,
+  completedChapterCount,
+  readingSeconds,
+  savedWordsCount,
+  isBookComplete,
+  hasChapterWords,
+  hasBookWords,
+  onBack,
+  onNextChapter,
+  onReviewWords,
+  onReturnToBook,
+  onReturnToLibrary,
+}: {
+  book: HomeShelfBook;
+  chapter: ReaderChapter;
+  chapterCount: number;
+  completedChapterCount: number;
+  readingSeconds: number;
+  savedWordsCount: number;
+  isBookComplete: boolean;
+  hasChapterWords: boolean;
+  hasBookWords: boolean;
+  onBack: () => void;
+  onNextChapter: () => void;
+  onReviewWords: (scope?: "chapter" | "book") => void;
+  onReturnToBook: () => void;
+  onReturnToLibrary: () => void;
+}) {
+  const safeCompletedCount = Math.min(chapterCount, Math.max(completedChapterCount, isBookComplete ? chapterCount : completedChapterCount));
+  const progressPercent = Math.round((safeCompletedCount / Math.max(1, chapterCount)) * 100);
+  const wordsLabel = `${savedWordsCount} ${pluralizeRussian(savedWordsCount, "слово", "слова", "слов")} сохранено`;
+
+  return (
+    <main className="chapter-completion-page">
+      <button className="text-button completion-back-button" type="button" onClick={onBack}>
+        ← Назад к странице
+      </button>
+      <section className="chapter-completion-card" aria-labelledby="chapter-completion-title">
+        <div className="completion-mark" aria-hidden="true">
+          <CheckCircle2 size={34} />
+        </div>
+        <span className="eyebrow">{isBookComplete ? "Финал книги" : "StoryLingo Reader"}</span>
+        <h1 id="chapter-completion-title">{isBookComplete ? "Книга прочитана!" : "Глава прочитана"}</h1>
+        <div className="completion-chapter-title">
+          <span>{isBookComplete ? book.title : `${chapter.number}. ${chapter.title}`}</span>
+          <small>{isBookComplete ? `${chapterCount} из ${chapterCount} глав` : `${safeCompletedCount} из ${chapterCount} глав`}</small>
+        </div>
+        <div className="completion-stats" aria-label="Статистика завершения">
+          <Metric label="Время чтения" value={formatReadingDuration(readingSeconds)} />
+          <Metric label="Словарь" value={savedWordsCount ? wordsLabel : "Слов не сохранено"} />
+          <Metric label="Прогресс" value={`${progressPercent}%`} />
+        </div>
+        <Progress value={progressPercent} />
+        <p className="completion-note">
+          {savedWordsCount
+            ? "Можно быстро повторить сохранённые слова или продолжить чтение в том же темпе."
+            : "В этой главе вы не сохраняли слова. Можно сразу двигаться дальше."}
+        </p>
+        <div className="completion-actions">
+          {isBookComplete ? (
+            <>
+              {hasBookWords ? (
+                <button className="primary-button" type="button" onClick={() => onReviewWords("book")}>
+                  Повторить слова книги
+                </button>
+              ) : null}
+              <button className="primary-button" type="button" onClick={onReturnToLibrary}>
+                Вернуться в библиотеку
+              </button>
+              <button className="secondary-button" type="button" onClick={onReturnToBook}>
+                Открыть книгу
+              </button>
+            </>
+          ) : (
+            <>
+              <button className="primary-button" type="button" onClick={onNextChapter}>
+                Следующая глава
+              </button>
+              {hasChapterWords ? (
+                <button className="secondary-button" type="button" onClick={() => onReviewWords("chapter")}>
+                  Повторить {savedWordsCount} {pluralizeRussian(savedWordsCount, "слово", "слова", "слов")}
+                </button>
+              ) : null}
+              <button className="text-button" type="button" onClick={onReturnToBook}>
+                Вернуться к книге
+              </button>
+            </>
+          )}
+        </div>
+      </section>
     </main>
   );
 }

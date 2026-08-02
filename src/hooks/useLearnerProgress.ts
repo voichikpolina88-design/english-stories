@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { LastOpenedContent, LearnerProgress, NativeLanguage } from "../types";
+import type { ChapterCompletion, LastOpenedContent, LearnerProgress, NativeLanguage } from "../types";
 
 const STORAGE_KEY = "english-stories-progress";
 
@@ -8,6 +8,7 @@ const today = () => new Date().toISOString().slice(0, 10);
 const defaultProgress: LearnerProgress = {
   selectedLanguage: "Russian",
   readingProgress: {},
+  chapterCompletions: {},
   lastVisitDate: today(),
 };
 
@@ -22,6 +23,7 @@ export function useLearnerProgress() {
         ...migrateLessonProgress(saved),
         ...(saved?.readingProgress ?? {}),
       },
+      chapterCompletions: saved?.chapterCompletions ?? {},
       lastOpenedContent: saved?.lastOpenedContent ?? null,
       lastVisitDate: saved?.lastVisitDate ?? today(),
     };
@@ -67,6 +69,29 @@ export function useLearnerProgress() {
     });
   }
 
+  function saveChapterCompletion(nextCompletion: ChapterCompletion) {
+    const key = getChapterCompletionKey(nextCompletion.bookId, nextCompletion.chapterId);
+    setProgress((current) => {
+      const existing = current.chapterCompletions?.[key];
+      const completion: ChapterCompletion = {
+        ...nextCompletion,
+        completed: true,
+        completedAt: existing?.completedAt ?? nextCompletion.completedAt ?? new Date().toISOString(),
+        totalReadingSeconds: Math.max(existing?.totalReadingSeconds ?? 0, nextCompletion.totalReadingSeconds),
+        savedWordsCount: nextCompletion.savedWordsCount,
+      };
+
+      return {
+        ...current,
+        lastVisitDate: today(),
+        chapterCompletions: {
+          ...(current.chapterCompletions ?? {}),
+          [key]: completion,
+        },
+      };
+    });
+  }
+
   function selectLanguage(language: NativeLanguage) {
     setProgress((current) => ({ ...current, selectedLanguage: language }));
   }
@@ -75,8 +100,13 @@ export function useLearnerProgress() {
     progress,
     saveReadingProgress,
     saveLastOpenedContent,
+    saveChapterCompletion,
     selectLanguage,
   };
+}
+
+export function getChapterCompletionKey(bookId: string, chapterId: string) {
+  return `${bookId}:${chapterId}`;
 }
 
 function migrateLessonProgress(saved: Partial<LearnerProgress> & { lessonProgress?: Record<string, number> } | null) {

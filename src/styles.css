@@ -3009,6 +3009,88 @@ p {
   line-height: 1.55;
 }
 
+.chapter-completion-page {
+  min-height: 100dvh;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 18px;
+  padding: clamp(18px, 4vw, 42px);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.82), transparent 34%),
+    #f7f1e5;
+  color: var(--ink);
+}
+
+.completion-back-button {
+  justify-self: start;
+  max-width: min(760px, 100%);
+}
+
+.chapter-completion-card {
+  display: grid;
+  gap: 16px;
+  width: min(760px, 100%);
+  padding: clamp(22px, 5vw, 38px);
+  border: 1px solid rgba(30, 58, 138, 0.12);
+  border-radius: 28px;
+  background: rgba(255, 252, 245, 0.96);
+  box-shadow: 0 28px 80px rgba(30, 58, 138, 0.14);
+}
+
+.completion-mark {
+  display: grid;
+  width: 58px;
+  height: 58px;
+  place-items: center;
+  border-radius: 20px;
+  background: var(--purple-soft);
+  color: var(--purple);
+}
+
+.chapter-completion-card h1 {
+  color: var(--ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2rem, 6vw, 3.6rem);
+  line-height: 1;
+}
+
+.completion-chapter-title {
+  display: grid;
+  gap: 4px;
+}
+
+.completion-chapter-title span {
+  color: var(--ink);
+  font-size: clamp(1.18rem, 3vw, 1.6rem);
+  font-weight: 860;
+}
+
+.completion-chapter-title small,
+.completion-note {
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.completion-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.completion-stats .metric {
+  min-height: auto;
+  padding: 14px;
+  border-radius: 18px;
+}
+
+.completion-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
 @keyframes reader-page-next {
   from {
     opacity: 0.74;
@@ -3800,6 +3882,39 @@ blockquote {
   }
 
   .timer-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .chapter-completion-page {
+    align-content: start;
+    min-height: 100dvh;
+    padding: 14px 12px calc(104px + env(safe-area-inset-bottom));
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .completion-back-button {
+    justify-self: stretch;
+  }
+
+  .chapter-completion-card {
+    gap: 14px;
+    padding: 20px 16px;
+    border-radius: 24px;
+  }
+
+  .completion-mark {
+    width: 52px;
+    height: 52px;
+    border-radius: 18px;
+  }
+
+  .completion-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .completion-actions {
+    display: grid;
     grid-template-columns: 1fr;
   }
 
