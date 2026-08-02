@@ -656,8 +656,11 @@ function HomeContinuePanel({
         <h2>{book.title}</h2>
         <p>{book.author}</p>
         <span>{isStory ? "Рассказ" : lastOpened.chapterId ?? book.chapter}</span>
-        <Progress value={progressInfo?.progressPercent ?? 0} />
-        <small>{progressLabel}</small>
+        <BookProgressBar
+          percent={progressInfo?.progressPercent ?? 0}
+          isCompleted={Boolean(progressInfo?.isCompleted)}
+          label={progressLabel}
+        />
         <button className="primary-button" type="button" onClick={onContinue}>{actionLabel}</button>
       </div>
     </section>
@@ -1112,7 +1115,12 @@ function BookCover({
         </span>
         {!isMinimalCover && progressInfo.isStarted && !book.comingSoon ? (
           <span className={progressInfo.isCompleted ? "cover-progress completed" : "cover-progress"}>
-            <span style={{ width: `${safeProgress}%` }} />
+            <span className="cover-progress-track">
+              <span
+                className={progressInfo.isCompleted ? "cover-progress-fill completed" : "cover-progress-fill"}
+                style={{ width: `${progressInfo.isCompleted ? 100 : safeProgress}%` }}
+              />
+            </span>
             <small>{safeProgress}%</small>
           </span>
         ) : !isMinimalCover ? (
@@ -1168,10 +1176,11 @@ function BookInfoPopover({
       {!book.comingSoon ? <span className="book-progress-location">{meta.locationLabel}</span> : null}
       <p>{meta.description}</p>
       {!book.comingSoon ? (
-        <span className={progressInfo.isCompleted ? "details-progress completed" : "details-progress"}>
-          <span style={{ width: `${meta.safeProgress}%` }} />
-          <small>{meta.progressLabel}</small>
-        </span>
+        <BookProgressBar
+          percent={meta.safeProgress}
+          isCompleted={progressInfo.isCompleted}
+          label={meta.progressLabel}
+        />
       ) : null}
       <button className="book-info-button" type="button" disabled={book.comingSoon} onClick={() => (progressInfo.isCompleted ? onOpenBookPage(book.id) : onOpen(book.id))}>
         {meta.buttonLabel}
@@ -1231,10 +1240,11 @@ function BookInfoSheet({
           {!book.comingSoon ? <span className="book-progress-location">{meta.locationLabel}</span> : null}
           <p>{meta.description}</p>
           {!book.comingSoon ? (
-            <span className={progressInfo.isCompleted ? "details-progress completed" : "details-progress"}>
-              <span style={{ width: `${meta.safeProgress}%` }} />
-              <small>{meta.progressLabel}</small>
-            </span>
+            <BookProgressBar
+              percent={meta.safeProgress}
+              isCompleted={progressInfo.isCompleted}
+              label={meta.progressLabel}
+            />
           ) : null}
           <button className="book-info-button" type="button" disabled={book.comingSoon} onClick={() => (progressInfo.isCompleted ? onOpenBookPage(book.id) : onOpen(book.id))}>
             {meta.buttonLabel}
@@ -2057,8 +2067,11 @@ function ContentDetailPage({
           <p className="content-detail-description">{meta.description}</p>
           {!book.comingSoon ? (
             <div className="content-detail-progress">
-              <Progress value={progressInfo.progressPercent} />
-              <small>{meta.progressLabel}</small>
+              <BookProgressBar
+                percent={progressInfo.progressPercent}
+                isCompleted={progressInfo.isCompleted}
+                label={meta.progressLabel}
+              />
             </div>
           ) : null}
           {!book.comingSoon ? <small className="book-progress-location">{meta.locationLabel}</small> : null}
@@ -3722,6 +3735,30 @@ function Metric({ label, value }: { label: string; value: string }) {
       <span>{label}</span>
       <strong>{value}</strong>
     </article>
+  );
+}
+
+function BookProgressBar({ percent, isCompleted, label }: { percent: number; isCompleted: boolean; label: string }) {
+  const safePercent = Math.min(100, Math.max(0, Math.round(percent)));
+  const fillPercent = isCompleted ? 100 : Math.min(99, safePercent);
+
+  return (
+    <span className="details-progress">
+      <span
+        className="book-progress-track"
+        role="progressbar"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={fillPercent}
+        aria-label={isCompleted ? "Книга прочитана" : `Прочитано ${safePercent}%`}
+      >
+        <span
+          className={isCompleted ? "book-progress-fill book-progress-fill--completed" : "book-progress-fill"}
+          style={{ width: `${fillPercent}%` }}
+        />
+      </span>
+      <small>{label}</small>
+    </span>
   );
 }
 
