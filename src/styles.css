@@ -626,6 +626,77 @@ p {
   color: var(--muted);
 }
 
+.content-chapters-panel {
+  display: grid;
+  gap: 16px;
+  padding: clamp(18px, 3vw, 28px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: var(--soft-shadow);
+}
+
+.content-chapters-heading {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.content-chapters-heading h2 {
+  color: var(--ink);
+  font-size: clamp(1.4rem, 2.4vw, 2rem);
+}
+
+.content-chapter-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.content-chapter-button {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  min-height: 58px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #fff;
+  color: var(--ink);
+  text-align: left;
+}
+
+.content-chapter-button:hover {
+  border-color: rgba(94, 73, 214, 0.28);
+  background: var(--purple-soft);
+}
+
+.content-chapter-button span {
+  display: inline-grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--cream);
+  color: var(--purple);
+  font-weight: 860;
+}
+
+.content-chapter-button strong {
+  min-width: 0;
+  color: var(--ink);
+  font-size: 0.95rem;
+}
+
+.content-chapter-button small {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 760;
+}
+
 .reading-goal-card {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 190px;

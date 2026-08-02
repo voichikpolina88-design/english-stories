@@ -488,9 +488,9 @@ function App() {
           <ContentDetailPage
             book={activeDetailBook}
             progressInfo={bookProgress[activeDetailBook.id] ?? getEmptyBookProgress(activeDetailBook)}
+            chapterCompletions={progress.chapterCompletions ?? {}}
             onBack={() => setActiveDetailId(null)}
             onOpen={openContent}
-            onOpenBookPage={openBookPage}
           />
         ) : (
           <>
@@ -679,6 +679,7 @@ function HomePage({
         lastOpened={lastOpened}
         progressInfo={lastOpenedBook ? bookProgress[lastOpenedBook.id] ?? getEmptyBookProgress(lastOpenedBook) : null}
         onContinue={onContinueLast}
+        onOpenBookPage={onOpenBookPage}
         onChooseFirstBook={() => onNavigate("library")}
       />
 
@@ -726,12 +727,14 @@ function HomeContinuePanel({
   lastOpened,
   progressInfo,
   onContinue,
+  onOpenBookPage,
   onChooseFirstBook,
 }: {
   book: HomeShelfBook | null;
   lastOpened: LastOpenedContent | null;
   progressInfo: BookReadingProgress | null;
   onContinue: () => void;
+  onOpenBookPage: (bookId: string) => void;
   onChooseFirstBook: () => void;
 }) {
   if (!book || !lastOpened) {
@@ -756,12 +759,22 @@ function HomeContinuePanel({
     : progressInfo?.isStarted
       ? `${progressInfo.progressPercent}% прочитано`
       : "Позиция сохранена";
-  const actionLabel = isStory ? "Продолжить рассказ" : "Продолжить чтение";
+  const actionLabel = progressInfo?.isCompleted
+    ? (isStory ? "Открыть рассказ" : "Открыть книгу")
+    : isStory ? "Продолжить рассказ" : "Продолжить чтение";
+  const handlePrimaryAction = () => {
+    if (progressInfo?.isCompleted) {
+      onOpenBookPage(book.id);
+      return;
+    }
+
+    onContinue();
+  };
 
   return (
     <section className="home-continue-panel">
       <div className="home-continue-book">
-        <BookCover book={book} progressInfo={progressInfo ?? getEmptyBookProgress(book)} onOpen={onContinue} featured />
+        <BookCover book={book} progressInfo={progressInfo ?? getEmptyBookProgress(book)} onOpen={handlePrimaryAction} featured />
       </div>
       <div className="home-continue-copy">
         <span className="eyebrow">Продолжить чтение</span>
@@ -773,7 +786,7 @@ function HomeContinuePanel({
           isCompleted={Boolean(progressInfo?.isCompleted)}
           label={progressLabel}
         />
-        <button className="primary-button" type="button" onClick={onContinue}>{actionLabel}</button>
+        <button className="primary-button" type="button" onClick={handlePrimaryAction}>{actionLabel}</button>
       </div>
     </section>
   );
@@ -784,7 +797,7 @@ function RecommendationCard({
   onOpen,
 }: {
   book: HomeShelfBook;
-  onOpen: (bookId: string) => void;
+  onOpen: (bookId: string, options?: OpenContentOptions) => void;
 }) {
   const [imageFailed, setImageFailed] = useState(false);
   const hasCoverImage = Boolean(book.coverImage && !imageFailed);
@@ -2176,18 +2189,29 @@ function shuffleArray<T>(items: T[]) {
 function ContentDetailPage({
   book,
   progressInfo,
+  chapterCompletions,
   onBack,
   onOpen,
-  onOpenBookPage,
 }: {
   book: HomeShelfBook;
   progressInfo: BookReadingProgress;
+  chapterCompletions: Record<string, ChapterCompletion>;
   onBack: () => void;
-  onOpen: (bookId: string) => void;
-  onOpenBookPage: (bookId: string) => void;
+  onOpen: (bookId: string, options?: OpenContentOptions) => void;
 }) {
   const meta = getBookInfoMeta(book, progressInfo);
   const cardState = getBookCardState(book, progressInfo);
+  const readerBook = getReaderBook(book.id);
+  const firstChapter = readerBook?.chapters[0];
+
+  function openChapter(chapterId: string) {
+    onOpen(book.id, {
+      chapterId,
+      readingProgress: progressInfo.isCompleted ? 100 : progressInfo.progressPercent,
+      scrollPosition: 0,
+      restorePosition: false,
+    });
+  }
 
   return (
     <main className="page-stack content-detail-page">
@@ -2217,11 +2241,46 @@ function ContentDetailPage({
             </div>
           ) : null}
           {cardState.canOpen ? <small className="book-progress-location">{meta.locationLabel}</small> : null}
-          <button className="primary-button" type="button" disabled={!cardState.canOpen} onClick={() => (progressInfo.isCompleted ? onOpenBookPage(book.id) : onOpen(book.id))}>
-            {cardState.canOpen ? meta.buttonLabel : "Скоро будет доступно"}
+          <button
+            className="primary-button"
+            type="button"
+            disabled={!cardState.canOpen}
+            onClick={() => {
+              if (!cardState.canOpen) return;
+              if (progressInfo.isCompleted && firstChapter) {
+                openChapter(firstChapter.id);
+                return;
+              }
+              onOpen(book.id);
+            }}
+          >
+            {cardState.canOpen ? (progressInfo.isCompleted ? "Перечитать" : meta.buttonLabel) : "Скоро будет доступно"}
           </button>
         </div>
       </section>
+      {readerBook && cardState.canOpen ? (
+        <section className="content-chapters-panel">
+          <div className="content-chapters-heading">
+            <div>
+              <span className="eyebrow">Главы</span>
+              <h2>Выберите главу</h2>
+            </div>
+            {progressInfo.isCompleted ? <span className="book-progress-location">Книга прочитана · можно перечитывать с любой главы</span> : null}
+          </div>
+          <div className="content-chapter-list">
+            {readerBook.chapters.map((chapter) => {
+              const isCompleted = Boolean(chapterCompletions[getChapterCompletionKey(book.id, chapter.id)]?.completed);
+              return (
+                <button key={chapter.id} type="button" className="content-chapter-button" onClick={() => openChapter(chapter.id)}>
+                  <span>{chapter.number}</span>
+                  <strong>{chapter.title}</strong>
+                  {isCompleted ? <small>Прочитано</small> : <small>Открыть</small>}
+                </button>
+              );
+            })}
+          </div>
+        </section>
+      ) : null}
     </main>
   );
 }
