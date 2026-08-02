@@ -22,7 +22,7 @@ import {
   normalizeVocabularyAnswer,
 } from "./services/vocabularyHelpers";
 import { useSavedVocabulary } from "./services/vocabularyStorage";
-import type { ChapterCompletion, LastOpenedContent, NativeLanguage, ReaderChapter, ReaderPosition, ReadingSession, ReadingSettings, SavedVocabularyWord } from "./types";
+import type { BookCompletion, ChapterCompletion, LastOpenedContent, NativeLanguage, ReaderChapter, ReaderPosition, ReadingSession, ReadingSettings, SavedVocabularyWord } from "./types";
 
 type Page = "home" | "library" | "dictionary" | "profile";
 
@@ -61,6 +61,16 @@ type OpenContentOptions = {
   readingProgress?: number;
   scrollPosition?: number;
   restorePosition?: boolean;
+};
+
+type CompleteChapterInput = {
+  bookId: string;
+  chapterId: string;
+  chapterIds: string[];
+  readingSeconds: number;
+  savedWordsCount: number;
+  readingProgress: number;
+  completedAt?: string;
 };
 
 const READING_SETTINGS_KEY = "storylingo-reading-settings";
@@ -183,7 +193,7 @@ function App() {
   const [goalDialogOpen, setGoalDialogOpen] = useState(false);
   const closeInfoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pendingScrollPosition = useRef<number | null>(null);
-  const { progress, saveChapterCompletion, saveLastOpenedContent, saveReadingProgress, selectLanguage } = useLearnerProgress();
+  const { completeChapterAndUpdateBook, progress, saveLastOpenedContent, saveReadingProgress, selectLanguage } = useLearnerProgress();
   const allItems = homeShelfBooks;
   const activeBook = allItems.find((book) => book.id === activeBookId) ?? null;
   const activeDetailBook = allItems.find((book) => book.id === activeDetailId) ?? null;
@@ -348,7 +358,7 @@ function App() {
             readingTimer={readingTimer}
             chapterCompletions={progress.chapterCompletions ?? {}}
             onChapterChange={setActiveReaderChapterId}
-            onChapterComplete={saveChapterCompletion}
+            onChapterComplete={completeChapterAndUpdateBook}
             onChapterOpen={(chapterId, readingProgress) =>
               saveOpenedContent(activeBook, {
                 chapterId,
@@ -1894,14 +1904,14 @@ function getReadingSecondsForBook(sessions: ReadingSession[], bookId: string, cu
   return savedSeconds + currentSessionSeconds;
 }
 
-function buildBookReadingProgressMap(books: HomeShelfBook[], progress: { readingProgress: Record<string, number>; chapterCompletions?: Record<string, ChapterCompletion> }, sessions: ReadingSession[]) {
+function buildBookReadingProgressMap(books: HomeShelfBook[], progress: { readingProgress: Record<string, number>; chapterCompletions?: Record<string, ChapterCompletion>; bookCompletions?: Record<string, BookCompletion> }, sessions: ReadingSession[]) {
   return books.reduce<Record<string, BookReadingProgress>>((result, book) => {
     result[book.id] = getBookReadingProgress(book, progress, sessions);
     return result;
   }, {});
 }
 
-function getBookReadingProgress(book: HomeShelfBook, progress: { readingProgress: Record<string, number>; chapterCompletions?: Record<string, ChapterCompletion> }, sessions: ReadingSession[]): BookReadingProgress {
+function getBookReadingProgress(book: HomeShelfBook, progress: { readingProgress: Record<string, number>; chapterCompletions?: Record<string, ChapterCompletion>; bookCompletions?: Record<string, BookCompletion> }, sessions: ReadingSession[]): BookReadingProgress {
   if (book.comingSoon) return getEmptyBookProgress(book);
 
   const readerBook = getReaderBook(book.id);
@@ -1914,7 +1924,10 @@ function getBookReadingProgress(book: HomeShelfBook, progress: { readingProgress
   const totalReadingSeconds = sessions
     .filter((session) => session.contentId === book.id)
     .reduce((sum, session) => sum + session.durationSeconds, 0);
-  const isCompleted = totalChapterCount > 0 && completedChapterCount >= totalChapterCount;
+  const allChaptersCompleted = readerBook
+    ? readerBook.chapters.every((chapter) => completedChapterIds.includes(chapter.id))
+    : totalChapterCount > 0 && completedChapterCount >= totalChapterCount;
+  const isCompleted = allChaptersCompleted && Boolean(progress.bookCompletions?.[book.id]?.completed ?? true);
   const savedProgress = progress.readingProgress[book.id] ?? 0;
   const positionProgress = savedPosition?.progressRatio !== undefined ? Math.round(savedPosition.progressRatio * 100) : 0;
   const fallbackChapterProgress = totalChapterCount > 0 ? Math.round((completedChapterCount / totalChapterCount) * 100) : 0;
@@ -2118,7 +2131,7 @@ function ReaderPreview({
   readingTimer: ReturnType<typeof useReadingTimer>;
   chapterCompletions: Record<string, ChapterCompletion>;
   onChapterChange: (chapterId: string) => void;
-  onChapterComplete: (completion: ChapterCompletion) => void;
+  onChapterComplete: (completion: CompleteChapterInput) => void;
   onChapterOpen: (chapterId: string, readingProgress: number) => void;
   onReturnToBook: () => void;
   onReturnToLibrary: () => void;
@@ -2413,12 +2426,12 @@ function ReaderPreview({
     onChapterComplete({
       bookId: book.id,
       chapterId: chapter.id,
-      completed: true,
+      chapterIds: readerBook?.chapters.map((item) => item.id) ?? [chapter.id],
       completedAt,
-      totalReadingSeconds: chapterReadingSeconds,
+      readingSeconds: chapterReadingSeconds,
       savedWordsCount: chapterSavedWords.length,
+      readingProgress: nextProgress,
     });
-    onProgressRef.current(nextProgress);
     saveOpenedContentForReader(chapter.id, nextProgress);
     readingTimer.finishSession();
     setCompletionOpen(true);

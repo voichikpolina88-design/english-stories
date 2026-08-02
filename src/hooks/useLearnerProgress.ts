@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import type { ChapterCompletion, LastOpenedContent, LearnerProgress, NativeLanguage } from "../types";
+import { getReaderBook } from "../data/aliceReader";
+import type { BookCompletion, ChapterCompletion, LastOpenedContent, LearnerProgress, NativeLanguage } from "../types";
 
 const STORAGE_KEY = "english-stories-progress";
 
@@ -9,13 +10,24 @@ const defaultProgress: LearnerProgress = {
   selectedLanguage: "Russian",
   readingProgress: {},
   chapterCompletions: {},
+  bookCompletions: {},
   lastVisitDate: today(),
+};
+
+type CompleteChapterInput = {
+  bookId: string;
+  chapterId: string;
+  chapterIds: string[];
+  readingSeconds: number;
+  savedWordsCount: number;
+  readingProgress: number;
+  completedAt?: string;
 };
 
 export function useLearnerProgress() {
   const [progress, setProgress] = useState<LearnerProgress>(() => {
     const saved = readProgressFromStorage();
-    return {
+    return repairCompletedBookState({
       ...defaultProgress,
       ...saved,
       selectedLanguage: saved?.selectedLanguage ?? defaultProgress.selectedLanguage,
@@ -24,9 +36,10 @@ export function useLearnerProgress() {
         ...(saved?.readingProgress ?? {}),
       },
       chapterCompletions: saved?.chapterCompletions ?? {},
+      bookCompletions: saved?.bookCompletions ?? {},
       lastOpenedContent: saved?.lastOpenedContent ?? null,
       lastVisitDate: saved?.lastVisitDate ?? today(),
-    };
+    });
   });
 
   useEffect(() => {
@@ -92,6 +105,64 @@ export function useLearnerProgress() {
     });
   }
 
+  function completeChapterAndUpdateBook(input: CompleteChapterInput) {
+    const completedAt = input.completedAt ?? new Date().toISOString();
+    setProgress((current) => {
+      const chapterKey = getChapterCompletionKey(input.bookId, input.chapterId);
+      const existingChapter = current.chapterCompletions?.[chapterKey];
+      const nextChapterCompletions = {
+        ...(current.chapterCompletions ?? {}),
+        [chapterKey]: {
+          bookId: input.bookId,
+          chapterId: input.chapterId,
+          completed: true,
+          completedAt: existingChapter?.completedAt ?? completedAt,
+          totalReadingSeconds: Math.max(existingChapter?.totalReadingSeconds ?? 0, input.readingSeconds),
+          savedWordsCount: input.savedWordsCount,
+        },
+      };
+      const completedChapterIds = new Set(
+        input.chapterIds.filter((chapterId) => nextChapterCompletions[getChapterCompletionKey(input.bookId, chapterId)]?.completed),
+      );
+      const isBookCompleted = input.chapterIds.length > 0 && input.chapterIds.every((chapterId) => completedChapterIds.has(chapterId));
+      const existingBook = current.bookCompletions?.[input.bookId];
+      const nextBookCompletion: BookCompletion | undefined = isBookCompleted
+        ? {
+            bookId: input.bookId,
+            completed: true,
+            completedAt: existingBook?.completedAt ?? completedAt,
+            totalChapterCount: input.chapterIds.length,
+          }
+        : existingBook;
+      const normalizedProgress = isBookCompleted ? 100 : Math.min(99, Math.max(0, Math.round(input.readingProgress)));
+
+      return repairCompletedBookState({
+        ...current,
+        lastVisitDate: today(),
+        readingProgress: {
+          ...current.readingProgress,
+          [input.bookId]: Math.max(current.readingProgress[input.bookId] ?? 0, normalizedProgress),
+        },
+        chapterCompletions: nextChapterCompletions,
+        bookCompletions: nextBookCompletion
+          ? {
+              ...(current.bookCompletions ?? {}),
+              [input.bookId]: nextBookCompletion,
+            }
+          : current.bookCompletions,
+        lastOpenedContent:
+          current.lastOpenedContent?.contentId === input.bookId
+            ? {
+                ...current.lastOpenedContent,
+                chapterId: input.chapterId,
+                readingProgress: Math.max(current.lastOpenedContent.readingProgress, normalizedProgress),
+                openedAt: completedAt,
+              }
+            : current.lastOpenedContent,
+      });
+    });
+  }
+
   function selectLanguage(language: NativeLanguage) {
     setProgress((current) => ({ ...current, selectedLanguage: language }));
   }
@@ -101,6 +172,7 @@ export function useLearnerProgress() {
     saveReadingProgress,
     saveLastOpenedContent,
     saveChapterCompletion,
+    completeChapterAndUpdateBook,
     selectLanguage,
   };
 }
@@ -121,6 +193,42 @@ function readProgressFromStorage(): (Partial<LearnerProgress> & { lessonProgress
   } catch {
     return null;
   }
+}
+
+function repairCompletedBookState(progress: LearnerProgress): LearnerProgress {
+  const chapterCompletions = progress.chapterCompletions ?? {};
+  const bookCompletions = { ...(progress.bookCompletions ?? {}) };
+  const readingProgress = { ...progress.readingProgress };
+
+  [getReaderBook("alice-in-wonderland")].forEach((book) => {
+    if (!book) return;
+    const isCompleted = book.chapters.every((chapter) => chapterCompletions[getChapterCompletionKey(book.id, chapter.id)]?.completed);
+    if (!isCompleted) return;
+
+    const existing = bookCompletions[book.id];
+    bookCompletions[book.id] = {
+      bookId: book.id,
+      completed: true,
+      completedAt: existing?.completedAt ?? getLatestChapterCompletionAt(book.id, book.chapters.map((chapter) => chapter.id), chapterCompletions),
+      totalChapterCount: book.chapters.length,
+    };
+    readingProgress[book.id] = 100;
+  });
+
+  return {
+    ...progress,
+    readingProgress,
+    chapterCompletions,
+    bookCompletions,
+  };
+}
+
+function getLatestChapterCompletionAt(bookId: string, chapterIds: string[], completions: Record<string, ChapterCompletion>) {
+  return chapterIds
+    .map((chapterId) => completions[getChapterCompletionKey(bookId, chapterId)]?.completedAt)
+    .filter((value): value is string => Boolean(value))
+    .sort()
+    .at(-1) ?? new Date().toISOString();
 }
 
 function writeProgressToStorage(progress: LearnerProgress) {
