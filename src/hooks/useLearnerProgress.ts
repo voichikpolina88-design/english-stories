@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getReaderBook } from "../data/aliceReader";
+import { comingSoonBookIds } from "../data/homeShelves";
 import type { BookCompletion, ChapterCompletion, LastOpenedContent, LearnerProgress, NativeLanguage } from "../types";
 
 const STORAGE_KEY = "english-stories-progress";
@@ -27,7 +28,7 @@ type CompleteChapterInput = {
 export function useLearnerProgress() {
   const [progress, setProgress] = useState<LearnerProgress>(() => {
     const saved = readProgressFromStorage();
-    return repairCompletedBookState({
+    return normalizeProgressForAvailability(repairCompletedBookState({
       ...defaultProgress,
       ...saved,
       selectedLanguage: saved?.selectedLanguage ?? defaultProgress.selectedLanguage,
@@ -39,7 +40,7 @@ export function useLearnerProgress() {
       bookCompletions: saved?.bookCompletions ?? {},
       lastOpenedContent: saved?.lastOpenedContent ?? null,
       lastVisitDate: saved?.lastVisitDate ?? today(),
-    });
+    }));
   });
 
   useEffect(() => {
@@ -220,6 +221,35 @@ function repairCompletedBookState(progress: LearnerProgress): LearnerProgress {
     readingProgress,
     chapterCompletions,
     bookCompletions,
+  };
+}
+
+function normalizeProgressForAvailability(progress: LearnerProgress): LearnerProgress {
+  const readingProgress = { ...progress.readingProgress };
+  const chapterCompletions = { ...(progress.chapterCompletions ?? {}) };
+  const bookCompletions = { ...(progress.bookCompletions ?? {}) };
+
+  comingSoonBookIds.forEach((bookId) => {
+    delete readingProgress[bookId];
+    delete bookCompletions[bookId];
+
+    Object.keys(chapterCompletions).forEach((key) => {
+      if (key.startsWith(`${bookId}:`)) {
+        delete chapterCompletions[key];
+      }
+    });
+  });
+
+  const lastOpenedContent = progress.lastOpenedContent && comingSoonBookIds.has(progress.lastOpenedContent.contentId)
+    ? null
+    : progress.lastOpenedContent;
+
+  return {
+    ...progress,
+    readingProgress,
+    chapterCompletions,
+    bookCompletions,
+    lastOpenedContent,
   };
 }
 

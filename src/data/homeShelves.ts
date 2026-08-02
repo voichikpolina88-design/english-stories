@@ -18,6 +18,8 @@ export type HomeShelfBook = {
   comingSoon?: boolean;
 };
 
+export const comingSoonBookIds = new Set(["secret-garden", "wonderful-wizard-of-oz"]);
+
 export type HomeShelf = {
   id: string;
   title: string;
@@ -55,14 +57,15 @@ export const libraryCatalog: HomeShelfBook[] = [
     type: "book",
     contentType: "book",
     chapter: "Глава 5",
-    readingTime: "30 мин",
-    progress: 28,
+    readingTime: "",
+    progress: 0,
     tone: "rose",
     coverStyle: "botanical",
     coverImage: "/covers/secret-garden-classic-book.jpg",
     level: "A2",
     chapters: "15 глав",
     tilt: 2,
+    comingSoon: true,
     excerpt: "When Mary Lennox was sent to Misselthwaite Manor she felt lonely and curious.",
   },
   {
@@ -72,14 +75,15 @@ export const libraryCatalog: HomeShelfBook[] = [
     type: "book",
     contentType: "book",
     chapter: "Глава 2",
-    readingTime: "22 мин",
-    progress: 64,
+    readingTime: "",
+    progress: 0,
     tone: "gold",
     coverStyle: "gold",
     coverImage: "/covers/wizard-of-oz-classic-book.jpg",
     level: "A1",
     chapters: "14 глав",
     tilt: -1,
+    comingSoon: true,
     excerpt: "Dorothy lived in the midst of the great Kansas prairies with Uncle Henry.",
   },
   {

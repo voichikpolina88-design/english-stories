@@ -1,6 +1,6 @@
 import { ArrowLeft, BookOpen, Bookmark, CheckCircle2, Clock, Home, Languages, Library, Pause, Play, Search, User, Volume2, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type Dispatch, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode, type RefObject, type SetStateAction } from "react";
-import { getCatalogBook, getCategoryBooks, homeShelfBooks, libraryCategories, type HomeShelfBook } from "./data/homeShelves";
+import { comingSoonBookIds, getCatalogBook, getCategoryBooks, homeShelfBooks, libraryCategories, type HomeShelfBook } from "./data/homeShelves";
 import { getReaderBook, getReaderChapter } from "./data/aliceReader";
 import { getChapterCompletionKey, useLearnerProgress } from "./hooks/useLearnerProgress";
 import {
@@ -54,6 +54,14 @@ type BookReadingProgress = {
   nextChapterNumber?: number;
   nextChapterTitle?: string;
   totalReadingSeconds: number;
+};
+
+type BookCardState = {
+  availability: "available" | "comingSoon";
+  canOpen: boolean;
+  showProgress: boolean;
+  progressPercent?: number;
+  primaryAction: "start" | "continue" | "open" | "comingSoon";
 };
 
 type OpenContentOptions = {
@@ -177,6 +185,28 @@ function writeReaderPosition(contentId: string, position: ReaderPosition) {
   }
 }
 
+function clearComingSoonReaderPositions() {
+  try {
+    const saved = window.localStorage.getItem(READER_POSITION_KEY);
+    if (!saved) return;
+
+    const positions = JSON.parse(saved) as Record<string, ReaderPosition>;
+    let changed = false;
+    comingSoonBookIds.forEach((bookId) => {
+      if (positions[bookId]) {
+        delete positions[bookId];
+        changed = true;
+      }
+    });
+
+    if (changed) {
+      window.localStorage.setItem(READER_POSITION_KEY, JSON.stringify(positions));
+    }
+  } catch {
+    // Ignore invalid stored reader positions; reading remains available.
+  }
+}
+
 function getDefaultChapterId(book: HomeShelfBook) {
   const readerBook = getReaderBook(book.id);
   if (!readerBook) return book.chapter;
@@ -197,7 +227,8 @@ function App() {
   const allItems = homeShelfBooks;
   const activeBook = allItems.find((book) => book.id === activeBookId) ?? null;
   const activeDetailBook = allItems.find((book) => book.id === activeDetailId) ?? null;
-  const lastOpenedBook = progress.lastOpenedContent ? getShelfBook(progress.lastOpenedContent.contentId) : null;
+  const savedLastOpenedBook = progress.lastOpenedContent ? getShelfBook(progress.lastOpenedContent.contentId) : null;
+  const lastOpenedBook = savedLastOpenedBook && !savedLastOpenedBook.comingSoon ? savedLastOpenedBook : null;
   const readingTimer = useReadingTimer(
     activeBook
       ? {
@@ -211,6 +242,10 @@ function App() {
     () => buildBookReadingProgressMap(allItems, progress, readingTimer.sessions),
     [allItems, progress, readingTimer.sessions],
   );
+
+  useEffect(() => {
+    clearComingSoonReaderPositions();
+  }, []);
 
   function navigate(nextPage: Page) {
     setPage(nextPage);
@@ -240,6 +275,8 @@ function App() {
   }
 
   function saveOpenedContent(book: HomeShelfBook, options: OpenContentOptions = {}) {
+    if (book.comingSoon) return;
+
     const fallbackProgress = bookProgress[book.id]?.progressPercent ?? progress.readingProgress[book.id] ?? 0;
     saveLastOpenedContent({
       contentId: book.id,
@@ -255,20 +292,21 @@ function App() {
     const book = getShelfBook(contentId);
     if (!book) return;
 
-    const restorePosition = options.restorePosition ?? true;
-    pendingScrollPosition.current = restorePosition ? options.scrollPosition ?? progress.lastOpenedContent?.scrollPosition ?? null : null;
-    saveOpenedContent(book, options);
     setBookInfo(null);
     setSheetInfo(null);
-    setPage("home");
 
     if (book.comingSoon) {
+      pendingScrollPosition.current = null;
       setActiveBookId(null);
       setActiveReaderChapterId(null);
       setActiveDetailId(book.id);
       return;
     }
 
+    const restorePosition = options.restorePosition ?? true;
+    pendingScrollPosition.current = restorePosition ? options.scrollPosition ?? progress.lastOpenedContent?.scrollPosition ?? null : null;
+    saveOpenedContent(book, options);
+    setPage("home");
     setActiveDetailId(null);
     setActiveReaderChapterId(options.chapterId ?? getDefaultChapterId(book));
     setActiveBookId(book.id);
@@ -293,6 +331,9 @@ function App() {
 
   function continueLastOpened() {
     if (!progress.lastOpenedContent) return;
+    const book = getShelfBook(progress.lastOpenedContent.contentId);
+    if (!book || book.comingSoon) return;
+
     openContent(progress.lastOpenedContent.contentId, {
       chapterId: progress.lastOpenedContent.chapterId,
       readingProgress: progress.lastOpenedContent.readingProgress,
@@ -324,12 +365,13 @@ function App() {
   }
 
   function startReadingFromGoal() {
-    if (progress.lastOpenedContent && allItems.some((item) => item.id === progress.lastOpenedContent?.contentId)) {
+    const lastOpened = progress.lastOpenedContent ? getShelfBook(progress.lastOpenedContent.contentId) : null;
+    if (progress.lastOpenedContent && lastOpened && !lastOpened.comingSoon) {
       continueLastOpened();
       return;
     }
 
-    if (readingTimer.lastContentId && allItems.some((item) => item.id === readingTimer.lastContentId)) {
+    if (readingTimer.lastContentId && allItems.some((item) => item.id === readingTimer.lastContentId && !item.comingSoon)) {
       openContent(readingTimer.lastContentId);
       return;
     }
@@ -1011,7 +1053,8 @@ function BookCover({
   compact?: boolean;
   featured?: boolean;
 }) {
-  const safeProgress = progressInfo.progressPercent;
+  const cardState = getBookCardState(book, progressInfo);
+  const safeProgress = cardState.progressPercent ?? progressInfo.progressPercent;
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageFailed, setImageFailed] = useState(false);
   const pointerStart = useRef<{ x: number; y: number } | null>(null);
@@ -1042,7 +1085,7 @@ function BookCover({
   }
 
   function handleCoverClick(event: React.MouseEvent<HTMLDivElement>) {
-    if (book.comingSoon && !canShowInfo) return;
+    if (!cardState.canOpen && !canShowInfo) return;
 
     if (!canShowInfo) {
       onOpen(book.id);
@@ -1084,6 +1127,10 @@ function BookCover({
       onKeyDown={(event) => {
         if (event.key === "Enter" || event.key === " ") {
           event.preventDefault();
+          if (!cardState.canOpen && !canShowInfo) {
+            return;
+          }
+
           if (canShowInfo) {
             showInfo(event.currentTarget);
           } else {
@@ -1108,12 +1155,12 @@ function BookCover({
           />
         ) : null}
         {book.original ? <span className="original-ribbon">StoryLingo Original</span> : null}
-        {book.comingSoon ? <span className="soon-ribbon">Скоро</span> : null}
+        {cardState.availability === "comingSoon" ? <span className="soon-ribbon">Скоро</span> : null}
         <span className={hasCoverImage || isMinimalCover ? "cover-frame image-cover-copy" : "cover-frame"}>
           <span className="cover-title">{book.title}</span>
           <span className="cover-author">{book.author}</span>
         </span>
-        {!isMinimalCover && progressInfo.isStarted && !book.comingSoon ? (
+        {!isMinimalCover && cardState.showProgress && progressInfo.isStarted ? (
           <span className={progressInfo.isCompleted ? "cover-progress completed" : "cover-progress"}>
             <span className="cover-progress-track">
               <span
@@ -1124,7 +1171,7 @@ function BookCover({
             <small>{safeProgress}%</small>
           </span>
         ) : !isMinimalCover ? (
-          <span className="cover-meta">{book.comingSoon ? "Скоро" : "Не начато"}</span>
+          <span className="cover-meta">{cardState.availability === "comingSoon" ? "Скоро" : "Не начато"}</span>
         ) : null}
       </span>
       <span className="book-pages" aria-hidden="true" />
@@ -1150,6 +1197,7 @@ function BookInfoPopover({
   onRequestClose: () => void;
 }) {
   const meta = getBookInfoMeta(book, progressInfo);
+  const cardState = getBookCardState(book, progressInfo);
   const cardWidth = 292;
   const gap = 18;
   const viewportWidth = window.innerWidth;
@@ -1173,16 +1221,16 @@ function BookInfoPopover({
       <strong>{book.title}</strong>
       <span>{book.author}</span>
       <small>{meta.metaLine}</small>
-      {!book.comingSoon ? <span className="book-progress-location">{meta.locationLabel}</span> : null}
+      {cardState.canOpen ? <span className="book-progress-location">{meta.locationLabel}</span> : null}
       <p>{meta.description}</p>
-      {!book.comingSoon ? (
+      {cardState.showProgress ? (
         <BookProgressBar
           percent={meta.safeProgress}
           isCompleted={progressInfo.isCompleted}
           label={meta.progressLabel}
         />
       ) : null}
-      <button className="book-info-button" type="button" disabled={book.comingSoon} onClick={() => (progressInfo.isCompleted ? onOpenBookPage(book.id) : onOpen(book.id))}>
+      <button className="book-info-button" type="button" disabled={!cardState.canOpen} onClick={() => (progressInfo.isCompleted ? onOpenBookPage(book.id) : onOpen(book.id))}>
         {meta.buttonLabel}
       </button>
     </aside>
@@ -1203,6 +1251,7 @@ function BookInfoSheet({
   onOpenBookPage: (bookId: string) => void;
 }) {
   const meta = getBookInfoMeta(book, progressInfo);
+  const cardState = getBookCardState(book, progressInfo);
   const [imageFailed, setImageFailed] = useState(false);
   const dragStartY = useRef<number | null>(null);
   const hasCoverImage = Boolean(book.coverImage && !imageFailed);
@@ -1237,16 +1286,16 @@ function BookInfoSheet({
           <strong>{book.title}</strong>
           <span>{book.author}</span>
           <small>{meta.metaLine}</small>
-          {!book.comingSoon ? <span className="book-progress-location">{meta.locationLabel}</span> : null}
+          {cardState.canOpen ? <span className="book-progress-location">{meta.locationLabel}</span> : null}
           <p>{meta.description}</p>
-          {!book.comingSoon ? (
+          {cardState.showProgress ? (
             <BookProgressBar
               percent={meta.safeProgress}
               isCompleted={progressInfo.isCompleted}
               label={meta.progressLabel}
             />
           ) : null}
-          <button className="book-info-button" type="button" disabled={book.comingSoon} onClick={() => (progressInfo.isCompleted ? onOpenBookPage(book.id) : onOpen(book.id))}>
+          <button className="book-info-button" type="button" disabled={!cardState.canOpen} onClick={() => (progressInfo.isCompleted ? onOpenBookPage(book.id) : onOpen(book.id))}>
             {meta.buttonLabel}
           </button>
         </div>
@@ -1256,19 +1305,22 @@ function BookInfoSheet({
 }
 
 function getBookInfoMeta(book: HomeShelfBook, progressInfo: BookReadingProgress) {
+  const cardState = getBookCardState(book, progressInfo);
   const safeProgress = progressInfo.progressPercent;
   const level = book.level ?? (book.type === "book" ? "A2" : "A1");
   const chapters = book.chapters ?? (book.type === "book" ? "10 глав" : "1 рассказ");
-  const description = book.excerpt.length > 156 ? `${book.excerpt.slice(0, 153)}...` : book.excerpt;
-  const timeLabel = book.comingSoon ? "Скоро" : progressInfo.isStarted ? `Читали ${formatReadingDuration(progressInfo.totalReadingSeconds)}` : "Ещё не читали";
-  const metaLine = `${level} · ${chapters} · ${timeLabel}`;
+  const description = cardState.availability === "comingSoon"
+    ? "Книга готовится: мы добавим полный текст, переводы слов, аудио и упражнения."
+    : book.excerpt.length > 156 ? `${book.excerpt.slice(0, 153)}...` : book.excerpt;
+  const timeLabel = progressInfo.isStarted ? `Читали ${formatReadingDuration(progressInfo.totalReadingSeconds)}` : "Ещё не читали";
+  const metaLine = cardState.availability === "comingSoon" ? `${level} · ${chapters}` : `${level} · ${chapters} · ${timeLabel}`;
   const progressLabel = progressInfo.isCompleted
     ? (book.type === "story" ? "Рассказ прочитан ✓" : "Книга прочитана ✓")
     : progressInfo.isStarted
       ? `${safeProgress}% прочитано`
       : "Ещё не начинали";
   const locationLabel = getProgressLocationLabel(book, progressInfo);
-  const buttonLabel = book.comingSoon
+  const buttonLabel = cardState.primaryAction === "comingSoon"
     ? "Скоро"
     : progressInfo.isCompleted
       ? book.type === "story" ? "Открыть рассказ" : "Открыть книгу"
@@ -1963,6 +2015,25 @@ function getBookReadingProgress(book: HomeShelfBook, progress: { readingProgress
   };
 }
 
+function getBookCardState(book: HomeShelfBook, progressInfo: BookReadingProgress): BookCardState {
+  if (book.comingSoon) {
+    return {
+      availability: "comingSoon",
+      canOpen: false,
+      showProgress: false,
+      primaryAction: "comingSoon",
+    };
+  }
+
+  return {
+    availability: "available",
+    canOpen: true,
+    showProgress: true,
+    progressPercent: progressInfo.progressPercent,
+    primaryAction: progressInfo.isCompleted ? "open" : progressInfo.isStarted ? "continue" : "start",
+  };
+}
+
 function getEmptyBookProgress(book: HomeShelfBook): BookReadingProgress {
   return {
     progressPercent: 0,
@@ -2046,6 +2117,7 @@ function ContentDetailPage({
   onOpenBookPage: (bookId: string) => void;
 }) {
   const meta = getBookInfoMeta(book, progressInfo);
+  const cardState = getBookCardState(book, progressInfo);
 
   return (
     <main className="page-stack content-detail-page">
@@ -2061,11 +2133,11 @@ function ContentDetailPage({
           <div className="content-detail-meta">
             <span>{meta.level}</span>
             <span>{meta.chapters}</span>
-            <span>{book.comingSoon ? "Скоро" : progressInfo.isStarted ? `Читали ${formatReadingDuration(progressInfo.totalReadingSeconds)}` : "Ещё не читали"}</span>
+            <span>{cardState.availability === "comingSoon" ? "Скоро" : progressInfo.isStarted ? `Читали ${formatReadingDuration(progressInfo.totalReadingSeconds)}` : "Ещё не читали"}</span>
           </div>
-          {book.comingSoon ? <strong className="soon-status">Скоро</strong> : null}
+          {cardState.availability === "comingSoon" ? <strong className="soon-status">Скоро</strong> : null}
           <p className="content-detail-description">{meta.description}</p>
-          {!book.comingSoon ? (
+          {cardState.showProgress ? (
             <div className="content-detail-progress">
               <BookProgressBar
                 percent={progressInfo.progressPercent}
@@ -2074,9 +2146,9 @@ function ContentDetailPage({
               />
             </div>
           ) : null}
-          {!book.comingSoon ? <small className="book-progress-location">{meta.locationLabel}</small> : null}
-          <button className="primary-button" type="button" disabled={book.comingSoon} onClick={() => (progressInfo.isCompleted ? onOpenBookPage(book.id) : onOpen(book.id))}>
-            {book.comingSoon ? "Скоро будет доступно" : meta.buttonLabel}
+          {cardState.canOpen ? <small className="book-progress-location">{meta.locationLabel}</small> : null}
+          <button className="primary-button" type="button" disabled={!cardState.canOpen} onClick={() => (progressInfo.isCompleted ? onOpenBookPage(book.id) : onOpen(book.id))}>
+            {cardState.canOpen ? meta.buttonLabel : "Скоро будет доступно"}
           </button>
         </div>
       </section>
