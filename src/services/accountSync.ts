@@ -67,11 +67,10 @@ type SupabaseAuthResponse = {
 
 const AUTH_STORAGE_KEY = "storylingo-supabase-session";
 
-const supabaseUrl = readSupabaseEnv("SUPABASE_URL");
-const supabaseAnonKey = readSupabaseEnv("SUPABASE_ANON_KEY");
+const supabaseConfig = readSupabaseConfig();
 
 export function isSupabaseConfigured() {
-  return Boolean(supabaseUrl && supabaseAnonKey);
+  return Boolean(supabaseConfig.url && supabaseConfig.publicKey);
 }
 
 export function getStoredSession(): SupabaseSession | null {
@@ -221,9 +220,12 @@ export function mergeAccountSnapshots(local: LocalAccountSnapshot, cloud: StoryL
   };
 }
 
-function readSupabaseEnv(name: "SUPABASE_URL" | "SUPABASE_ANON_KEY") {
+function readSupabaseConfig() {
   const env = import.meta.env as Record<string, string | undefined>;
-  return env[name] || env[`VITE_${name}`] || "";
+  return {
+    url: env.VITE_SUPABASE_URL || "",
+    publicKey: env.VITE_SUPABASE_PUBLISHABLE_KEY || env.VITE_SUPABASE_ANON_KEY || "",
+  };
 }
 
 async function requestAuthSession(path: string, email: string, password: string) {
@@ -422,17 +424,17 @@ async function supabaseFetch<T = unknown>(
     body?: unknown;
   } = {},
 ): Promise<T> {
-  if (!supabaseUrl || !supabaseAnonKey) {
+  if (!supabaseConfig.url || !supabaseConfig.publicKey) {
     throw new Error("SUPABASE_NOT_CONFIGURED");
   }
 
   const separator = path.includes("?") ? "&" : "?";
-  const url = options.query ? `${supabaseUrl}${path}${separator}${options.query}` : `${supabaseUrl}${path}`;
+  const url = options.query ? `${supabaseConfig.url}${path}${separator}${options.query}` : `${supabaseConfig.url}${path}`;
   const response = await fetch(url, {
     method: options.method ?? "GET",
     headers: {
-      apikey: supabaseAnonKey,
-      Authorization: `Bearer ${options.token ?? supabaseAnonKey}`,
+      apikey: supabaseConfig.publicKey,
+      Authorization: `Bearer ${options.token ?? supabaseConfig.publicKey}`,
       "Content-Type": "application/json",
       ...(options.prefer ? { Prefer: options.prefer } : {}),
     },
