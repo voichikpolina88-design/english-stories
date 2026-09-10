@@ -50,7 +50,7 @@ export const aliceInWonderlandBook: ReaderBook = {
             {
               "id": "alice-ch1-p3-s1",
               "text": "There was nothing so _very_ remarkable in that; nor did Alice think it so _very_ much out of the way to hear the Rabbit say to itself, “Oh dear!",
-              "translation": "В этом не было ничего уж такого _очень_ замечательного; и Алисе не показалось _очень_ странным услышать, как Кролик сказал самому себе: «Ах, боже мой!",
+              "translation": "В этом не было ничего уж такого очень замечательного; и Алисе не показалось очень странным услышать, как Кролик сказал самому себе: «Ах, боже мой!",
               "words": []
             },
             {
@@ -74,7 +74,7 @@ export const aliceInWonderlandBook: ReaderBook = {
             {
               "id": "alice-ch1-p3-s4",
               "text": "(when she thought it over afterwards, it occurred to her that she ought to have wondered at this, but at the time it all seemed quite natural); but when the Rabbit actually _took a watch out of its waistcoat-pocket_, and looked at it, and then hurried on, Alice started to her feet, for it flashed across her mind that she had never before seen a rabbit with either a waistcoat-pocket, or a watch to take out of it, and burning with curiosity, she ran across the field after it, and fortunately was just in time to see it pop down a large rabbit-hole under the hedge.",
-              "translation": "(когда она потом об этом подумала, ей пришло в голову, что этому следовало бы удивиться, но в тот момент всё казалось совершенно естественным); но когда Кролик и правда _вытащил часы из кармана жилета_, посмотрел на них и поспешил дальше, Алиса вскочила на ноги, потому что ей вдруг пришло в голову, что она никогда прежде не видела кролика ни с карманом в жилете, ни с часами, которые можно из него вынуть; сгорая от любопытства, она побежала за ним через поле и, к счастью, успела увидеть, как он юркнул в большую кроличью нору под изгородью.",
+              "translation": "(когда она потом об этом подумала, ей пришло в голову, что этому следовало бы удивиться, но в тот момент всё казалось совершенно естественным); но когда Кролик и правда вытащил часы из кармана жилета, посмотрел на них и поспешил дальше, Алиса вскочила на ноги, потому что ей вдруг пришло в голову, что она никогда прежде не видела кролика ни с карманом в жилете, ни с часами, которые можно из него вынуть; сгорая от любопытства, она побежала за ним через поле и, к счастью, успела увидеть, как он юркнул в большую кроличью нору под изгородью.",
               "words": []
             }
           ]
@@ -170,7 +170,7 @@ export const aliceInWonderlandBook: ReaderBook = {
             {
               "id": "alice-ch1-p8-s2",
               "text": "Would the fall _never_ come to an end?",
-              "translation": "Неужели это падение _никогда_ не закончится?",
+              "translation": "Неужели это падение никогда не закончится?",
               "words": []
             }
           ]
@@ -194,7 +194,7 @@ export const aliceInWonderlandBook: ReaderBook = {
             {
               "id": "alice-ch1-p8-s5",
               "text": "Let me see: that would be four thousand miles down, I think—” (for, you see, Alice had learnt several things of this sort in her lessons in the schoolroom, and though this was not a _very_ good opportunity for showing off her knowledge, as there was no one to listen to her, still it was good practice to say it over) “—yes, that’s about the right distance—but then I wonder what Latitude or Longitude I’ve got to?”",
-              "translation": "Посмотрим: это, кажется, около четырёх тысяч миль вниз...» (видите ли, Алиса выучила на уроках в классной комнате несколько таких вещей, и хотя это была не _очень_ удачная возможность показать свои знания, ведь слушать её было некому, всё же произнести это вслух было хорошей практикой) «...да, примерно такое расстояние и должно быть, но интересно, на какой я теперь широте или долготе?»",
+              "translation": "Посмотрим: это, кажется, около четырёх тысяч миль вниз...» (видите ли, Алиса выучила на уроках в классной комнате несколько таких вещей, и хотя это была не очень удачная возможность показать свои знания, ведь слушать её было некому, всё же произнести это вслух было хорошей практикой) «...да, примерно такое расстояние и должно быть, но интересно, на какой я теперь широте или долготе?»",
               "words": []
             }
           ]
@@ -230,7 +230,7 @@ export const aliceInWonderlandBook: ReaderBook = {
             {
               "id": "alice-ch1-p9-s2",
               "text": "“I wonder if I shall fall right _through_ the earth!",
-              "translation": "«Интересно, не провалюсь ли я прямо _сквозь_ Землю!",
+              "translation": "«Интересно, не провалюсь ли я прямо сквозь Землю!",
               "words": []
             },
             {
@@ -260,7 +260,7 @@ export const aliceInWonderlandBook: ReaderBook = {
             {
               "id": "alice-ch1-p9-s6",
               "text": "(and she tried to curtsey as she spoke—fancy _curtseying_ as you’re falling through the air!",
-              "translation": "(и, говоря это, она попыталась сделать реверанс — только представьте себе, _делать реверанс_, падая сквозь воздух!",
+              "translation": "(и, говоря это, она попыталась сделать реверанс — только представьте себе, делать реверанс, падая сквозь воздух!",
               "words": []
             },
             {
@@ -518,7 +518,7 @@ export const aliceInWonderlandBook: ReaderBook = {
             {
               "id": "alice-ch1-p16-s1",
               "text": "It was all very well to say “Drink me,” but the wise little Alice was not going to do _that_ in a hurry.",
-              "translation": "Сказать «Выпей меня» было, конечно, легко, но разумная маленькая Алиса не собиралась делать _это_ впопыхах.",
+              "translation": "Сказать «Выпей меня» было, конечно, легко, но разумная маленькая Алиса не собиралась делать это впопыхах.",
               "words": []
             }
           ]
@@ -530,7 +530,7 @@ export const aliceInWonderlandBook: ReaderBook = {
             {
               "id": "alice-ch1-p16-s2",
               "text": "“No, I’ll look first,” she said, “and see whether it’s marked ‘_poison_’ or not”; for she had read several nice little histories about children who had got burnt, and eaten up by wild beasts and other unpleasant things, all because they _would_ not remember the simple rules their friends had taught them: such as, that a red-hot poker will burn you if you hold it too long; and that if you cut your finger _very_ deeply with a knife, it usually bleeds; and she had never forgotten that, if you drink much from a bottle marked “poison,” it is almost certain to disagree with you, sooner or later.",
-              "translation": "«Нет, сначала я посмотрю, — сказала она, — не написано ли на ней “_яд_”»; ведь она читала несколько поучительных маленьких историй о детях, которые обжигались, бывали съедены дикими зверями и попадали в другие неприятности только потому, что _не хотели_ помнить простые правила, которым учили их друзья: например, что раскалённая кочерга обожжёт, если слишком долго держать её в руках; и что если очень глубоко порезать палец ножом, он обычно кровоточит; и она никогда не забывала, что если много выпить из бутылки с надписью «яд», то рано или поздно это почти наверняка плохо отразится на самочувствии.",
+              "translation": "«Нет, сначала я посмотрю, — сказала она, — не написано ли на ней “яд”»; ведь она читала несколько поучительных маленьких историй о детях, которые обжигались, бывали съедены дикими зверями и попадали в другие неприятности только потому, что не хотели помнить простые правила, которым учили их друзья: например, что раскалённая кочерга обожжёт, если слишком долго держать её в руках; и что если очень глубоко порезать палец ножом, он обычно кровоточит; и она никогда не забывала, что если много выпить из бутылки с надписью «яд», то рано или поздно это почти наверняка плохо отразится на самочувствии.",
               "words": []
             }
           ]
@@ -542,7 +542,7 @@ export const aliceInWonderlandBook: ReaderBook = {
             {
               "id": "alice-ch1-p17-s1",
               "text": "However, this bottle was _not_ marked “poison,” so Alice ventured to taste it, and finding it very nice, (it had, in fact, a sort of mixed flavour of cherry-tart, custard, pine-apple, roast turkey, toffee, and hot buttered toast,) she very soon finished it off.",
-              "translation": "Однако на этой бутылочке _не_ было написано «яд», поэтому Алиса решилась попробовать, и, найдя напиток очень приятным (у него, в самом деле, был какой-то смешанный вкус вишнёвого пирога, заварного крема, ананаса, жареной индейки, ирисок и горячего тоста с маслом), она очень быстро выпила всё до конца.",
+              "translation": "Однако на этой бутылочке не было написано «яд», поэтому Алиса решилась попробовать, и, найдя напиток очень приятным (у него, в самом деле, был какой-то смешанный вкус вишнёвого пирога, заварного крема, ананаса, жареной индейки, ирисок и горячего тоста с маслом), она очень быстро выпила всё до конца.",
               "words": []
             }
           ]
@@ -809,7 +809,7 @@ export const aliceInWonderlandBook: ReaderBook = {
             {
               "id": "alice-ch2-p1-s5",
               "text": "I’m sure _I_ shan’t be able!",
-              "translation": "Я уверен, что _я_ не смогу!",
+              "translation": "Я уверена, что я не смогу!",
             },
             {
               "id": "alice-ch2-p1-s6",
@@ -861,12 +861,12 @@ export const aliceInWonderlandBook: ReaderBook = {
             {
               "id": "alice-ch2-p3-s1",
               "text": "_Alice’s Right Foot, Esq., Hearthrug, near the Fender,_ (_with",
-              "translation": "_Правая нога Алисы, эсквайр, Hearthrug, возле крыла,_ (_with",
+              "translation": "Правая нога Алисы, эсквайр. Коврик у камина, возле каминной решётки (с",
             },
             {
               "id": "alice-ch2-p3-s2",
               "text": "Alice’s love_).",
-              "translation": "Любовь Алисы_).",
+              "translation": "любовью от Алисы).",
             }
           ]
         },
@@ -1183,7 +1183,7 @@ export const aliceInWonderlandBook: ReaderBook = {
             {
               "id": "alice-ch2-p13-s6",
               "text": "I am so _very_ tired of being all alone here!”",
-              "translation": "Я так _очень_ устала оставаться здесь одна!",
+              "translation": "Я так устала оставаться здесь совсем одна!",
             }
           ]
         },
@@ -1232,7 +1232,7 @@ export const aliceInWonderlandBook: ReaderBook = {
             {
               "id": "alice-ch2-p15-s1",
               "text": "“That _was_ a narrow escape!” said Alice, a good deal frightened at the sudden change, but very glad to find herself still in existence; “and now for the garden!” and she ran with all speed back to the little door: but, alas! the little door was shut again, and the little golden key was lying on the glass table as before, “and things are worse than ever,” thought the poor child, “for I never was so small as this before, never!",
-              "translation": "«Это _was_ едва удалось спастись!» — сказала Алиса, сильно напуганная внезапной переменой, но очень радующаяся тому, что она все еще существует; «А теперь в сад!» и она побежала со всей скоростью назад к маленькой двери: но, увы! дверца снова закрылась, а золотой ключик, как и раньше, лежал на стеклянном столике, «и дела обстоят хуже, чем когда-либо», — подумал бедный ребенок, — «ибо никогда я еще не был таким маленьким, как сейчас, никогда!»",
+              "translation": "«Я едва спаслась!» — сказала Алиса, сильно испуганная внезапной переменой, но очень довольная тем, что всё ещё существует; «А теперь в сад!» — и она со всех ног побежала обратно к маленькой двери. Но, увы! Дверца снова была заперта, а золотой ключик, как и прежде, лежал на стеклянном столике. «Теперь всё хуже, чем когда-либо, — подумала бедная девочка, — ведь никогда прежде я не была такой маленькой, никогда!»",
             },
             {
               "id": "alice-ch2-p15-s2",
@@ -1478,12 +1478,12 @@ export const aliceInWonderlandBook: ReaderBook = {
             {
               "id": "alice-ch2-p23-s2",
               "text": "“As if _I_ would talk on such a subject!",
-              "translation": "«Как будто _I_ стал бы говорить на такую тему!",
+              "translation": "«Как будто я стану говорить на такую тему!",
             },
             {
               "id": "alice-ch2-p23-s3",
               "text": "Our family always _hated_ cats: nasty, low, vulgar things!",
-              "translation": "Наша семья всегда _ненавидела_ кошек: гадости, низкие, пошлые вещи!",
+              "translation": "В нашей семье всегда ненавидели кошек: мерзкие, низкие, пошлые создания!",
             },
             {
               "id": "alice-ch2-p23-s4",
@@ -1740,7 +1740,7 @@ export const aliceInWonderlandBook: ReaderBook = {
             {
               "id": "alice-ch3-p9-s1",
               "text": "“Found _what_?” said the Duck.",
-              "translation": "«Нашел _что_?» — сказала Утка.",
+              "translation": "«Нашёл что?» — спросила Утка.",
             }
           ]
         },
@@ -2099,7 +2099,7 @@ export const aliceInWonderlandBook: ReaderBook = {
             {
               "id": "alice-ch3-p34-s2",
               "text": "go to law: _I_ will prosecute _you_.—Come, I’ll take no",
-              "translation": "обратиться в суд: _Я_ буду преследовать _вас_. — Пойдем, я не возьму",
+              "translation": "обратиться в суд: я буду преследовать тебя. — Пойдём, я не приму",
             },
             {
               "id": "alice-ch3-p34-s3",
@@ -2642,7 +2642,7 @@ export const aliceInWonderlandBook: ReaderBook = {
             {
               "id": "alice-ch4-p9-s3",
               "text": "I do wonder what _can_ have happened to me!",
-              "translation": "Интересно, что _может_ со мной случиться!",
+              "translation": "Интересно, что могло со мной случиться!",
             },
             {
               "id": "alice-ch4-p9-s4",
@@ -2657,7 +2657,7 @@ export const aliceInWonderlandBook: ReaderBook = {
             {
               "id": "alice-ch4-p9-s6",
               "text": "And when I grow up, I’ll write one—but I’m grown up now,” she added in a sorrowful tone; “at least there’s no room to grow up any more _here_.”",
-              "translation": "А когда вырасту, напишу, — но я теперь взрослая, — прибавила она печальным тоном, — по крайней мере, расти уже некуда _здесь_.",
+              "translation": "А когда вырасту, напишу, — но я теперь взрослая, — прибавила она печальным тоном, — по крайней мере, здесь расти уже некуда.",
             }
           ]
         },
@@ -2683,7 +2683,7 @@ export const aliceInWonderlandBook: ReaderBook = {
             {
               "id": "alice-ch4-p10-s4",
               "text": "_”",
-              "translation": "_»",
+              "translation": "»",
             }
           ]
         },
@@ -2835,7 +2835,7 @@ export const aliceInWonderlandBook: ReaderBook = {
             {
               "id": "alice-ch4-p17-s4",
               "text": "_” (Sounds of more broken glass.)",
-              "translation": "_» (Звук разбитого стекла.)",
+              "translation": "» (Снова раздаётся звон разбитого стекла.)",
             }
           ]
         },
@@ -2946,7 +2946,7 @@ export const aliceInWonderlandBook: ReaderBook = {
             {
               "id": "alice-ch4-p23-s7",
               "text": "_ I’m sure _I_ don’t want to stay in here any longer!”",
-              "translation": "_ Я уверен, _я_ не хочу здесь больше оставаться!",
+              "translation": "Я уверена, что больше не хочу здесь оставаться!",
             }
           ]
         },
@@ -2997,12 +2997,12 @@ export const aliceInWonderlandBook: ReaderBook = {
             {
               "id": "alice-ch4-p24-s9",
               "text": "_You_ do it!",
-              "translation": "_Ты_ сделай это!",
+              "translation": "Ты это сделай!",
             },
             {
               "id": "alice-ch4-p24-s10",
               "text": "—_That_ I won’t, then!",
-              "translation": "--_Это_ тогда я не буду!",
+              "translation": "— Тогда я этого не стану!",
             },
             {
               "id": "alice-ch4-p24-s11",
@@ -3109,7 +3109,7 @@ export const aliceInWonderlandBook: ReaderBook = {
             {
               "id": "alice-ch4-p31-s1",
               "text": "There was a dead silence instantly, and Alice thought to herself, “I wonder what they _will_ do next!",
-              "translation": "Мгновенно воцарилась мертвая тишина, и Алиса подумала про себя: «Интересно, что они _будут_ делать дальше!",
+              "translation": "Мгновенно воцарилась мёртвая тишина, и Алиса подумала про себя: «Интересно, что они будут делать дальше!",
             },
             {
               "id": "alice-ch4-p31-s2",
@@ -3135,7 +3135,7 @@ export const aliceInWonderlandBook: ReaderBook = {
             {
               "id": "alice-ch4-p32-s2",
               "text": "_” thought Alice; but she had not long to doubt, for the next moment a shower of little pebbles came rattling in at the window, and some of them hit her in the face.",
-              "translation": "_» — подумала Алиса; но ей не пришлось долго сомневаться: в следующую минуту в окно посыпался ливень мелких камешков, и некоторые из них попали ей в лицо.",
+              "translation": "» — подумала Алиса; но ей не пришлось долго сомневаться: в следующую минуту в окно посыпался ливень мелких камешков, и некоторые из них попали ей в лицо.",
             },
             {
               "id": "alice-ch4-p32-s3",

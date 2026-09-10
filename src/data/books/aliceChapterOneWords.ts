@@ -1,4 +1,5 @@
 import type { ReaderSentence, ReaderWord } from "../../types";
+import { aliceChaptersOneToFourLexicon } from "./aliceChaptersOneToFourLexicon";
 
 type PartOfSpeech =
   | "noun"
@@ -1204,11 +1205,49 @@ const partOfSpeechOverrides: Record<string, PartOfSpeech> = {
 
 const contextualOverrides: Record<string, Record<string, string>> = {
   bank: { "alice-ch1-p1-s1": "берег" },
+  bathing: { "alice-ch2-p16-s3": "купальные" },
+  bowed: { "alice-ch3-p29-s1": "поклонилась" },
+  capital: {
+    "alice-ch2-p10-s7": "столица",
+    "alice-ch2-p22-s3": "отлично ловит мышей",
+    "alice-ch3-p46-s2": "отлично ловит мышей",
+  },
+  charges: { "alice-ch4-p38-s1": "короткие наскоки" },
+  confused: { "alice-ch3-p22-s1": "беспорядочно" },
+  crossed: { "alice-ch2-p10-s9": "скрестила" },
   fall: { "alice-ch1-p7-s3": "падение" },
+  fixed: { "alice-ch3-p3-s4": "пристально устремлёнными" },
+  general: {
+    "alice-ch2-p16-s3": "общее",
+    "alice-ch4-p27-s1": "общий",
+  },
+  grave: { "alice-ch3-p29-s1": "серьёзными" },
+  lay: { "alice-ch4-p33-s1": "лежали" },
+  o: { "alice-ch2-p20-s3": "где" },
+  produced: { "alice-ch4-p32-s3": "вызвало" },
+  salt: {
+    "alice-ch2-p16-s1": "солёной",
+    "alice-ch3-p23-s1": "солёная",
+  },
+  spread: {
+    "alice-ch2-p12-s2": "расправляет",
+    "alice-ch4-p15-s1": "протянула",
+    "alice-ch4-p23-s2": "протянула",
+  },
+  submitted: { "alice-ch3-p4-s4": "покорены" },
   shutting: { "alice-ch1-p15-s1": "сжимаясь, как телескоп" },
   toast: { "alice-ch1-p25-s2": "тост в выражении hot buttered toast" },
   watch: { "alice-ch1-p3-s4": "часы" },
   wonder: { "alice-ch1-p9-s1": "интересно, не..." },
+};
+
+const contextualPartOfSpeechOverrides: Record<string, Record<string, PartOfSpeech>> = {
+  capital: { "alice-ch2-p10-s7": "noun" },
+  kick: {
+    "alice-ch4-p25-s4": "verb",
+    "alice-ch4-p26-s1": "noun",
+  },
+  o: { "alice-ch2-p20-s3": "adverb" },
 };
 
 const phraseOverrides: Record<string, Record<string, PhraseContext>> = {
@@ -1428,6 +1467,7 @@ export function buildAliceSentenceWords({ sentence, paragraphId, chapterId }: Bu
     const isPunctuation = normalized.length === 0;
     const lexical = isPunctuation ? punctuationEntry() : getLexicalEntry(normalized);
     const contextualTranslation = normalized ? getContextualTranslation(normalized, sentence) : undefined;
+    const partOfSpeech = contextualPartOfSpeechOverrides[normalized]?.[sentence.id] ?? lexical.partOfSpeech;
     const phraseContext = normalized ? phraseOverrides[normalized]?.[sentence.id] : undefined;
 
     return {
@@ -1441,11 +1481,11 @@ export function buildAliceSentenceWords({ sentence, paragraphId, chapterId }: Bu
       phrase: phraseContext?.phrase,
       phraseTranslation: phraseContext?.phraseTranslation,
       transcription: lexical.transcription,
-      partOfSpeech: lexical.partOfSpeech,
+      partOfSpeech,
       sentenceId: sentence.id,
       paragraphId,
       chapterId,
-      lexicalEntryId: isPunctuation ? undefined : lexicalEntryId(lexical),
+      lexicalEntryId: isPunctuation ? undefined : lexicalEntryId({ ...lexical, partOfSpeech }),
       isProperNoun: lexical.isProperNoun,
       isArchaic: lexical.isArchaic,
       isPunctuation,
@@ -1470,6 +1510,9 @@ function entry(
 function getLexicalEntry(normalized: string): LexicalEntry {
   const override = lexicalOverrides[normalized];
   if (override) return override;
+
+  const chapterOneToFourEntry = aliceChaptersOneToFourLexicon[normalized];
+  if (chapterOneToFourEntry) return chapterOneToFourEntry;
 
   const lemma = lemmaOverrides[normalized] ?? inferLemma(normalized);
   const translation = translations[normalized] ?? translations[lemma] ?? supplementalTranslations[normalized] ?? supplementalTranslations[lemma] ?? "";
